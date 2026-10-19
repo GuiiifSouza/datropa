@@ -17,7 +17,7 @@ Tudo roda num projeto GCP só, com todos os serviços na mesma região. O front 
 | `stats` | Cloud Run (`sa-stats`) | Rankings, desempenho por time, mapa e agente, análise coletiva e eventos de round para a prancheta. Lê a gold e guarda cache no Firestore |
 | `coach` | Cloud Run (`sa-coach`) | Coach de IA. Agente no Gemini que escolhe tools; cada tool é uma consulta pronta e parametrizada na gold, só leitura |
 | `ingest` | Cloud Run (`sa-ingest`) | Recebe o evento de arquivo novo, carrega o bronze e atualiza a gold |
-| Partidas brutas | Cloud Storage `raw-matches` | JSONs da base oficial do hackathon, sem transformação |
+| Partidas brutas | Cloud Storage `raw-matches` | JSONs da base oficial do hackathon, sem transformação. O nome real do bucket é `datropa-raw-matches`, porque nome de bucket é global |
 | Analytics | BigQuery, dataset `valorant` | `bronze`: NDJSON aninhado como chegou. `gold`: tabelas prontas para consulta |
 | App | Firestore | Usuários, estratégias salvas da prancheta (código curto) e cache de estatísticas |
 | IA | Vertex AI (Gemini) | Agente do coach com function calling, scouting e resumo de partidas |
@@ -87,7 +87,7 @@ As posições vêm de `kills[].playerLocations`, `victimLocation`, `plantLocatio
 
 ## Camadas de dados
 
-**Bronze.** Uma linha por partida, NDJSON aninhado do jeito que veio da API. Não se corrige nada aqui: se o dado veio errado, reprocessa a partir do bucket.
+**Bronze.** Tabela `valorant.bronze_partidas`. Uma linha por mapa, NDJSON aninhado do jeito que veio da API, com o nome do arquivo em `_arquivo`. Não se corrige nada aqui: se o dado veio errado, reprocessa a partir do bucket.
 
 **Gold.** Tabelas planas, prontas para leitura: rankings, desempenho por time, mapa e agente, análise coletiva (economia, pós-plant, retake, composições), `eventos_round` (posição dos jogadores em cada abate, plant e defuse) e `mapas` (minimapa e conversão de coordenada do jogo para o minimapa). É a única camada que `stats` e `coach` leem.
 
@@ -119,6 +119,7 @@ As posições vêm de `kills[].playerLocations`, `victimLocation`, `plantLocatio
 | Bronze/gold, sem silver | Volume pequeno. Uma camada intermediária só adicionaria passo. Se a gold ficar complexa, a silver entra |
 | Coach como agente com tools | SQL gerado livre erra e é difícil de validar. Consulta pronta e testada dá número certo; o Gemini só escolhe qual usar e explica |
 | Prancheta grava direto no Firestore | Não precisa de serviço para salvar desenho. As regras do Firestore garantem que cada um só edita o que é seu |
+| Região única `southamerica-east1` (São Paulo) | Menor latência para quem usa no Brasil. BigQuery, Cloud Run, Firestore, Eventarc e Vertex AI (Gemini) estão disponíveis nela |
 | Primeira versão em `devs.datropa.com` | Ambiente do hackathon. O domínio principal fica para depois |
 | Linguagem do back e framework do front | **Em aberto.** Registrar aqui quando o time decidir |
 
