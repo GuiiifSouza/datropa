@@ -102,7 +102,7 @@ Detalhes em [docs/dados.md](docs/dados.md). Pontos que pegam:
 ## Git e GitHub
 
 - Repo: `GuiiifSouza/datropa`, público. Nada de e-mail, chave, `.env` ou dado pessoal em commit.
-- A `main` é protegida: só entra por PR aprovado pelo dono da pasta (veja o `CODEOWNERS`).
+- Mudança entra na `main` por PR. O dono da pasta revisa (veja o `CODEOWNERS`), e o Guilherme faz o merge.
 - Branch por tarefa, commit pequeno com mensagem clara.
 - Deploy e qualquer coisa que gaste dinheiro no GCP só com o OK do Guilherme.
 - Agentes do Guilherme: no `gh`, use a conta pessoal (`GH_TOKEN=$(gh auth token --user GuiiifSouza) gh ...`) e o remoto `git@github-pessoal:GuiiifSouza/datropa.git`. Nunca a conta da Nublify.

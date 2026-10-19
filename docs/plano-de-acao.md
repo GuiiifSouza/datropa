@@ -30,7 +30,7 @@ Como cada peça funciona: [docs/arquitetura/README.md](arquitetura/README.md).
 
 **Admin é com o Guilherme.** Precisa de permissão no GCP, de uma API ligada, de um segredo, de acesso ao repo ou de mudar alguma configuração? Peça no canal. Ninguém mais mexe em IAM, billing ou configuração do repo.
 
-**Cada um na sua pasta.** O [CODEOWNERS](../.github/CODEOWNERS) define quem aprova o PR de cada pasta, e a `main` só aceita PR aprovado pelo dono.
+**Cada um na sua pasta.** O [CODEOWNERS](../.github/CODEOWNERS) define quem revisa o PR de cada pasta. O GitHub chama o dono automaticamente.
 
 ## Contrato entre front e back
 

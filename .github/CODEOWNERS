@@ -1,4 +1,4 @@
-# Quem aprova PR em cada pasta. A main só aceita PR aprovado pelo dono.
+# Quem revisa PR em cada pasta. O GitHub pede a revisão do dono automaticamente.
 # A última regra que casa com o arquivo vence.
 
 *                           @GuiiifSouza
