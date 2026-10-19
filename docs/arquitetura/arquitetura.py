@@ -84,7 +84,7 @@ with Diagram(
         usuario = User("Navegador")
         celular = Mobile("Celular")
 
-    riot = Storage("JSON de partidas\n(Riot API)")
+    riot = Storage("Base do hackathon\nJSONs da organização")
 
     with Cluster("Projeto GCP · todos os serviços na mesma região",
                  graph_attr=camada("gcp", "#fafbff")):

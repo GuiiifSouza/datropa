@@ -55,171 +55,171 @@
 <path fill="#f1f3f4" stroke="#9aa0a6" d="M20,-1842.47C20,-1842.47 992.88,-1842.47 992.88,-1842.47 998.88,-1842.47 1004.88,-1848.47 1004.88,-1854.47 1004.88,-1854.47 1004.88,-2084.47 1004.88,-2084.47 1004.88,-2090.47 998.88,-2096.47 992.88,-2096.47 992.88,-2096.47 20,-2096.47 20,-2096.47 14,-2096.47 8,-2090.47 8,-2084.47 8,-2084.47 8,-1854.47 8,-1854.47 8,-1848.47 14,-1842.47 20,-1842.47"/>
 <text xml:space="preserve" text-anchor="middle" x="36.25" y="-2078.22" font-family="Helvetica,sans-Serif" font-weight="bold" font-size="15.00" fill="#2d3436">CI/CD</text>
 </g>
-<!-- b9ea6782fab941e495aeb17b910c060f -->
+<!-- 1821c2af9f90470f9f1cbf689dc1e4ed -->
 <g id="node1" class="node">
-<title>b9ea6782fab941e495aeb17b910c060f</title>
+<title>1821c2af9f90470f9f1cbf689dc1e4ed</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/onprem/client/user.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="26" y="-554.867"/>
 <text xml:space="preserve" text-anchor="middle" x="76.4" y="-437.22" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Navegador</text>
 </g>
-<!-- 96182a6a3489400cb8cb73f9e07a6c92 -->
+<!-- 978077339a0a4678bcc05aa3b3bc42bc -->
 <g id="node4" class="node">
-<title>96182a6a3489400cb8cb73f9e07a6c92</title>
+<title>978077339a0a4678bcc05aa3b3bc42bc</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/firebase/develop/hosting.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="389.3" y="-500.867"/>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-381.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Firebase Hosting</text>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-367.92" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">SPA · datropa.com.br</text>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-354.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">rewrites /api/**</text>
 </g>
-<!-- b9ea6782fab941e495aeb17b910c060f&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92 -->
+<!-- 1821c2af9f90470f9f1cbf689dc1e4ed&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc -->
 <g id="edge1" class="edge">
-<title>b9ea6782fab941e495aeb17b910c060f&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92</title>
+<title>1821c2af9f90470f9f1cbf689dc1e4ed&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M126.5,-497.13C191.57,-487.4 306.38,-470.24 377.16,-459.66"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="377.65,-463.13 387.02,-458.19 376.61,-456.21 377.65,-463.13"/>
 <text xml:space="preserve" text-anchor="middle" x="258.05" y="-489.66" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 1 &#160;HTTPS datropa.com.br </text>
 </g>
-<!-- 987fb62cc9a24ad58180822f8d6b3886 -->
+<!-- 7a47737539234718bdcf45b136d5b938 -->
 <g id="node2" class="node">
-<title>987fb62cc9a24ad58180822f8d6b3886</title>
+<title>7a47737539234718bdcf45b136d5b938</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/generic/device/mobile.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="26" y="-352.867"/>
 <text xml:space="preserve" text-anchor="middle" x="76.4" y="-235.22" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Celular</text>
 </g>
-<!-- 987fb62cc9a24ad58180822f8d6b3886&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92 -->
+<!-- 7a47737539234718bdcf45b136d5b938&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc -->
 <g id="edge2" class="edge">
-<title>987fb62cc9a24ad58180822f8d6b3886&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92</title>
+<title>7a47737539234718bdcf45b136d5b938&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M126.5,-322.58C191.84,-349.35 307.33,-396.65 378.04,-425.62"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="376.59,-428.81 387.17,-429.36 379.25,-422.33 376.59,-428.81"/>
 </g>
-<!-- 633a5a52d13c47d3a17946d05a934404 -->
+<!-- dbebaa4262a24aba896a3a46bfe57331 -->
 <g id="node3" class="node">
-<title>633a5a52d13c47d3a17946d05a934404</title>
+<title>dbebaa4262a24aba896a3a46bfe57331</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/generic/storage/storage.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="26" y="-136.867"/>
-<text xml:space="preserve" text-anchor="middle" x="76.4" y="-18.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">JSON de partidas</text>
-<text xml:space="preserve" text-anchor="middle" x="76.4" y="-4.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">(Riot API)</text>
+<text xml:space="preserve" text-anchor="middle" x="76.4" y="-18.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Base do hackathon</text>
+<text xml:space="preserve" text-anchor="middle" x="76.4" y="-4.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">JSONs da organização</text>
 </g>
-<!-- 88145f47925349eba637962baf6c0465 -->
+<!-- 833b2acb2c7b4d0bbcd58a6b207fdbad -->
 <g id="node12" class="node">
-<title>88145f47925349eba637962baf6c0465</title>
+<title>833b2acb2c7b4d0bbcd58a6b207fdbad</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/storage/storage.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-1458.87"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1340.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Cloud Storage</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1326.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">raw&#45;matches</text>
 </g>
-<!-- 633a5a52d13c47d3a17946d05a934404&#45;&gt;88145f47925349eba637962baf6c0465 -->
+<!-- dbebaa4262a24aba896a3a46bfe57331&#45;&gt;833b2acb2c7b4d0bbcd58a6b207fdbad -->
 <g id="edge12" class="edge">
-<title>633a5a52d13c47d3a17946d05a934404&#45;&gt;88145f47925349eba637962baf6c0465</title>
+<title>dbebaa4262a24aba896a3a46bfe57331&#45;&gt;833b2acb2c7b4d0bbcd58a6b207fdbad</title>
 <path fill="none" stroke="#188038" stroke-width="1.6" d="M126.72,-72.73C314.96,-23.64 993.96,122.47 1319.35,-224.47 1402.6,-313.23 1305.94,-1215.22 1370.35,-1318.47 1393.31,-1355.27 1436.94,-1378.16 1473.43,-1391.65"/>
 <polygon fill="#188038" stroke="#188038" stroke-width="1.6" points="1472.12,-1394.9 1482.71,-1394.9 1474.43,-1388.29 1472.12,-1394.9"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-5.49" font-family="Sans-Serif" font-size="13.00" fill="#188038"> 7 &#160;upload </text>
 </g>
-<!-- 6d193f8fd0884ee8bad1b8977c89378f -->
+<!-- 3e5be836869241629831a58a8384f56f -->
 <g id="node5" class="node">
-<title>6d193f8fd0884ee8bad1b8977c89378f</title>
+<title>3e5be836869241629831a58a8384f56f</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/firebase/develop/authentication.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-500.867"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-382.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Firebase</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-368.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Authentication</text>
 </g>
-<!-- 96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;6d193f8fd0884ee8bad1b8977c89378f -->
+<!-- 978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;3e5be836869241629831a58a8384f56f -->
 <g id="edge3" class="edge">
-<title>96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;6d193f8fd0884ee8bad1b8977c89378f</title>
+<title>978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;3e5be836869241629831a58a8384f56f</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M489.95,-450.47C580.9,-450.47 774.96,-450.47 874.22,-450.47"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="874,-453.97 884,-450.47 874,-446.97 874,-453.97"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-451.62" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 2 &#160;login · JWT </text>
 </g>
-<!-- b8cdaf74ca39451c9433bdffb23d54b1 -->
+<!-- 0371a34a86b04534984e138f5808746d -->
 <g id="node6" class="node">
-<title>b8cdaf74ca39451c9433bdffb23d54b1</title>
+<title>0371a34a86b04534984e138f5808746d</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/compute/run.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-1220.87"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1102.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">stats</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1088.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">sa&#45;stats</text>
 </g>
-<!-- 96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;b8cdaf74ca39451c9433bdffb23d54b1 -->
+<!-- 978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;0371a34a86b04534984e138f5808746d -->
 <g id="edge4" class="edge">
-<title>96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;b8cdaf74ca39451c9433bdffb23d54b1</title>
+<title>978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;0371a34a86b04534984e138f5808746d</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M469.62,-547.66C511.82,-676.17 600.8,-903.91 740.35,-1054.47 778.02,-1095.11 833.17,-1126.1 875.24,-1145.78"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="873.71,-1148.93 884.26,-1149.9 876.62,-1142.56 873.71,-1148.93"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-1042.24" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 3 &#160;/api/stats/** </text>
 </g>
-<!-- 4bcb71384e074d87b6fccf8399f87ed0 -->
+<!-- 77f1b08b36b34401b864571fb88f2bec -->
 <g id="node7" class="node">
-<title>4bcb71384e074d87b6fccf8399f87ed0</title>
+<title>77f1b08b36b34401b864571fb88f2bec</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/compute/run.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-758.867"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-640.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">coach</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-626.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">sa&#45;coach</text>
 </g>
-<!-- 96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;4bcb71384e074d87b6fccf8399f87ed0 -->
+<!-- 978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;77f1b08b36b34401b864571fb88f2bec -->
 <g id="edge5" class="edge">
-<title>96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;4bcb71384e074d87b6fccf8399f87ed0</title>
+<title>978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;77f1b08b36b34401b864571fb88f2bec</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M489.95,-476.15C581.27,-523.77 776.54,-625.59 875.43,-677.16"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="873.79,-680.25 884.28,-681.77 877.03,-674.04 873.79,-680.25"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-596.06" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 3 &#160;/api/coach/** </text>
 </g>
-<!-- c9697956b3cd447590093c94c26c82d2 -->
+<!-- a68a654a73794ce0a34e9b8786c37063 -->
 <g id="node8" class="node">
-<title>c9697956b3cd447590093c94c26c82d2</title>
+<title>a68a654a73794ce0a34e9b8786c37063</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/compute/run.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-1451.87"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1333.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">bolao</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1319.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">sa&#45;bolao</text>
 </g>
-<!-- 96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;c9697956b3cd447590093c94c26c82d2 -->
+<!-- 978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;a68a654a73794ce0a34e9b8786c37063 -->
 <g id="edge6" class="edge">
-<title>96182a6a3489400cb8cb73f9e07a6c92&#45;&gt;c9697956b3cd447590093c94c26c82d2</title>
+<title>978077339a0a4678bcc05aa3b3bc42bc&#45;&gt;a68a654a73794ce0a34e9b8786c37063</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M441.44,-547.57C444.71,-732.57 461.14,-1126.58 541.1,-1232.47 622.24,-1339.91 785.4,-1379.88 874.31,-1394.1"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="873.54,-1397.52 883.95,-1395.57 874.6,-1390.6 873.54,-1397.52"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-1358.84" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 3 &#160;/api/bolao/** </text>
 </g>
-<!-- 59776c35b89d425ca6768082c293a3a9 -->
+<!-- dfaa6f9fe7d647148f6eb0f50ed8eae9 -->
 <g id="node14" class="node">
-<title>59776c35b89d425ca6768082c293a3a9</title>
+<title>dfaa6f9fe7d647148f6eb0f50ed8eae9</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/analytics/bigquery.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-1213.87"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1094.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">gold</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1080.92" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">rankings · time/mapa</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1067.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">meta de agentes</text>
 </g>
-<!-- b8cdaf74ca39451c9433bdffb23d54b1&#45;&gt;59776c35b89d425ca6768082c293a3a9 -->
+<!-- 0371a34a86b04534984e138f5808746d&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9 -->
 <g id="edge7" class="edge">
-<title>b8cdaf74ca39451c9433bdffb23d54b1&#45;&gt;59776c35b89d425ca6768082c293a3a9</title>
+<title>0371a34a86b04534984e138f5808746d&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M986.83,-1169.89C1095.3,-1168.62 1354.22,-1165.58 1472.95,-1164.19"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="1472.98,-1167.69 1482.94,-1164.07 1472.9,-1160.69 1472.98,-1167.69"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1169.15" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 4 &#160;leitura </text>
 </g>
-<!-- aa0e920acc834bc29d7e111d04f9c843 -->
+<!-- b3589184c0554ae1a4868171702a7a08 -->
 <g id="node15" class="node">
-<title>aa0e920acc834bc29d7e111d04f9c843</title>
+<title>b3589184c0554ae1a4868171702a7a08</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/database/firestore.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-1703.87"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1584.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Firestore</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1570.92" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">usuários · palpites</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-1557.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">pontuação · cache</text>
 </g>
-<!-- b8cdaf74ca39451c9433bdffb23d54b1&#45;&gt;aa0e920acc834bc29d7e111d04f9c843 -->
+<!-- 0371a34a86b04534984e138f5808746d&#45;&gt;b3589184c0554ae1a4868171702a7a08 -->
 <g id="edge8" class="edge">
-<title>b8cdaf74ca39451c9433bdffb23d54b1&#45;&gt;aa0e920acc834bc29d7e111d04f9c843</title>
+<title>0371a34a86b04534984e138f5808746d&#45;&gt;b3589184c0554ae1a4868171702a7a08</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M986.78,-1197.57C1027.02,-1220.18 1084.98,-1253.85 1133.6,-1286.47 1219.56,-1344.13 1252.29,-1348.11 1319.35,-1426.97 1350.78,-1463.92 1339.35,-1486.16 1370.35,-1523.47 1400.13,-1559.3 1441.22,-1591.85 1474.83,-1615.42"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="1472.78,-1618.26 1483,-1621.07 1476.76,-1612.5 1472.78,-1618.26"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1428.12" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 4 &#160;cache </text>
 </g>
-<!-- 64f2f6e6477244bf8cf562224423c9ad -->
+<!-- 6ffdb51600ee442cb1c5efc991403bbc -->
 <g id="node10" class="node">
-<title>64f2f6e6477244bf8cf562224423c9ad</title>
+<title>6ffdb51600ee442cb1c5efc991403bbc</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/ml/vertex-ai.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-298.867"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-181.67" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Vertex AI · Gemini</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-168.17" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">NL → SQL · scouting</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-152.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">resumo de partidas</text>
 </g>
-<!-- 4bcb71384e074d87b6fccf8399f87ed0&#45;&gt;64f2f6e6477244bf8cf562224423c9ad -->
+<!-- 77f1b08b36b34401b864571fb88f2bec&#45;&gt;6ffdb51600ee442cb1c5efc991403bbc -->
 <g id="edge9" class="edge">
-<title>4bcb71384e074d87b6fccf8399f87ed0&#45;&gt;64f2f6e6477244bf8cf562224423c9ad</title>
+<title>77f1b08b36b34401b864571fb88f2bec&#45;&gt;6ffdb51600ee442cb1c5efc991403bbc</title>
 <path fill="none" stroke="#8430ce" stroke-width="1.6" d="M986.71,-697.68C1033.48,-684.56 1101.32,-657.4 1133.6,-605.47 1143.01,-590.33 1129.43,-297.74 1141.6,-284.72 1225.8,-194.67 1385.81,-213.35 1473.36,-232.36"/>
 <polygon fill="#8430ce" stroke="#8430ce" stroke-width="1.6" points="1472.33,-235.72 1482.86,-234.5 1473.87,-228.89 1472.33,-235.72"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-288.12" font-family="Sans-Serif" font-size="13.00" fill="#8430ce"> 5a &#160;pergunta → SQL/texto </text>
 </g>
-<!-- 4bcb71384e074d87b6fccf8399f87ed0&#45;&gt;59776c35b89d425ca6768082c293a3a9 -->
+<!-- 77f1b08b36b34401b864571fb88f2bec&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9 -->
 <g id="edge10" class="edge">
-<title>4bcb71384e074d87b6fccf8399f87ed0&#45;&gt;59776c35b89d425ca6768082c293a3a9</title>
+<title>77f1b08b36b34401b864571fb88f2bec&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9</title>
 <path fill="none" stroke="#8430ce" stroke-width="1.6" d="M986.77,-722.94C1033.25,-739.41 1100.56,-771.18 1133.6,-824.47 1146.4,-845.11 1126.99,-914.07 1141.6,-933.47 1192.25,-1000.72 1245.59,-958.38 1319.35,-998.97 1336.01,-1008.14 1417.58,-1071.49 1475.3,-1116.83"/>
 <polygon fill="#8430ce" stroke="#8430ce" stroke-width="1.6" points="1473.13,-1119.58 1483.15,-1123.01 1477.46,-1114.08 1473.13,-1119.58"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1000.12" font-family="Sans-Serif" font-size="13.00" fill="#8430ce"> 5b &#160;SQL validado · read&#45;only </text>
 </g>
-<!-- 0dff8f34321044d09e4e4b768fcbea47 -->
+<!-- 8c5cb1a6dba2494f9a92b529c5df7c59 -->
 <g id="node16" class="node">
-<title>0dff8f34321044d09e4e4b768fcbea47</title>
+<title>8c5cb1a6dba2494f9a92b529c5df7c59</title>
 <polygon fill="#fef7e0" stroke="#f9ab00" points="1694.35,-508.52 1370.35,-508.52 1370.35,-410.42 1700.35,-410.42 1700.35,-502.52 1694.35,-508.52"/>
 <polyline fill="none" stroke="#f9ab00" points="1694.35,-508.52 1694.35,-502.52"/>
 <polyline fill="none" stroke="#f9ab00" points="1700.35,-502.52 1694.35,-502.52"/>
@@ -230,116 +230,116 @@
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-424.52" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#2d3436">• token do Firebase validado em cada serviço</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-411.77" font-family="Helvetica,sans-Serif" font-size="12.00" fill="#2d3436">• todos os serviços na mesma região</text>
 </g>
-<!-- 4bcb71384e074d87b6fccf8399f87ed0&#45;&gt;0dff8f34321044d09e4e4b768fcbea47 -->
-<!-- c9697956b3cd447590093c94c26c82d2&#45;&gt;aa0e920acc834bc29d7e111d04f9c843 -->
+<!-- 77f1b08b36b34401b864571fb88f2bec&#45;&gt;8c5cb1a6dba2494f9a92b529c5df7c59 -->
+<!-- a68a654a73794ce0a34e9b8786c37063&#45;&gt;b3589184c0554ae1a4868171702a7a08 -->
 <g id="edge11" class="edge">
-<title>c9697956b3cd447590093c94c26c82d2&#45;&gt;aa0e920acc834bc29d7e111d04f9c843</title>
+<title>a68a654a73794ce0a34e9b8786c37063&#45;&gt;b3589184c0554ae1a4868171702a7a08</title>
 <path fill="none" stroke="#1a73e8" stroke-width="1.6" d="M986.83,-1412.72C1061.02,-1430.56 1204.79,-1468.73 1319.35,-1520.97 1374.63,-1546.17 1433.06,-1582.92 1475.04,-1611.32"/>
 <polygon fill="#1a73e8" stroke="#1a73e8" stroke-width="1.6" points="1472.84,-1614.06 1483.07,-1616.8 1476.78,-1608.27 1472.84,-1614.06"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1522.12" font-family="Sans-Serif" font-size="13.00" fill="#1a73e8"> 6 &#160;palpites · ranking </text>
 </g>
-<!-- 2af20e80526d48c89efe9aa002605340 -->
+<!-- d2105f3e7f67406eb636751685286b06 -->
 <g id="node9" class="node">
-<title>2af20e80526d48c89efe9aa002605340</title>
+<title>d2105f3e7f67406eb636751685286b06</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/compute/run.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-989.867"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-871.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">ingest</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-857.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">sa&#45;ingest</text>
 </g>
-<!-- de9725d41948428c89149f0ed61c87d9 -->
+<!-- d095bb64287d412a87e8e42833d4ade1 -->
 <g id="node11" class="node">
-<title>de9725d41948428c89149f0ed61c87d9</title>
+<title>d095bb64287d412a87e8e42833d4ade1</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/analytics/pubsub.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-706.867"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-588.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Pub/Sub</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-574.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">match&#45;ingested</text>
 </g>
-<!-- 2af20e80526d48c89efe9aa002605340&#45;&gt;de9725d41948428c89149f0ed61c87d9 -->
+<!-- d2105f3e7f67406eb636751685286b06&#45;&gt;d095bb64287d412a87e8e42833d4ade1 -->
 <g id="edge16" class="edge">
-<title>2af20e80526d48c89efe9aa002605340&#45;&gt;de9725d41948428c89149f0ed61c87d9</title>
+<title>d2105f3e7f67406eb636751685286b06&#45;&gt;d095bb64287d412a87e8e42833d4ade1</title>
 <path fill="none" stroke="#e37400" stroke-width="1.6" d="M986.83,-916.07C1095.73,-864.43 1356.32,-740.88 1474.39,-684.9"/>
 <polygon fill="#e37400" stroke="#e37400" stroke-width="1.6" points="1475.63,-688.18 1483.17,-680.73 1472.63,-681.86 1475.63,-688.18"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-841" font-family="Sans-Serif" font-size="13.00" fill="#e37400"> 10 &#160;publica </text>
 </g>
-<!-- 29320350ef9e4b958cc996a9f418d142 -->
+<!-- 6b9166c3e1dd4622aef67f8034e7c3b5 -->
 <g id="node13" class="node">
-<title>29320350ef9e4b958cc996a9f418d142</title>
+<title>6b9166c3e1dd4622aef67f8034e7c3b5</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/analytics/bigquery.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="1484.95" y="-968.867"/>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-850.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">bronze</text>
 <text xml:space="preserve" text-anchor="middle" x="1535.35" y="-836.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">NDJSON aninhado</text>
 </g>
-<!-- 2af20e80526d48c89efe9aa002605340&#45;&gt;29320350ef9e4b958cc996a9f418d142 -->
+<!-- d2105f3e7f67406eb636751685286b06&#45;&gt;6b9166c3e1dd4622aef67f8034e7c3b5 -->
 <g id="edge14" class="edge">
-<title>2af20e80526d48c89efe9aa002605340&#45;&gt;29320350ef9e4b958cc996a9f418d142</title>
+<title>d2105f3e7f67406eb636751685286b06&#45;&gt;6b9166c3e1dd4622aef67f8034e7c3b5</title>
 <path fill="none" stroke="#188038" stroke-width="1.6" d="M986.82,-931.87C1028.07,-925.92 1088.51,-918.14 1141.6,-914.97 1258.47,-907.98 1395.23,-911.94 1472.64,-915.3"/>
 <polygon fill="#188038" stroke="#188038" stroke-width="1.6" points="1472.44,-918.8 1482.58,-915.75 1472.75,-911.81 1472.44,-918.8"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-916.12" font-family="Sans-Serif" font-size="13.00" fill="#188038"> 9 &#160;carrega NDJSON </text>
 </g>
-<!-- 2af20e80526d48c89efe9aa002605340&#45;&gt;59776c35b89d425ca6768082c293a3a9 -->
+<!-- d2105f3e7f67406eb636751685286b06&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9 -->
 <g id="edge15" class="edge">
-<title>2af20e80526d48c89efe9aa002605340&#45;&gt;59776c35b89d425ca6768082c293a3a9</title>
+<title>d2105f3e7f67406eb636751685286b06&#45;&gt;dfaa6f9fe7d647148f6eb0f50ed8eae9</title>
 <path fill="none" stroke="#188038" stroke-width="1.6" d="M986.51,-958.35C1027.83,-974.22 1088.53,-997.46 1141.6,-1017.47 1258.95,-1061.7 1396.36,-1112.57 1473.6,-1141.08"/>
 <polygon fill="#188038" stroke="#188038" stroke-width="1.6" points="1472.14,-1144.27 1482.73,-1144.45 1474.56,-1137.7 1472.14,-1144.27"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1083.06" font-family="Sans-Serif" font-size="13.00" fill="#188038"> 9 &#160;atualiza </text>
 </g>
-<!-- de9725d41948428c89149f0ed61c87d9&#45;&gt;c9697956b3cd447590093c94c26c82d2 -->
+<!-- d095bb64287d412a87e8e42833d4ade1&#45;&gt;a68a654a73794ce0a34e9b8786c37063 -->
 <g id="edge17" class="edge">
-<title>de9725d41948428c89149f0ed61c87d9&#45;&gt;c9697956b3cd447590093c94c26c82d2</title>
+<title>d095bb64287d412a87e8e42833d4ade1&#45;&gt;a68a654a73794ce0a34e9b8786c37063</title>
 <path fill="none" stroke="#e37400" stroke-width="1.6" d="M1485.07,-684.91C1446.47,-710.15 1395.28,-750.84 1370.35,-801.47 1297.04,-950.34 1440.63,-1433.21 1319.35,-1546.47 1226.9,-1632.81 1077.88,-1528.43 996.01,-1457.19"/>
 <polygon fill="#e37400" stroke="#e37400" stroke-width="1.6" points="998.49,-1454.71 988.67,-1450.72 993.86,-1459.96 998.49,-1454.71"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1582.46" font-family="Sans-Serif" font-size="13.00" fill="#e37400"> 11 &#160;apura palpites → ranking </text>
 </g>
-<!-- 88145f47925349eba637962baf6c0465&#45;&gt;2af20e80526d48c89efe9aa002605340 -->
+<!-- 833b2acb2c7b4d0bbcd58a6b207fdbad&#45;&gt;d2105f3e7f67406eb636751685286b06 -->
 <g id="edge13" class="edge">
-<title>88145f47925349eba637962baf6c0465&#45;&gt;2af20e80526d48c89efe9aa002605340</title>
+<title>833b2acb2c7b4d0bbcd58a6b207fdbad&#45;&gt;d2105f3e7f67406eb636751685286b06</title>
 <path fill="none" stroke="#188038" stroke-width="1.6" d="M1485.23,-1433C1449.28,-1453.08 1401.52,-1484.5 1370.35,-1523.47 1333.12,-1570 1368.86,-1614.3 1319.35,-1647.47 1253.72,-1691.44 1197.84,-1702.95 1141.6,-1647.47 1129.89,-1635.92 1141.84,-1069.7 1133.6,-1055.47 1104.5,-1005.24 1044.33,-974.48 998.27,-957.38"/>
 <polygon fill="#188038" stroke="#188038" stroke-width="1.6" points="999.46,-954.09 988.87,-954.03 997.11,-960.68 999.46,-954.09"/>
 <text xml:space="preserve" text-anchor="middle" x="1230.48" y="-1686.03" font-family="Sans-Serif" font-size="13.00" fill="#188038"> 8 &#160;novo arquivo (Eventarc) </text>
 </g>
-<!-- 9aade18e8cbb492bb531f2b6644226cb -->
+<!-- 55b7a1ab764247fd9040abb365e92619 -->
 <g id="node17" class="node">
-<title>9aade18e8cbb492bb531f2b6644226cb</title>
+<title>55b7a1ab764247fd9040abb365e92619</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/onprem/vcs/github.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="26" y="-2007.87"/>
 <text xml:space="preserve" text-anchor="middle" x="76.4" y="-1889.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">GitHub · monorepo</text>
 <text xml:space="preserve" text-anchor="middle" x="76.4" y="-1875.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">/front · /services/*</text>
 </g>
-<!-- f286c95b5b1b46adaa1e226ab6c9b539 -->
+<!-- 6d1d21679f9642a298130e6ce22d16eb -->
 <g id="node18" class="node">
-<title>f286c95b5b1b46adaa1e226ab6c9b539</title>
+<title>6d1d21679f9642a298130e6ce22d16eb</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/onprem/ci/github-actions.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="389.3" y="-2007.87"/>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-1888.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">GitHub Actions</text>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-1874.92" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Workload Identity Federation</text>
 <text xml:space="preserve" text-anchor="middle" x="439.7" y="-1861.42" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">(sem chave JSON)</text>
 </g>
-<!-- 9aade18e8cbb492bb531f2b6644226cb&#45;&gt;f286c95b5b1b46adaa1e226ab6c9b539 -->
+<!-- 55b7a1ab764247fd9040abb365e92619&#45;&gt;6d1d21679f9642a298130e6ce22d16eb -->
 <g id="edge18" class="edge">
-<title>9aade18e8cbb492bb531f2b6644226cb&#45;&gt;f286c95b5b1b46adaa1e226ab6c9b539</title>
+<title>55b7a1ab764247fd9040abb365e92619&#45;&gt;6d1d21679f9642a298130e6ce22d16eb</title>
 <path fill="none" stroke="#5f6368" stroke-width="1.6" d="M126.5,-1957.47C191.57,-1957.47 306.38,-1957.47 377.16,-1957.47"/>
 <polygon fill="#5f6368" stroke="#5f6368" stroke-width="1.6" points="376.99,-1960.97 386.99,-1957.47 376.99,-1953.97 376.99,-1960.97"/>
 <text xml:space="preserve" text-anchor="middle" x="258.05" y="-1958.62" font-family="Sans-Serif" font-size="13.00" fill="#5f6368"> push / PR </text>
 </g>
-<!-- f286c95b5b1b46adaa1e226ab6c9b539&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92 -->
+<!-- 6d1d21679f9642a298130e6ce22d16eb&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc -->
 <g id="edge21" class="edge">
-<title>f286c95b5b1b46adaa1e226ab6c9b539&#45;&gt;96182a6a3489400cb8cb73f9e07a6c92</title>
+<title>6d1d21679f9642a298130e6ce22d16eb&#45;&gt;978077339a0a4678bcc05aa3b3bc42bc</title>
 <path fill="none" stroke="#5f6368" stroke-width="1.6" stroke-dasharray="5,2" d="M439.7,-1860.35C439.7,-1592.12 439.7,-842.26 439.7,-559.89"/>
 <polygon fill="#5f6368" stroke="#5f6368" stroke-width="1.6" points="443.2,-560.03 439.7,-550.03 436.2,-560.03 443.2,-560.03"/>
 <text xml:space="preserve" text-anchor="middle" x="429.95" y="-1198.37" font-family="Sans-Serif" font-size="13.00" fill="#5f6368"> deploy front + preview por PR </text>
 </g>
-<!-- 6d5a5449b43d40388788bdba9b797d90 -->
+<!-- 644076adc7824316bbe8603b3bd4dbee -->
 <g id="node19" class="node">
-<title>6d5a5449b43d40388788bdba9b797d90</title>
+<title>644076adc7824316bbe8603b3bd4dbee</title>
 <image xlink:href="/Users/guilherme/.cache/uv/archive-v0/q8UpJs8frSWs8hKb/lib/python3.12/site-packages/resources/gcp/devtools/container-registry.png" width="100.8px" height="100.8px" preserveAspectRatio="xMinYMin meet" x="886.075" y="-2007.87"/>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1889.32" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">Artifact Registry</text>
 <text xml:space="preserve" text-anchor="middle" x="936.48" y="-1875.82" font-family="Helvetica,sans-Serif" font-size="13.00" fill="#2d3436">imagens dos containers</text>
 </g>
-<!-- f286c95b5b1b46adaa1e226ab6c9b539&#45;&gt;6d5a5449b43d40388788bdba9b797d90 -->
+<!-- 6d1d21679f9642a298130e6ce22d16eb&#45;&gt;644076adc7824316bbe8603b3bd4dbee -->
 <g id="edge19" class="edge">
-<title>f286c95b5b1b46adaa1e226ab6c9b539&#45;&gt;6d5a5449b43d40388788bdba9b797d90</title>
+<title>6d1d21679f9642a298130e6ce22d16eb&#45;&gt;644076adc7824316bbe8603b3bd4dbee</title>
 <path fill="none" stroke="#5f6368" stroke-width="1.6" d="M489.95,-1957.47C580.9,-1957.47 774.96,-1957.47 874.22,-1957.47"/>
 <polygon fill="#5f6368" stroke="#5f6368" stroke-width="1.6" points="874,-1960.97 884,-1957.47 874,-1953.97 874,-1960.97"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-1958.62" font-family="Sans-Serif" font-size="13.00" fill="#5f6368"> build </text>
 </g>
-<!-- 6d5a5449b43d40388788bdba9b797d90&#45;&gt;2af20e80526d48c89efe9aa002605340 -->
+<!-- 644076adc7824316bbe8603b3bd4dbee&#45;&gt;d2105f3e7f67406eb636751685286b06 -->
 <g id="edge20" class="edge">
-<title>6d5a5449b43d40388788bdba9b797d90&#45;&gt;2af20e80526d48c89efe9aa002605340</title>
+<title>644076adc7824316bbe8603b3bd4dbee&#45;&gt;d2105f3e7f67406eb636751685286b06</title>
 <path fill="none" stroke="#5f6368" stroke-width="1.6" stroke-dasharray="5,2" d="M886.21,-1880.18C804.74,-1749.73 647.3,-1474.77 590.89,-1216.22 559.63,-1072.9 767.04,-989.46 874.64,-956.27"/>
 <polygon fill="#5f6368" stroke="#5f6368" stroke-width="1.6" points="875.42,-959.69 883.98,-953.45 873.4,-952.99 875.42,-959.69"/>
 <text xml:space="preserve" text-anchor="middle" x="636.73" y="-1203.87" font-family="Sans-Serif" font-size="13.00" fill="#5f6368"> deploy só da pasta que mudou </text>
