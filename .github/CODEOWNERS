@@ -1,0 +1,15 @@
+# Quem aprova PR em cada pasta. A main só aceita PR aprovado pelo dono.
+# A última regra que casa com o arquivo vence.
+
+*                           @GuiiifSouza
+
+# TODO: descomentar quando o Guilherme passar os @ do GitHub do time.
+# /front/                     @<lhobregat> @<rhuank>
+# /services/stats/            @<gugu> @<chico>
+# /services/stats/sql/gold/   @<chico>
+
+/services/coach/            @GuiiifSouza
+/services/ingest/           @GuiiifSouza
+/infra/                     @GuiiifSouza
+/.github/                   @GuiiifSouza
+/docs/arquitetura/          @GuiiifSouza
