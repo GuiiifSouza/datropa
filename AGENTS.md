@@ -1,6 +1,20 @@
 # Da Tropa
 
-Plataforma de analytics de partidas de VALORANT de campeonatos universitários, com coach de IA e bolão de palpites (só pontos, sem dinheiro). Projeto do Hackathon SEMCOMP/VALORANT da USP São Carlos.
+Plataforma de analytics de partidas de VALORANT de campeonatos universitários, com coach de IA. Projeto do Hackathon SEMCOMP/VALORANT da USP São Carlos.
+
+Este repo guarda tudo do Da Tropa. O bolão de palpites (só pontos, sem dinheiro) é uma das ideias, não o foco. A primeira versão vai ao ar em `devs.datropa.com`.
+
+## Time
+
+| Quem | Frente |
+|---|---|
+| Lhobregat | Front |
+| RhuanK | Front |
+| chico | Back |
+| gugu | Back |
+| Guilherme (GuiiifSouza) | Infra, DevOps e back |
+
+Contato e e-mails ficam fora do repo (ele é público).
 
 Responda e escreva em português do Brasil, curto e direto. Código, nomes de variáveis e commits podem ficar em inglês ou português, mas siga o que já existe na pasta.
 
@@ -40,6 +54,8 @@ data/                JSONs baixados localmente (fora do git)
 
 As pastas `front/` e `services/` ainda não existem. Crie seguindo esta estrutura.
 
+Linguagem do back-end e framework do front ainda não foram decididos. Não escolha sozinho: pergunte ao time e registre a decisão em `docs/arquitetura/README.md`.
+
 ## Arquitetura
 
 Leia [docs/arquitetura/README.md](docs/arquitetura/README.md) antes de mexer em infraestrutura ou criar serviço. Resumo:
@@ -72,7 +88,8 @@ Detalhes em [docs/dados.md](docs/dados.md). Pontos que pegam:
 
 - Repo pessoal: `GuiiifSouza/datropa`, remoto `git@github-pessoal:GuiiifSouza/datropa.git`.
 - No `gh`, use a conta pessoal: `GH_TOKEN=$(gh auth token --user GuiiifSouza) gh ...`. Nunca a conta da Nublify.
-- Branch por frente de trabalho, commit pequeno com mensagem clara.
+- O repo é público: nada de e-mail, chave, `.env` ou dado pessoal em commit.
+- Branch por frente de trabalho, commit pequeno com mensagem clara. Cada um mexe na sua pasta (`front/` ou `services/<nome>/`); mudança em pasta de outra frente, combine antes.
 - Push, PR, deploy e qualquer coisa que gaste dinheiro no GCP só com o OK do Guilherme.
 
 ## Antes de dizer que terminou

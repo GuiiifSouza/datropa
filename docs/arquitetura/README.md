@@ -12,7 +12,7 @@ Tudo roda num projeto GCP só, com todos os serviços na mesma região. O front 
 
 | Componente | Serviço GCP | Papel |
 |---|---|---|
-| Front | Firebase Hosting | SPA em `datropa.com.br`. Rewrites de `/api/stats/**`, `/api/coach/**` e `/api/bolao/**` para o Cloud Run |
+| Front | Firebase Hosting | SPA em `devs.datropa.com`. Rewrites de `/api/stats/**`, `/api/coach/**` e `/api/bolao/**` para o Cloud Run |
 | Login | Firebase Authentication | Emite o JWT que o front manda em toda chamada de API |
 | `stats` | Cloud Run (`sa-stats`) | Rankings, desempenho por time e mapa, meta de agentes. Lê a camada gold e guarda cache no Firestore |
 | `coach` | Cloud Run (`sa-coach`) | Coach de IA. Usa o Gemini para transformar pergunta em SQL ou texto, valida o SQL e roda só leitura na gold |
@@ -31,7 +31,7 @@ Os números batem com as setas do diagrama.
 
 ### Usuário (azul)
 
-1. O usuário abre `datropa.com.br` no navegador ou no celular.
+1. O usuário abre `devs.datropa.com` no navegador ou no celular.
 2. Faz login no Firebase Authentication e recebe um JWT.
 3. O front chama `/api/<serviço>/**`. O Hosting reescreve para o Cloud Run certo.
 4. `stats` lê a gold no BigQuery e usa o Firestore como cache.
@@ -86,7 +86,9 @@ Os números batem com as setas do diagrama.
 | Firestore para estado do app | Leitura rápida por documento, integra direto com o Firebase Auth e não precisa de servidor |
 | Bronze/gold, sem silver | Volume pequeno. Uma camada intermediária só adicionaria passo. Se a gold ficar complexa, a silver entra |
 | Pub/Sub entre ingest e bolão | O `ingest` não precisa saber quem consome a partida nova. Outro consumidor entra sem mexer nele |
-| Bolão só de pontos | Sem dinheiro, sem aposta. Evita regulação e pagamento |
+| Bolão só de pontos | Sem dinheiro, sem aposta. Evita regulação e pagamento. É uma das ideias, não o foco |
+| Primeira versão em `devs.datropa.com` | Ambiente do hackathon. O domínio principal fica para depois |
+| Linguagem do back e framework do front | **Em aberto.** Registrar aqui quando o time decidir |
 
 ## Regerar o diagrama
 
