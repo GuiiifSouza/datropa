@@ -1,0 +1,32 @@
+# Base do hackathon (baixar do Drive, ver docs/dados.md)
+data/
+
+# Segredos
+.env
+.env.*
+!.env.example
+*-sa.json
+service-account*.json
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Node
+node_modules/
+dist/
+.firebase/
+*.log
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# Sistema e ferramentas
+.DS_Store
+.claude/worktrees/
+.claude/settings.local.json

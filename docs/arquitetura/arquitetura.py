@@ -84,13 +84,13 @@ with Diagram(
         usuario = User("Navegador")
         celular = Mobile("Celular")
 
-    riot = Storage("JSON de partidas\n(Riot API)")
+    riot = Storage("Base do hackathon\nJSONs da organização")
 
     with Cluster("Projeto GCP · todos os serviços na mesma região",
                  graph_attr=camada("gcp", "#fafbff")):
 
         with Cluster("Front · Firebase", graph_attr=camada("Front", "#fff8e1")):
-            hosting = Hosting("Firebase Hosting\nSPA · datropa.com.br\nrewrites /api/**")
+            hosting = Hosting("Firebase Hosting\nSPA · devs.datropa.com\nrewrites /api/**")
             auth = Authentication("Firebase\nAuthentication")
 
         with Cluster("Microsserviços · Cloud Run (1 service account cada)",
@@ -129,7 +129,7 @@ with Diagram(
         registry = GCR("Artifact Registry\nimagens dos containers")
 
     # Fluxo do usuário
-    usuario >> seta(1, "HTTPS datropa.com.br", AZUL) >> hosting
+    usuario >> seta(1, "HTTPS devs.datropa.com", AZUL) >> hosting
     celular >> Edge(color=AZUL) >> hosting
     hosting >> seta(2, "login · JWT", AZUL) >> auth
     hosting >> seta(3, "/api/stats/**", AZUL) >> stats
