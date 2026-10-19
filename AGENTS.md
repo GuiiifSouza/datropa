@@ -41,6 +41,8 @@ Com o prazo curto, prefira o que aparece no pitch. Funcionalidade que não entra
 
 ## Regras do hackathon (não negociáveis)
 
+Todas as regras, a entrega e os critérios estão em [docs/hackathon.md](docs/hackathon.md). O essencial:
+
 - **Dados de partida só da base oficial** (os JSONs do Drive da organização). Nada de Riot API, tracker, VLR, scraping ou qualquer outra fonte para completar partidas.
 - **Só pós-partida.** Nada que ajude durante uma partida em andamento ou dê vantagem em tempo real.
 - **Nada que interaja com o cliente do jogo** ou com serviços da Riot sem autorização.
@@ -50,7 +52,7 @@ Na dúvida se algo fere uma regra, pare e pergunte ao Guilherme.
 
 ## Critérios de julgamento
 
-Seis critérios, nota de 1 a 5 cada, mesmo peso (até 30 pontos): inovação, impacto para jogadores e equipes, qualidade da análise e do uso dos dados, viabilidade, usabilidade, qualidade do protótipo e da apresentação. A banca tem gente da Riot Games e da AcadArena. Análise coletiva (time, papéis, padrões de jogo) é bem-vista.
+Detalhes em [docs/hackathon.md](docs/hackathon.md). Seis critérios, nota de 1 a 5 cada, mesmo peso (até 30 pontos): inovação, impacto para jogadores e equipes, qualidade da análise e do uso dos dados, viabilidade, usabilidade, qualidade do protótipo e da apresentação. A banca tem gente da Riot Games e da AcadArena. Análise coletiva (time, papéis, padrões de jogo) é bem-vista.
 
 ## Estrutura do monorepo
 

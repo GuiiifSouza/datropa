@@ -28,6 +28,7 @@ Projeto para o [Hackathon SEMCOMP/VALORANT da USP São Carlos](https://docs.goog
 | Arquivo | Conteúdo |
 |---|---|
 | [docs/plano-de-acao.md](docs/plano-de-acao.md) | Quem faz o quê até quarta, cronograma e riscos |
+| [docs/hackathon.md](docs/hackathon.md) | Regras do hackathon, entrega, critérios e prazos |
 | [AGENTS.md](AGENTS.md) | Regras do projeto e do hackathon, donos das pastas, segurança. Vale para pessoas e agentes de IA |
 | [docs/arquitetura/README.md](docs/arquitetura/README.md) | Componentes, fluxos, tools do coach, prancheta, decisões |
 | [docs/dados.md](docs/dados.md) | A base de partidas: onde baixar, formato do JSON, armadilhas |
