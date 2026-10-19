@@ -6,7 +6,7 @@ Gera arquitetura-da-tropa.png e .svg com:  uv run --with diagrams python arquite
 
 from diagrams import Cluster, Diagram, Edge, Node
 from diagrams.firebase.develop import Authentication, Hosting
-from diagrams.gcp.analytics import BigQuery, PubSub
+from diagrams.gcp.analytics import BigQuery
 from diagrams.gcp.compute import Run
 from diagrams.gcp.database import Firestore
 from diagrams.gcp.devtools import GCR
@@ -21,7 +21,6 @@ from diagrams.onprem.vcs import Github
 AZUL = "#1a73e8"      # requisição do usuário
 ROXO = "#8430ce"      # IA
 VERDE = "#188038"     # ingestão de partidas
-LARANJA = "#e37400"   # eventos / mensageria
 CINZA = "#5f6368"     # CI/CD
 
 graph_attr = {
@@ -90,35 +89,31 @@ with Diagram(
                  graph_attr=camada("gcp", "#fafbff")):
 
         with Cluster("Front · Firebase", graph_attr=camada("Front", "#fff8e1")):
-            hosting = Hosting("Firebase Hosting\nSPA · devs.datropa.com\nrewrites /api/**")
+            hosting = Hosting("Firebase Hosting\nSPA · devs.datropa.com\nrewrites /api/** · prancheta")
             auth = Authentication("Firebase\nAuthentication")
 
         with Cluster("Microsserviços · Cloud Run (1 service account cada)",
                      graph_attr=camada("Run", "#e8f0fe")):
             stats = Run("stats\nsa-stats")
-            coach = Run("coach\nsa-coach")
-            bolao = Run("bolao\nsa-bolao")
+            coach = Run("coach · agente\nsa-coach")
             ingest = Run("ingest\nsa-ingest")
 
         with Cluster("IA", graph_attr=camada("IA", "#f3e8fd")):
-            vertex = VertexAI("Vertex AI · Gemini\nNL → SQL · scouting\nresumo de partidas")
-
-        with Cluster("Mensageria", graph_attr=camada("Msg", "#fef7e0")):
-            pubsub = PubSub("Pub/Sub\nmatch-ingested")
+            vertex = VertexAI("Vertex AI · Gemini\nagente com tools\nscouting · resumo")
 
         with Cluster("Dados", graph_attr=camada("Dados", "#e6f4ea")):
             gcs = GCS("Cloud Storage\nraw-matches")
             with Cluster("BigQuery · dataset valorant",
                          graph_attr=camada("BQ", "#ffffff")):
                 bronze = BigQuery("bronze\nNDJSON aninhado")
-                gold = BigQuery("gold\nrankings · time/mapa\nmeta de agentes")
-            firestore = Firestore("Firestore\nusuários · palpites\npontuação · cache")
+                gold = BigQuery("gold\nrankings · time/mapa · coletiva\neventos_round · mapas")
+            firestore = Firestore("Firestore\nusuários · estratégias\nda prancheta · cache")
 
         seg = nota(
             "Segurança\n"
             "• 1 service account por microsserviço, privilégio mínimo\n"
             "• coach: só leitura no dataset valorant\n"
-            "  (só SELECT, limite de bytes, dry run)\n"
+            "  (tools com SQL parametrizado, limite de bytes)\n"
             "• token do Firebase validado em cada serviço\n"
             "• todos os serviços na mesma região"
         )
@@ -134,23 +129,20 @@ with Diagram(
     hosting >> seta(2, "login · JWT", AZUL) >> auth
     hosting >> seta(3, "/api/stats/**", AZUL) >> stats
     hosting >> seta(3, "/api/coach/**", AZUL) >> coach
-    hosting >> seta(3, "/api/bolao/**", AZUL) >> bolao
 
     stats >> seta(4, "leitura", AZUL) >> gold
     stats >> seta(4, "cache", AZUL) >> firestore
 
-    coach >> seta("5a", "pergunta → SQL/texto", ROXO) >> vertex
-    coach >> seta("5b", "SQL validado · read-only", ROXO) >> gold
+    coach >> seta("5a", "agente escolhe tools", ROXO) >> vertex
+    coach >> seta("5b", "tools · SQL parametrizado · read-only", ROXO) >> gold
 
-    bolao >> seta(6, "palpites · ranking", AZUL) >> firestore
+    hosting >> seta(6, "prancheta · estratégias salvas", AZUL) >> firestore
 
     # Ingestão
     riot >> seta(7, "upload", VERDE, constraint="false") >> gcs
     gcs >> seta(8, "novo arquivo (Eventarc)", VERDE, constraint="false") >> ingest
     ingest >> seta(9, "carrega NDJSON", VERDE) >> bronze
     ingest >> seta(9, "atualiza", VERDE) >> gold
-    ingest >> seta(10, "publica", LARANJA) >> pubsub
-    pubsub >> seta(11, "apura palpites → ranking", LARANJA, constraint="false") >> bolao
 
     # CI/CD
     github >> Edge(label=" push / PR ", color=CINZA, fontcolor=CINZA) >> actions

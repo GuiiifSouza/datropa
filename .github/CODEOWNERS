@@ -1,0 +1,14 @@
+# Quem revisa PR em cada pasta. O GitHub pede a revisão do dono automaticamente.
+# A última regra que casa com o arquivo vence.
+
+*                           @GuiiifSouza
+
+/front/                     @Lhobregat @RhuanKz
+/services/stats/            @gugisss @leoziN77
+/services/stats/sql/gold/   @leoziN77
+
+/services/coach/            @GuiiifSouza
+/services/ingest/           @GuiiifSouza
+/infra/                     @GuiiifSouza
+/.github/                   @GuiiifSouza
+/docs/arquitetura/          @GuiiifSouza
