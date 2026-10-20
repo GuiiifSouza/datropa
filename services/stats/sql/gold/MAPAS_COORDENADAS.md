@@ -1,44 +1,57 @@
-# Mapas e coordenadas — etapa de teste
+# Mapas e coordenadas — validacao de plants
 
-Destino: `datropa.valorant.chico_teste_mapas`. Dependencia: chico_teste_partidas.
-Catalogo apenas dos dez mapas presentes; IDs internos iguais aos das tabelas existentes.
-Nomes conferidos nos nomes dos 336 arquivos oficiais. Coeficientes candidatos transcritos
-do PDF Raio-X fornecido pelo Chico, nao verificados como calibracao de minimapa.
+Destino: datropa.valorant.chico_teste_mapas. Fonte: chico_teste_partidas.
+Dez mapas, 336 partidas. Apenas ambiente de teste, sem publicacao final.
 
-## Convencoes
+## Estado em 20/10/2026
 
-Eventos continuam nas coordenadas originais do jogo.
-O PDF propoe u = y*xm + xa; v = x*ym + ya, com troca de eixos.
-A proposta atual de docs/api.md usa u = x*x_multiplier + x_offset e
-v = y*y_multiplier + y_offset. Nao e possivel representar a troca nesse formato.
-Por isso transformacao publica e minimapa_url permanecem NULL em todos os mapas.
-transformacao_candidata e interna, nao deve ser serializada como transformacao pela API.
-A matriz candidata usa u = x*u_x + y*u_y + u_offset e
-v = x*v_x + y*v_y + v_offset, origem no canto superior esquerdo.
-No minimapa com largura W e altura H: pixel_x=u*W; pixel_y=v*H.
-Nao inverter eixos novamente nem limitar valores ao intervalo 0..1 para esconder erros.
-Summit/plummet nao tem coeficientes no PDF; permanece sem conversao.
+Chico confirmou visualmente os plants sobre as dez imagens locais usadas nos testes.
+Ascent: tres por site A/B; os outros mapas: ate tres por site (incluindo C).
+Summit: seis plants, todos corretos segundo Chico.
+Validacao visual executada pelo usuario; nao afirmar inspecao independente das imagens.
+Nao houve ajuste dos nove coeficientes do PDF.
+Ascent amostra 4 foi conferida contra bronze: mesma posicao, site, tempo e planter.
+Chico confirmou centro dentro da area de plant; somente a borda do marcador ultrapassava.
+Borda do circulo nao e a coordenada do evento.
 
-## Validacao
+calibracao_validada=true significa APENAS o escopo escopo_validacao:
+plants_visual_chico_2026_10_20. Nao significa teste de integracao, precisao absoluta
+nem validacao de todos os tipos de evento.
+Resta testar mortes/snapshots e prancheta real com o front.
 
-1. Dry run de mapas.sql; registrar bytes.
-2. Materializar somente chico_teste_mapas.
-3. Executar validacoes/mapas_teste.sql.
-   Esperado: 10 mapas/IDs, 336 partidas, 9 candidatos, 1 sem calibracao,
-   zero calibracoes validadas/publicadas, zero alertas e eventos_sem_mapa.
-   Ausencia de calibracao e pendencia explicita, nao falha de integridade.
-4. Executar validacoes/mapas_amostras.sql: 30 plants, tres por mapa.
-   Estar dentro da imagem nao comprova alinhamento.
-5. Com Lhobregat, escolher os minimapas com uso permitido e verificar tres plants
-   de cada mapa sobre a imagem exata, incluindo correspondencia do site.
-   Registrar imagem/versao, partida, round, resultado e evidencia visual.
-6. Resolver a convencao de eixos com Gugu/Lhobregat no contrato, em alteracao
-   autorizada pelos donos. Nao alterar o contrato nem o front nesta etapa.
-7. Somente apos isso publicar coeficientes/URLs e marcar calibracao validada.
-   Summit continua pendente ate obter e conferir uma referencia apropriada.
+## Summit
 
-## Evidencias
+Fonte consultada pelo Chico:
+https://valorant-api.com/v1/maps/756da597-416b-c0f2-f47b-afbdf28670bc
+Saida recebida: displayName=Summit; mapUrl=/Game/Maps/Plummet/Plummet;
+xMultiplier=0.000075; yMultiplier=-0.000075;
+xScalarToAdd=0.047401; yScalarToAdd=0.978891.
+Imagem usada:
+https://media.valorant-api.com/maps/756da597-416b-c0f2-f47b-afbdf28670bc/displayicon.png
+Guardar URL de Summit no catalogo; demais URLs nao foram fornecidas individualmente.
+Ainda registrar arquivos/URLs e versoes exatas dos outros nove minimapas no handoff.
 
-Conferencia local dos JSONs: 336 partidas, 10 mapas, todos com pelo menos tres plants.
-Dry run BigQuery, materializacao e validacao visual ainda pendentes.
-Nenhuma tabela final, merge ou deploy realizado.
+## Formula e contrato
+
+u = x*u_x + y*u_y + u_offset
+v = x*v_x + y*v_y + v_offset
+
+Nos dez mapas, u_x=0 e v_y=0: os eixos originais sao trocados.
+No minimapa inteiro: pixel_x=u*largura; pixel_y=v*altura.
+Origem superior esquerda. Nao trocar os eixos outra vez, nem limitar u/v para
+esconder coordenadas fora da imagem. Recorte/rotacao/margens exigem nova verificacao.
+
+transformacao_candidata conserva a matriz de seis campos por compatibilidade
+com os testes anteriores. As matrizes agora tiveram os plants conferidos.
+transformacao (formato simples de quatro campos no contrato) continua NULL:
+esse formato nao representa a troca de eixos. Gugu/Lhobregat devem alinhar a
+convencao publica; nao alterar docs/api.md ou o front nesta etapa.
+
+## Proxima execucao
+
+Dry run de mapas.sql atualizado; depois substituir somente chico_teste_mapas.
+Executar validacoes/mapas_teste.sql.
+Esperado: 10 mapas/IDs, 336 partidas, 10 matrizes, 0 sem calibracao,
+10 calibracoes validadas no escopo de plants, 10 mapas_com_plants_conferidos,
+0 transformacoes_publicadas, 0 alertas, 0 eventos_sem_mapa.
+Dry run e materializacao desta versao ainda pendentes.
