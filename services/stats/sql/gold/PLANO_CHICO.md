@@ -71,3 +71,7 @@ SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre 
 ## Evidencia recebida: dry run dos times
 
 20/10/2026: Chico executou `stats_time_partida.sql` com dry run. BigQuery retornou `Query successfully validated` e estimativa de 232028 bytes. Materializacao e validacao da tabela de teste pendentes.
+
+## Evidencia recebida: times por partida executados
+
+20/10/2026: validacao enviada pelo Chico: linhas=672, chaves_unicas=672, partidas=336, times=68, vitorias=336, derrotas=336, empates=0, alertas=0, rounds_times=13236, rounds_ganhos=6618, rounds_ataque=6618, rounds_defesa=6618, vitorias_ataque=3427, vitorias_defesa=3191, lados_inconsistentes=0, vitorias_inconsistentes=0. Totais coincidem com o calculo independente nos JSONs. Ainda apenas destino de teste.
