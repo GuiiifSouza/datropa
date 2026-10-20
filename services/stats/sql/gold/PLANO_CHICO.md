@@ -173,3 +173,21 @@ com cinco slots ordenados e ID de mapa/lista estavel; filtros antes de agregar.
 Referencia local dos 336 JSONs: 198 pares mapa/composicao, 3360 slots,
 336 vitorias e 336 derrotas, nenhuma composicao incompleta.
 Detalhes em COMPOSICOES.md. Dry run e materializacao BigQuery pendentes.
+
+## Composicoes: evidencia recebida
+
+20/10/2026: dry run aprovado, 935345 bytes. Saida enviada pelo Chico:
+672 linhas/chaves, 336 partidas, 68 times, 198 composicoes por mapa,
+3360 slots, 336 vitorias, 336 derrotas, 0 empates;
+alertas, composicoes_invalidas, ids_inconsistentes e listas_fora_de_ordem = 0.
+
+## Economia: preparada
+
+economia_time_round.sql usa soma loadoutValue dos cinco jogadores e limiares
+propostos no PDF, regra equipamento_time_10000_20000_v1:
+<10000 eco, <20000 force, >=20000 full. Mistos entram pela soma; pistol nas
+mesmas faixas. Nao significa intencao de compra. Revisar limites antes de publicar.
+Incompletos e time/partida todo zero ficam sem categoria, sem exclusao silenciosa.
+Referencia local: 13236 linhas, eco=2837/923 vitorias, force=2888/1413,
+full=7511/4282; zero dados incompletos. Detalhes em ECONOMIA.md.
+SQL e validacao enviados; dry run e execucao BigQuery pendentes.
