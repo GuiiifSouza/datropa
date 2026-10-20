@@ -113,3 +113,9 @@ Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao 
 ## Evidencia recebida: rounds executados
 
 20/10/2026: rounds=6618, chaves_unicas=6618, partidas=336, plants=4653, desarmes=1349, rounds_atipicos=6, vitorias_ataque=3427, vitorias_defesa=3191; alertas=0, numeracao_diferente_indice=0, resultados_sem_mapeamento=0, times_sem_id=0. Validacao no Cloud Shell enviada pelo Chico coincide com os totais independentes dos JSONs. Ainda somente tabela de teste.
+
+## Eventos de round: preparados
+
+`eventos_round.sql`: IDs SHA256 de partida/indice do round/posicao do evento na origem; ordem estavel por tempo e desempate deterministico. Coordenadas originais do jogo, sem transformacao. Abate usa posicao da vitima; plant/defuse usa spike. Snapshots so de abate/plant quando disponiveis; desarme tem array vazio, sem inventar posicoes. Arma so quando damageType=Weapon, sem converter habilidade em UUID de arma.
+Preserva self-kills e fogo amigo com flags, distinguindo abate_adversario. Para calor de abates atribuiveis ao autor/time, filtrar abate_adversario; revisar a semantica na integracao, para nao misturar fogo amigo/ambiente com combate adversario. Sem mudanca no envelope publico nesta etapa.
+Referencia local: 52755 eventos, 46753 abates/mortes (46371 contra adversario, 373 self-kills e 9 outros entre jogadores), 4653 plants, 1349 desarmes. Todos os atores/vitimas da origem pertencem aos jogadores validos; coordenadas de evento e tempos de abate presentes. Funcoes, colecoes e schema SQL ainda precisam de dry run BigQuery. Destino: chico_teste_eventos_round; dependencias: chico_teste_rounds e chico_teste_stats_jogador_partida.
