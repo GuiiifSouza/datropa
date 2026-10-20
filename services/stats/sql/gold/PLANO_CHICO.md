@@ -75,3 +75,7 @@ SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre 
 ## Evidencia recebida: times por partida executados
 
 20/10/2026: validacao enviada pelo Chico: linhas=672, chaves_unicas=672, partidas=336, times=68, vitorias=336, derrotas=336, empates=0, alertas=0, rounds_times=13236, rounds_ganhos=6618, rounds_ataque=6618, rounds_defesa=6618, vitorias_ataque=3427, vitorias_defesa=3191, lados_inconsistentes=0, vitorias_inconsistentes=0. Totais coincidem com o calculo independente nos JSONs. Ainda apenas destino de teste.
+
+## Resumo de times: preparado
+
+`stats_time.sql` agrega a base por partida com GROUPING SETS: escopo='geral' (mapa_id null) ou escopo='mapa'. Nao misturar os dois escopos na soma. Referencia independente dos nomes e mapIds dos JSONs: 68 times e 264 pares time/mapa, total 332 linhas. Cada escopo soma 672 participacoes, 336 vitorias e 336 derrotas. Percentuais recalculados a partir dos totais. Filtros adicionais de periodo/torneio devem ser aplicados a stats_time_partida antes de agregar, nao depois na tabela total. Dry run e execucao pendentes. Destino de teste: chico_teste_stats_time.
