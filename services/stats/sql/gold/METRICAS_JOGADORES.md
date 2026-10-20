@@ -41,3 +41,7 @@ bq --project_id=datropa --location=southamerica-east1 query --use_legacy_sql=fal
 ```
 
 O destino e exclusivamente de teste. Nao promover tabelas finais ou alterar contrato publico ate revisar discrepancias e amostras. Sem merge nesta etapa.
+
+## Evidencia recebida: dry run
+
+20/10/2026: Chico executou o dry run de `stats_jogador_partida.sql`. BigQuery retornou `Query successfully validated` e estimativa de 24274906 bytes (23,15 MiB). Materializacao e verificacao dos resultados ainda pendentes.
