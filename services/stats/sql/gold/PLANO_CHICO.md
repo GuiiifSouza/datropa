@@ -218,3 +218,12 @@ Chico enviou as 21 verificacoes com passou=true.
 Resumo, consumo, ordem de publicacao e pendencias em ENTREGA_CHICO.md.
 Gold principal e coletiva implementadas e testadas; conversao de mapas ainda
 pendente, sem publicacao final nem integracao ponta a ponta comprovada.
+
+## Dez mapas: plants conferidos pelo Chico
+
+20/10/2026: Chico confirmou plants de Ascent e dos outros oito mapas do PDF,
+depois Summit com coeficientes obtidos por consulta da Valorant-API no Cloud Shell:
+xm=0.000075, ym=-0.000075, xa=0.047401, ya=0.978891.
+SQL e validacao atualizados; calibracao_validada tem escopo explicito de plants.
+Transformacao publica permanece NULL ate alinhamento de eixos no contrato.
+Ver MAPAS_COORDENADAS.md. Dry run/materializacao da nova versao pendentes.
