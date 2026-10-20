@@ -10,8 +10,7 @@ WITH referencia AS (
     STRUCT('juliett', 'Sunset', 0.000078, -0.000078, 0.5, 0.515625),
     STRUCT('pitt', 'Pearl', 0.000078, -0.000078, 0.480469, 0.916016),
     STRUCT('triad', 'Haven', 0.000075, -0.000075, 1.09345, 0.642728),
-    STRUCT('plummet', 'Summit', CAST(NULL AS FLOAT64), CAST(NULL AS FLOAT64),
-      CAST(NULL AS FLOAT64), CAST(NULL AS FLOAT64))
+    STRUCT('plummet', 'Summit', 0.000075, -0.000075, 0.047401, 0.978891)
   ])
 ), presentes AS (
   SELECT mapa_id, MIN(mapa_id_origem) AS mapa_id_origem,
@@ -21,18 +20,24 @@ WITH referencia AS (
   GROUP BY mapa_id
 )
 SELECT p.mapa_id AS id, p.mapa_id, p.mapa_id_origem, r.nome, p.partidas,
-  CAST(NULL AS STRING) AS minimapa_url,
+  IF(p.mapa_id = 'plummet',
+    'https://media.valorant-api.com/maps/756da597-416b-c0f2-f47b-afbdf28670bc/displayicon.png',
+    CAST(NULL AS STRING)) AS minimapa_url,
   -- Campo publico do contrato: indisponivel ate validar com o front.
   CAST(NULL AS STRUCT<x_multiplier FLOAT64, x_offset FLOAT64,
     y_multiplier FLOAT64, y_offset FLOAT64>) AS transformacao,
   IF(r.xm IS NULL, NULL,
     STRUCT(0.0 AS u_x, r.xm AS u_y, r.xa AS u_offset,
       r.ym AS v_x, 0.0 AS v_y, r.ya AS v_offset)) AS transformacao_candidata,
-  IF(r.xm IS NULL, CAST(NULL AS STRING), 'raio_x_pdf_2026_10_20') AS fonte_candidata,
-  FALSE AS calibracao_validada,
+  CASE WHEN r.xm IS NULL THEN NULL
+    WHEN p.mapa_id = 'plummet' THEN 'valorant_api_plummet_2026_10_20'
+    ELSE 'raio_x_pdf_2026_10_20' END AS fonte_candidata,
+  r.nome IS NOT NULL AND r.xm IS NOT NULL AS calibracao_validada,
+  IF(r.nome IS NOT NULL AND r.xm IS NOT NULL,
+    'plants_visual_chico_2026_10_20', NULL) AS escopo_validacao,
   CASE WHEN r.nome IS NULL THEN 'mapa_sem_referencia'
     WHEN r.xm IS NULL THEN 'sem_calibracao'
-    ELSE 'aguarda_validacao_visual' END AS status_calibracao,
+    ELSE 'plants_validados_contrato_pendente' END AS status_calibracao,
   CASE WHEN r.nome IS NULL THEN 'mapa_sem_referencia'
     WHEN p.variantes_origem != 1 THEN 'origem_ambigua'
     ELSE 'ok' END AS status_qualidade
