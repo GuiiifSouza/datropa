@@ -93,3 +93,7 @@ SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre 
 `stats_mapa.sql`: 10 mapas; fonte partidas, nao contar uma partida por jogador. mapa_id interno estavel e nome publico derivado do arquivo; este resumo nao e a futura tabela `mapas` de conversao de coordenadas.
 `stats_agente.sql`: 28 UUIDs, 3360 aparicoes jogador-partida e 1680 vitorias. Funcao, nome e icone dependem do catalogo de Gugu, sem fontes externas adicionadas nesta etapa. Agregacoes de dano, rounds e tiros preservam contadores para recalcular taxas.
 Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao conjunta em validacoes/mapas_agentes_teste.sql. Dry runs e execucoes pendentes.
+
+## Evidencias recebidas: dry runs de mapas e agentes
+
+20/10/2026: ambos retornaram `Query successfully validated` no Cloud Shell do Chico. stats_mapa.sql: 21709 bytes. stats_agente.sql: 386400 bytes. Materializacao e validacao conjunta ainda pendentes.
