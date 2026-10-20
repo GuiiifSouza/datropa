@@ -79,3 +79,7 @@ SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre 
 ## Resumo de times: preparado
 
 `stats_time.sql` agrega a base por partida com GROUPING SETS: escopo='geral' (mapa_id null) ou escopo='mapa'. Nao misturar os dois escopos na soma. Referencia independente dos nomes e mapIds dos JSONs: 68 times e 264 pares time/mapa, total 332 linhas. Cada escopo soma 672 participacoes, 336 vitorias e 336 derrotas. Percentuais recalculados a partir dos totais. Filtros adicionais de periodo/torneio devem ser aplicados a stats_time_partida antes de agregar, nao depois na tabela total. Dry run e execucao pendentes. Destino de teste: chico_teste_stats_time.
+
+## Evidencia recebida: dry run do resumo de times
+
+20/10/2026: Chico executou `stats_time.sql` com dry run. Resultado: `Query successfully validated`, estimativa de 125497 bytes. Execucao e validacao dos resultados pendentes.
