@@ -59,3 +59,7 @@ Referencia local atualizada: 411 jogadores validos distintos na base completa de
 API com filtros deve usar a tabela jogador-partida, aplicar filtros de torneio/mapa/agente/time/data e entao a mesma agregacao; filtrar este ranking total depois nao produz resultados corretos.
 SQL nao define ordem de armazenamento: API ordena por kills/kd/adr e jogador_id de desempate conforme contrato.
 Datas de partida nao representam hora de atualizacao da gold; meta.atualizado_em continua null ate haver metadado de carga.
+
+## Evidencia recebida: dry run do ranking
+
+20/10/2026: Chico executou `ranking_jogador.sql` com dry run. Resultado: `Query successfully validated`, estimativa de 996878 bytes. Execucao e validacao da tabela de teste do ranking ainda pendentes.
