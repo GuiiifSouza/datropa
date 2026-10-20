@@ -210,3 +210,11 @@ Esperadas 21 verificacoes com passou=true. Dry run e execucao pendentes.
 Isso nao conclui a calibracao de mapas nem a integracao API/front.
 Extensoes do PDF (KAST, trocas, isolamento, WPA/percentis) nao foram implementadas
 nesta etapa; revisar prioridade/escopo explicitamente antes de declarar entrega total.
+
+## Conferencia conjunta: aprovada
+
+20/10/2026: dry run de conjunto_teste.sql aprovado, 6997754 bytes.
+Chico enviou as 21 verificacoes com passou=true.
+Resumo, consumo, ordem de publicacao e pendencias em ENTREGA_CHICO.md.
+Gold principal e coletiva implementadas e testadas; conversao de mapas ainda
+pendente, sem publicacao final nem integracao ponta a ponta comprovada.
