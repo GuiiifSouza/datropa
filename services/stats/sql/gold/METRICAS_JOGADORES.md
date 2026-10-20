@@ -63,3 +63,7 @@ Datas de partida nao representam hora de atualizacao da gold; meta.atualizado_em
 ## Evidencia recebida: dry run do ranking
 
 20/10/2026: Chico executou `ranking_jogador.sql` com dry run. Resultado: `Query successfully validated`, estimativa de 996878 bytes. Execucao e validacao da tabela de teste do ranking ainda pendentes.
+
+## Evidencia recebida: ranking executado
+
+20/10/2026: validacao enviada pelo Chico: jogadores=411, ids_unicos=411, participacoes=3360, rounds_jogador=66180, kills=46371, deaths=46428, assists=17839, dano_total=8906484, first_bloods=6588. alertas=0, kd_incorreto=0, adr_incorreto=0, hs_incorreto=0, time_atribuido_indevidamente=0. Ranking geral validado nessas verificacoes. Ainda em tabela de teste, sem publicacao final.
