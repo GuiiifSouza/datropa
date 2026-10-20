@@ -4,8 +4,10 @@
 Chico informou em 20/10/2026 que Guilherme aprovou a oficializacao e delegou a
 Chico as decisoes de dados antes pendentes de Gustavo/Gugu. Essas decisoes ficam
 registradas aqui para implementacao da API. Nao representam API implementada.
-SQLs preparados; execucao oficial e bytes de dry run ainda aguardam Cloud Shell.
-Nao afirmar publicacao concluida antes das saidas e validacoes reais.
+PUBLICACAO CONFIRMADA pelos logs enviados por Chico: 13 tabelas oficiais criadas,
+13 dry runs oficiais aprovados, 24 verificacoes conjuntas passou=true e validacoes
+individuais revisadas com zero alertas. Evidencias em PUBLICACAO_GOLD_336_V1.md.
+Merge e integracao API/front/coach continuam pendentes.
 
 ## Fontes oficiais e destinos
 Projeto datropa, dataset valorant, regiao southamerica-east1.
