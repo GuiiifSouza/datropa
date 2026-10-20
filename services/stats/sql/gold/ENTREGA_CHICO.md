@@ -76,9 +76,69 @@ transformacoes_publicadas=0, alertas=0, eventos_sem_mapa=0.
 Dry run de mapas.sql: 10638 bytes.
 
 A validacao cobre os plants amostrados nas imagens locais usadas.
-Ainda nao cobre mortes, snapshots, API nem prancheta.
+Mortes e snapshots tambem foram conferidos pelo Chico nos dez mapas, conforme
+registro abaixo. A conferencia local nao cobre API nem prancheta integrada.
 O teste de Ascent em SVG foi preparado, mas seu resultado nao foi confirmado.
 Se o SVG mudar recorte, orientacao ou margens, conferir novamente o alinhamento.
+
+
+## Mortes e snapshots: conferencia local em 20/10/2026
+
+Resultado informado pelo Chico, sem afirmar cobertura de todos os eventos:
+- Ascent, Fracture, Lotus, Pearl, Split, Summit e Sunset: amostras visualmente corretas.
+- Abyss: demais amostras corretas; amostras 1 e 2 no round 14 da partida
+  6ad69da1-9dac-459b-88a7-108fdbd71bfa com vitimas fora da area do mapa.
+  JSON original registra cinco mortes Fall nesse round; duas aos 23779 e 23798 ms.
+  Queda confirmada; intencao e correspondencia exata com cada amostra nao confirmadas.
+- Breeze: amostras 8 e 9, rounds 17 e 6, partida
+  72a9e2e7-f86a-483b-a35c-8291e8c71c89.
+  Round 6: Kaytoh mata INTL Psychovv (Iso), 70619 ms, vitima x=-50627, y=676.
+  Round 17: INTL Psychovv (Iso) mata ddz, 17995 ms, vitima x=-49653, y=-947.
+  Ambos Weapon e anteriores ao plant; explosao da spike nao explica esses eventos.
+- Haven: amostras 8 e 9 nas partidas ffe8bfdd-1687-44cc-8fcf-1e2358999044
+  e 4934cac4-80c0-4ece-a51e-ec6a1f644436; vitimas com x proximo de -50000,
+  mortes Weapon envolvendo Iso. Ha varios eventos assim nesses JSONs; vincular
+  cada captura ao evento_id antes de atribuir uma amostra a um abate especifico.
+
+Investigacao registrada nesta conversa: varredura dos JSONs locais encontrou
+12 mortes com victimLocation.x < -40000; todas envolviam Iso como autor ou vitima.
+A arena da ultimate e uma explicacao forte, mas o JSON consultado nao registra
+explicitamente a entrada na arena. Confirmacao por video continua pendente.
+Nao usar esse limiar sozinho como classificador universal de habilidade.
+Referencia de comportamento: https://playvalorant.com/en-gb/news/game-updates/valorant-patch-notes-10-04/
+
+### Tratamento proposto e implementacao do teste
+
+- Manter matrizes e coordenadas originais; nao deslocar nem limitar pontos a borda.
+- Preservar os eventos e contadores; separar a exibicao espacial da estatistica.
+- O teste mostra somente marcadores dentro da imagem e lista as coordenadas externas.
+  Ausencia de marcador nao significa ausencia de abate.
+- Avisar explicitamente vitima fora da imagem ou posicao invalida.
+- Exibir possivel arena do Iso como hipotese apenas com coordenada extrema e
+  associacao ao agente nos participantes ou nas partidas investigadas.
+- Limites 0 a 1 medem a imagem, nao a area caminhavel. Quedas podem estar dentro
+  da imagem e fora da area jogavel; nao classificar toda queda como erro.
+- Sem mudanca de schema, SQL produtivo ou contrato publico neste ajuste.
+  API/front ainda precisam acordar classificacao, avisos e exclusao de posicoes
+  externas dos mapas de calor, preservando os totais de abates.
+
+Script versionado: validacoes/atualizar_htmls_mortes.py.
+Na raiz do checkout, executar:
+```bash
+python3 services/stats/sql/gold/validacoes/atualizar_htmls_mortes.py
+cloudshell download testes_mortes_revisados/testes_mortes_revisados.zip
+```
+Reutiliza os HTMLs e dados ja exportados, sem consultar BigQuery. Gera copias,
+preserva os originais e permite selecionar PNG/SVG como antes.
+Se os HTMLs originais nao estiverem no checkout local, recupera-los primeiro.
+
+- [x] Registrar conferencia local dos dez mapas e evidencias das excecoes.
+- [x] Preparar script de revisao dos HTMLs com avisos para vitima e snapshots.
+- [ ] Chico executar script e reconferir Abyss, Breeze e Haven; informar evento_id,
+  imagem/versao e resultado. O novo HTML ainda nao foi conferido por ele.
+- [ ] Confirmar hipotese da arena do Iso por video, se disponivel.
+- [ ] Gugu e front acordarem o tratamento publico de posicoes externas.
+- [ ] Chico apoiar a conferencia na prancheta integrada apos API/front prontos.
 
 ## O que falta ao Chico, em ordem
 
@@ -120,8 +180,9 @@ Se o SVG mudar recorte, orientacao ou margens, conferir novamente o alinhamento.
 | Guilherme | Revisar PR, fazer merge e coordenar publicacao/acesso/deploy; preservar os seis JSONs corrigidos na fonte de recarga | Publicacao aprovada, consumo pela API/coach e teste final |
 | Time / organizacao, via Lhobregat e Guilherme | Confirmar permissao/licenca de uso dos metadados e imagens externos conforme plano-de-acao.md | Uso desses recursos na entrega oficial |
 
-Chico pode adiantar o registro das evidencias e a conferencia de mortes/snapshots
-nas imagens de teste sem esperar a API. O teste no produto depende da integracao.
+Chico concluiu a conferencia visual local das amostras de mortes/snapshots.
+Falta repetir as amostras afetadas com os avisos revisados e registrar imagens/versoes.
+O teste no produto depende da integracao.
 Nao e responsabilidade do Chico implementar API, telas, coach, IAM ou deploy.
 Ele fornece SQL, regras, evidencias e apoio para conferir os dados consumidos.
 
