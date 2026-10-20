@@ -46,7 +46,7 @@ O front usa esses exemplos como mock até a API real subir. Assim ninguém fica 
 
 ### Segunda 19/10 (até 23h)
 
-- **Guilherme:** feito. Projeto GCP, APIs, bucket com os 330 JSONs, dataset `valorant` com o bronze carregado, Firebase, limite de custo e acesso do chico e do gugu ao BigQuery. Estado e pendências em [infra/README.md](../infra/README.md).
+- **Guilherme:** feito. Projeto GCP, APIs, bucket com os 336 JSONs, dataset `valorant` com o bronze carregado, Firebase, limite de custo e acesso do chico e do gugu ao BigQuery. Estado e pendências em [infra/README.md](../infra/README.md).
 - **Todos:** clonar, ler o `AGENTS.md` e o `docs/dados.md`, baixar a base em `data/raw` e aceitar o convite do repo.
 - **gugu:** `docs/api.md`, com o chico, o Guilherme e o front.
 - **Lhobregat:**
