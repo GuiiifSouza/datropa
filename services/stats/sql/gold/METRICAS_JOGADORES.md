@@ -45,3 +45,7 @@ O destino e exclusivamente de teste. Nao promover tabelas finais ou alterar cont
 ## Evidencia recebida: dry run
 
 20/10/2026: Chico executou o dry run de `stats_jogador_partida.sql`. BigQuery retornou `Query successfully validated` e estimativa de 24274906 bytes (23,15 MiB). Materializacao e verificacao dos resultados ainda pendentes.
+
+## Evidencia recebida: teste executado
+
+20/10/2026: Chico executou a validacao na tabela de teste. Resultado: linhas=3360, chaves_unicas=3360, partidas=336, alertas=0, rounds_jogador=66180, kills=46371, deaths=46428, assists=17839, dano_total=8906484, first_bloods=6588, kd_incorreto=0, hs_fora_da_faixa=0, diferencas_kills=0, diferencas_deaths=308, diferencas_assists=134. Todos esses totais coincidem com o calculo independente nos JSONs. Nenhuma tabela final publicada.
