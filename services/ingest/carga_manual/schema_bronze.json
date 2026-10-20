@@ -1,0 +1,646 @@
+[
+  {
+    "name": "matchInfo",
+    "type": "RECORD",
+    "mode": "NULLABLE",
+    "fields": [
+      {
+        "name": "matchId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "mapId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gameVersion",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gameLengthMillis",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "region",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gameStartMillis",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "provisioningFlowId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "isCompleted",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "customGameName",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "queueId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gameMode",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "isRanked",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "seasonId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "premierMatchInfo",
+        "type": "JSON",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "players",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "puuid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "gameName",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "tagLine",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "teamId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "partyId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "characterId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "stats",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+          {
+            "name": "score",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "roundsPlayed",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "kills",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "deaths",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "assists",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "playtimeMillis",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "abilityCasts",
+            "type": "RECORD",
+            "mode": "NULLABLE",
+            "fields": [
+              {
+                "name": "grenadeCasts",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ability1Casts",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ability2Casts",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ultimateCasts",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "competitiveTier",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "isObserver",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "playerCard",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "playerTitle",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "accountLevel",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "coaches",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "puuid",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "teamId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "teams",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "teamId",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "won",
+        "type": "BOOLEAN",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "roundsPlayed",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "roundsWon",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "numPoints",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "rank",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "roundResults",
+    "type": "RECORD",
+    "mode": "REPEATED",
+    "fields": [
+      {
+        "name": "roundNum",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "roundResult",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "roundCeremony",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "winningTeam",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "winningTeamRole",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "bombPlanter",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "bombDefuser",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "plantRoundTime",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "plantPlayerLocations",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "puuid",
+            "type": "STRING",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "viewRadians",
+            "type": "FLOAT",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "location",
+            "type": "RECORD",
+            "mode": "NULLABLE",
+            "fields": [
+              {
+                "name": "x",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "y",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "plantLocation",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+          {
+            "name": "x",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "y",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          }
+        ]
+      },
+      {
+        "name": "plantSite",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "defuseRoundTime",
+        "type": "INTEGER",
+        "mode": "NULLABLE"
+      },
+      {
+        "name": "defusePlayerLocations",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "puuid",
+            "type": "STRING",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "viewRadians",
+            "type": "FLOAT",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "location",
+            "type": "RECORD",
+            "mode": "NULLABLE",
+            "fields": [
+              {
+                "name": "x",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "y",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "defuseLocation",
+        "type": "RECORD",
+        "mode": "NULLABLE",
+        "fields": [
+          {
+            "name": "x",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "y",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          }
+        ]
+      },
+      {
+        "name": "playerStats",
+        "type": "RECORD",
+        "mode": "REPEATED",
+        "fields": [
+          {
+            "name": "puuid",
+            "type": "STRING",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "kills",
+            "type": "RECORD",
+            "mode": "REPEATED",
+            "fields": [
+              {
+                "name": "timeSinceGameStartMillis",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "timeSinceRoundStartMillis",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "killer",
+                "type": "STRING",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "victim",
+                "type": "STRING",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "victimLocation",
+                "type": "RECORD",
+                "mode": "NULLABLE",
+                "fields": [
+                  {
+                    "name": "x",
+                    "type": "INTEGER",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "y",
+                    "type": "INTEGER",
+                    "mode": "NULLABLE"
+                  }
+                ]
+              },
+              {
+                "name": "assistants",
+                "type": "STRING",
+                "mode": "REPEATED"
+              },
+              {
+                "name": "playerLocations",
+                "type": "RECORD",
+                "mode": "REPEATED",
+                "fields": [
+                  {
+                    "name": "puuid",
+                    "type": "STRING",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "viewRadians",
+                    "type": "FLOAT",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "location",
+                    "type": "RECORD",
+                    "mode": "NULLABLE",
+                    "fields": [
+                      {
+                        "name": "x",
+                        "type": "INTEGER",
+                        "mode": "NULLABLE"
+                      },
+                      {
+                        "name": "y",
+                        "type": "INTEGER",
+                        "mode": "NULLABLE"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "name": "finishingDamage",
+                "type": "RECORD",
+                "mode": "NULLABLE",
+                "fields": [
+                  {
+                    "name": "damageType",
+                    "type": "STRING",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "damageItem",
+                    "type": "STRING",
+                    "mode": "NULLABLE"
+                  },
+                  {
+                    "name": "isSecondaryFireMode",
+                    "type": "BOOLEAN",
+                    "mode": "NULLABLE"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "damage",
+            "type": "RECORD",
+            "mode": "REPEATED",
+            "fields": [
+              {
+                "name": "receiver",
+                "type": "STRING",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "damage",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "legshots",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "bodyshots",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "headshots",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              }
+            ]
+          },
+          {
+            "name": "score",
+            "type": "INTEGER",
+            "mode": "NULLABLE"
+          },
+          {
+            "name": "economy",
+            "type": "RECORD",
+            "mode": "NULLABLE",
+            "fields": [
+              {
+                "name": "loadoutValue",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "weapon",
+                "type": "STRING",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "armor",
+                "type": "STRING",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "remaining",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "spent",
+                "type": "INTEGER",
+                "mode": "NULLABLE"
+              }
+            ]
+          },
+          {
+            "name": "ability",
+            "type": "RECORD",
+            "mode": "NULLABLE",
+            "fields": [
+              {
+                "name": "grenadeEffects",
+                "type": "JSON",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ability1Effects",
+                "type": "JSON",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ability2Effects",
+                "type": "JSON",
+                "mode": "NULLABLE"
+              },
+              {
+                "name": "ultimateEffects",
+                "type": "JSON",
+                "mode": "NULLABLE"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "roundResultCode",
+        "type": "STRING",
+        "mode": "NULLABLE"
+      }
+    ]
+  },
+  {
+    "name": "_arquivo",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  },
+  {
+    "name": "_pasta",
+    "type": "STRING",
+    "mode": "NULLABLE"
+  }
+]
