@@ -87,3 +87,9 @@ SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre 
 ## Evidencia recebida: resumo dos times executado
 
 20/10/2026: linhas=332, chaves_unicas=332, times_gerais=68, recortes_time_mapa=264, participacoes_gerais=672, participacoes_por_mapa=672, vitorias=336, derrotas=336, rounds_times=13236, alertas=0, resultados_inconsistentes=0, taxas_incorretas=0. Validacao enviada pelo Chico confere com a referencia local. Destino ainda de teste.
+
+## Mapas e agentes: preparados
+
+`stats_mapa.sql`: 10 mapas; fonte partidas, nao contar uma partida por jogador. mapa_id interno estavel e nome publico derivado do arquivo; este resumo nao e a futura tabela `mapas` de conversao de coordenadas.
+`stats_agente.sql`: 28 UUIDs, 3360 aparicoes jogador-partida e 1680 vitorias. Funcao, nome e icone dependem do catalogo de Gugu, sem fontes externas adicionadas nesta etapa. Agregacoes de dano, rounds e tiros preservam contadores para recalcular taxas.
+Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao conjunta em validacoes/mapas_agentes_teste.sql. Dry runs e execucoes pendentes.
