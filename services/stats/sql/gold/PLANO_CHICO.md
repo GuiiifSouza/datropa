@@ -60,3 +60,10 @@ Sem JSONs brutos, dados pessoais, PDF ou credenciais em commit. Bronze corrigida
 ## Evidencia recebida: tabela de teste de partidas
 
 20/10/2026: saida de `validacoes/partidas_teste.sql` enviada pelo Chico: linhas=336, partidas_unicas=336, partidas_com_alerta=0, cores_nao_resolvidas=0, times_sem_id=0, partidas_sem_inicio=0, rounds_totais=6618. A tabela `valorant.chico_teste_partidas` passou nessas verificacoes agregadas. Conferencia de amostras e tabela final ainda pendentes. Nenhum merge ou publicacao de tabela final realizado.
+
+## Times por partida: etapa preparada
+
+`stats_time_partida.sql`: duas linhas por partida, nomes e IDs estaveis, adversario, placar, resultado e contadores por lado. Ataque/defesa vem de winningTeamRole e winningTeam, inclusive overtime; nao de uma regra fixa de numero do round nem da cor.
+Dependencia: chico_teste_partidas. Destino: chico_teste_stats_time_partida.
+Validacao local independente: 672 linhas/336 partidas/68 slugs de time, 336 vitorias e 336 derrotas, 0 empates, 13236 rounds-times, 6618 rounds ganhos. Rounds ataque=6618 e defesa=6618; vitorias ataque=3427 e defesa=3191. Todos os placares conferidos contra os vencedores dos rounds.
+SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre esta granularidade, preservando filtros da API.
