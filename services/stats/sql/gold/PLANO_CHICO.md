@@ -56,3 +56,7 @@ Sem JSONs brutos, dados pessoais, PDF ou credenciais em commit. Bronze corrigida
 ## Evidencia recebida: primeiro dry run
 
 20/10/2026: Chico executou o dry run de `partidas.sql` no Cloud Shell. Saida: `Query successfully validated. Assuming the tables are not modified, running this query will process 67622494 bytes of data.` Estimativa: 67.622.494 bytes (64,49 MiB). Ainda nao comprova resultados: materializacao e validacao da tabela de teste pendentes.
+
+## Evidencia recebida: tabela de teste de partidas
+
+20/10/2026: saida de `validacoes/partidas_teste.sql` enviada pelo Chico: linhas=336, partidas_unicas=336, partidas_com_alerta=0, cores_nao_resolvidas=0, times_sem_id=0, partidas_sem_inicio=0, rounds_totais=6618. A tabela `valorant.chico_teste_partidas` passou nessas verificacoes agregadas. Conferencia de amostras e tabela final ainda pendentes. Nenhum merge ou publicacao de tabela final realizado.
