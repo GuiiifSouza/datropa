@@ -11,7 +11,7 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 | Recurso | Nome | Observação |
 |---|---|---|
 | Bucket | `gs://datropa-raw-matches` | JSONs originais em `partidas/`, NDJSON do bronze em `bronze/`. Acesso uniforme, sem acesso público |
-| BigQuery | dataset `valorant` | `bronze_partidas` com 330 linhas. A gold é do chico |
+| BigQuery | dataset `valorant` | `bronze_partidas` com 336 linhas. A gold é do chico |
 | Firestore | `(default)`, modo Native | Regras ainda fechadas (padrão) |
 | Vertex AI | `gemini-2.5-flash` | É o único Gemini disponível na região. Os modelos Gemini 3 não estão em `southamerica-east1` |
 | Firebase | web app `datropa-front` | Login por e-mail e senha. Hosting em `datropa.web.app` |
