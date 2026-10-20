@@ -52,3 +52,7 @@ Diferencas a resolver antes de copiar regras:
 - Pesos WPA e modelo treinado precisam de versao, verificacao e evidencia antes de alimentar recomendacoes. As coordenadas/calibracoes e funcoes de agentes do PDF nao foram conferidas contra fontes estaticas autorizadas.
 
 Sem JSONs brutos, dados pessoais, PDF ou credenciais em commit. Bronze corrigida manualmente para 336; Guilherme deve preservar isso na fonte de recarga.
+
+## Evidencia recebida: primeiro dry run
+
+20/10/2026: Chico executou o dry run de `partidas.sql` no Cloud Shell. Saida: `Query successfully validated. Assuming the tables are not modified, running this query will process 67622494 bytes of data.` Estimativa: 67.622.494 bytes (64,49 MiB). Ainda nao comprova resultados: materializacao e validacao da tabela de teste pendentes.
