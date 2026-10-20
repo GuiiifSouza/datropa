@@ -5,7 +5,10 @@ Estado: 13 tabelas de TESTE criadas; validacoes individuais executadas e
 21 verificacoes conjuntas aprovadas pelo Chico no Cloud Shell.
 Nenhum merge ou publicacao final realizado por esta entrega.
 Plants conferidos pelo Chico nos dez mapas; Summit incluido no SQL.
-Atualizacao dessa tabela no BigQuery, contrato da conversao e integracao pendentes.
+Tabela de mapas atualizada no BigQuery e validada pelo Chico em 20/10/2026.
+Contrato da conversao, destinos finais, publicacao e integracao ainda pendentes.
+Este estado considera as saidas e conferencias enviadas pelo Chico; nao representa
+nova execucao independente no BigQuery nem verificacao do produto publicado.
 
 ## Evidencia conjunta
 
@@ -58,32 +61,69 @@ Todos os nomes abaixo possuem o prefixo chico_teste_.
 - Busca, comparacoes, filtros e envelopes sao trabalho da API; nao pressupor
   que necessitam de uma tabela materializada por rota.
 
-## Pendencias para conversar com o time
+## Mapas: etapa de plants concluida em teste
 
-### Chico + Lhobregat/Rhuan
-Receber imagens/URLs dos minimapas exatos, com orientacao, recortes e margens.
-Validar pelo menos tres plants por mapa sobre essas imagens.
-Nove matrizes do PDF e a de Summit da Valorant-API tiveram os plants conferidos
-pelo Chico. Summit deixou de estar sem formula. Veja MAPAS_COORDENADAS.md.
-Ter u/v entre 0 e 1 nao comprova alinhamento.
-Transformacao publica continua NULL ate alinhar eixos no contrato.
-Somente a URL de Summit foi fornecida e registrada; faltam URLs/versoes das outras imagens.
-A disponibilidade/uso de metadados externos depende do alinhamento do time com
-a organizacao conforme docs/plano-de-acao.md.
+Plants conferidos pelo Chico em Ascent, Abyss, Breeze, Fracture, Haven, Lotus,
+Pearl, Split, Sunset e Summit. Manter as formulas atuais.
+Amostra 4 de Ascent esclarecida: centro correto; borda do marcador fora do site
+nao representa erro da coordenada. As seis amostras de Ascent conferiram contra
+a bronze nos campos comparados.
 
-### Chico + Gugu
-Acordar nomes finais e versao da carga, convencao de eixos e campos de mapas.
-O PDF troca eixos; a proposta simples atual de docs/api.md nao representa isso.
-Validar limites economicos e rotulo de retake antes da publicacao.
-API deve filtrar por partida antes de agregar, preservar NULL e recalcular razoes.
-Diferencas resumo/eventos e rounds atipicos continuam explicitas; nao filtrar
-ou mudar regras sem alinhamento.
-MVP e rounds decisivos permanecem sem criterio acordado, conforme contrato.
+Chico executou o SQL atualizado de mapas e enviou a validacao:
+mapas=10, ids_unicos=10, partidas=336, matrizes_disponiveis=10,
+sem_calibracao=0, calibracoes_validadas=10, mapas_com_plants_conferidos=10,
+transformacoes_publicadas=0, alertas=0, eventos_sem_mapa=0.
+Dry run de mapas.sql: 10638 bytes.
 
-### Guilherme
-Revisar e fazer merge do PR da pasta gold. Coordenar publicacao e acesso da API.
-Preservar as seis partidas corrigidas na origem da recarga: bronze tem 336.
-Nao recarregar dados nem mudar IAM/infra como parte desta revisao de SQL.
+A validacao cobre os plants amostrados nas imagens locais usadas.
+Ainda nao cobre mortes, snapshots, API nem prancheta.
+O teste de Ascent em SVG foi preparado, mas seu resultado nao foi confirmado.
+Se o SVG mudar recorte, orientacao ou margens, conferir novamente o alinhamento.
+
+## O que falta ao Chico, em ordem
+
+- [ ] Fechar com Gustavo (Gugu) os nomes e destinos finais das 13 tabelas e a
+  versao da carga. A mensagem de alinhamento ja foi enviada pelo Chico;
+  o retorno ainda nao foi informado nesta conversa.
+- [ ] Fechar com Gugu e Lhobregat a transformacao publica dos mapas. Proposta:
+  matriz de seis campos ja existente no SQL:
+  `u=x*u_x+y*u_y+u_offset`; `v=x*v_x+y*v_y+v_offset`.
+  Origem superior esquerda, coordenadas normalizadas; nao trocar eixos duas vezes.
+  Gugu atualiza o contrato/API; Chico ajusta a saida de mapas.sql ao acordo.
+  O campo publico transformacao continua NULL ate esse alinhamento.
+- [ ] Registrar os arquivos/URLs e versoes exatas dos minimapas do front com
+  Lhobregat/Rhuan. Summit tem URL registrada; os outros nove ainda nao.
+  Confirmar o teste de Ascent SVG caso esse seja o arquivo adotado pelo front.
+- [ ] Confirmar com Gugu/front as regras ja implementadas: economia por soma
+  de equipamento (10000/20000), retake como resultado apos plant, NULL,
+  filtros antes de agregar e razoes recalculadas pelos totais. Ajustar SQL
+  somente se o acordo exigir; definir MVP/rounds decisivos ou manter sem criterio.
+- [ ] Adaptar SQLs e validacoes aos destinos finais acordados, incluindo todas
+  as referencias internas chico_teste_. Conferir destinos existentes antes
+  de qualquer substituicao. Preparar PR com evidencias para revisao de Guilherme.
+- [ ] Apos aprovacao e coordenacao com Guilherme, executar dry runs, criar as
+  tabelas finais na ordem de dependencia e repetir validacoes individuais e conjunta.
+  Guardar comandos, bytes e resultados. Merge sozinho nao publica tabelas.
+- [ ] Conferir os dados na API e no front com os responsaveis: numeros e filtros,
+  round publico base 1, plants, mortes e snapshots espalhados pelos mapas,
+  mapa de calor e round real na prancheta. Corrigir problemas da Gold encontrados.
+- [ ] Registrar o resultado final neste documento e confirmar a entrega publicada.
+  Manter tabelas de teste ate terminar a conferencia final.
+
+## Dependencias: quem precisa fazer o que
+
+| Pessoa | O que precisa entregar/confirmar | O que destrava para Chico |
+|---|---|---|
+| Gustavo / Gugu | Retornar nomes/destinos finais e formato de transformacao; atualizar docs/api.md e implementar consumo da Gold, filtros e cache | Adaptacao final dos SQLs e teste das respostas reais da API |
+| Lhobregat | Confirmar minimapas exatos e convencao de coordenadas; integrar eventos, calor e round real na prancheta | Registro das imagens e conferencia de plants, mortes e snapshots no produto |
+| Rhuan | Confirmar imagens com Lhobregat quando aplicavel e ligar paginas/graficos a API | Comparacao dos numeros e filtros exibidos com a Gold |
+| Guilherme | Revisar PR, fazer merge e coordenar publicacao/acesso/deploy; preservar os seis JSONs corrigidos na fonte de recarga | Publicacao aprovada, consumo pela API/coach e teste final |
+| Time / organizacao, via Lhobregat e Guilherme | Confirmar permissao/licenca de uso dos metadados e imagens externos conforme plano-de-acao.md | Uso desses recursos na entrega oficial |
+
+Chico pode adiantar o registro das evidencias e a conferencia de mortes/snapshots
+nas imagens de teste sem esperar a API. O teste no produto depende da integracao.
+Nao e responsabilidade do Chico implementar API, telas, coach, IAM ou deploy.
+Ele fornece SQL, regras, evidencias e apoio para conferir os dados consumidos.
 
 ## Como oficializar, sem confundir GitHub com BigQuery
 
@@ -94,7 +134,7 @@ Nao recarregar dados nem mudar IAM/infra como parte desta revisao de SQL.
    Trocar somente o destination_table NAO basta: as consultas usam dependencias
    chico_teste_ internamente.
 4. Abrir PR de chico/gold-principal para main; revisao do dono e merge por Guilherme.
-   Pode ser uma entrega parcial claramente rotulada, com mapas pendentes.
+   Identificar explicitamente qualquer pendencia de contrato ou integracao.
 5. Com a versao aprovada, dry run e materializacao coordenados na ordem:
    partidas; stats_jogador_partida e stats_time_partida; rounds;
    ranking_jogador/stats_time/stats_mapa/stats_agente/mapas;
