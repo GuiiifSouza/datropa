@@ -109,3 +109,7 @@ Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao 
 ## Evidencia recebida: dry run dos rounds
 
 20/10/2026: Chico executou `rounds.sql` com dry run. Resultado: `Query successfully validated`, estimativa de 8787952 bytes. Execucao e validacao dos resultados pendentes.
+
+## Evidencia recebida: rounds executados
+
+20/10/2026: rounds=6618, chaves_unicas=6618, partidas=336, plants=4653, desarmes=1349, rounds_atipicos=6, vitorias_ataque=3427, vitorias_defesa=3191; alertas=0, numeracao_diferente_indice=0, resultados_sem_mapeamento=0, times_sem_id=0. Validacao no Cloud Shell enviada pelo Chico coincide com os totais independentes dos JSONs. Ainda somente tabela de teste.
