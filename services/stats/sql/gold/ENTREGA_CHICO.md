@@ -1,11 +1,18 @@
 > Atualizacao oficial de 20/10/2026: Guilherme autorizou a oficializacao, conforme
 > relato de Chico. As decisoes de dados antes pendentes de Gugu foram fixadas em
 > [OFICIALIZACAO_E_API.md](OFICIALIZACAO_E_API.md). Esse documento e os SQLs de
-> oficial/ prevalecem sobre as pendencias historicas abaixo. Publicacao e dry runs
-> oficiais ainda aguardam execucao no Cloud Shell; nao houve merge nesta etapa.
+> oficial/ prevalecem sobre as pendencias historicas abaixo. PUBLICACAO OFICIAL
+> concluida e conferida pelos logs: 13 tabelas, 24 checks aprovados e zero alertas
+> individuais. Ver PUBLICACAO_GOLD_336_V1.md. Merge e integracao ainda pendentes.
 > Chico confirmou os HTMLs revisados e a causa Iso nas amostras investigadas.
 
 # Entrega da Gold do Chico — estado em 20/10/2026
+
+Estado atual: tabelas oficiais publicadas em datropa.valorant, sem chico_teste_.
+Decisoes para API definidas em OFICIALIZACAO_E_API.md; PR #7 para revisao/merge.
+Restam integracao real e registro das imagens exatas do front.
+
+## Historico anterior a publicacao (preservado para rastreabilidade)
 
 Branch: chico/gold-principal. Pasta: services/stats/sql/gold/.
 Estado: 13 tabelas de TESTE criadas; validacoes individuais executadas e
