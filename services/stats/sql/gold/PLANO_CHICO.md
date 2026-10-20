@@ -138,3 +138,22 @@ Detalhes e pendencias em MAPAS_COORDENADAS.md; amostras de tres plants por mapa
 em validacoes/mapas_amostras.sql. Nao chamar conversao de concluida ate conferir
 os minimapas exatos com Lhobregat e alinhar o contrato com Gugu.
 Dry run, materializacao e validacao visual desta etapa pendentes.
+
+## Mapas: validacao recebida e pendencia adiada
+
+20/10/2026: dry run mapas.sql aprovado, 10638 bytes. Catalogo executado:
+10 mapas/IDs, 336 partidas, 9 candidatos PDF, 1 sem calibracao,
+0 calibracoes validadas, 0 transformacoes publicadas, 0 alertas, 0 eventos_sem_mapa.
+Amostras: 27 plants com coordenadas candidatas dentro de 0..1; tres Summit NULL.
+Isso nao valida alinhamento com imagem. Chico decidiu continuar as demais tabelas
+e verificar depois os minimapas exatos/links com Lhobregat e a calibracao pendente.
+
+## Pos-plant e retake: preparados
+
+pos_plant_retake_partida.sql preserva uma linha por time/partida e filtros.
+Referencia local independente: 672 linhas, 336 partidas, 13236 rounds-times;
+4653 oportunidades por lado, 3295 vitorias pos-plant, 1358 vitorias da defesa
+apos plant, sendo 1349 desarmes e nove resultados de tempo esgotado.
+Nao presume tentativa de retake nem altera resultado original.
+Detalhes em POS_PLANT_RETAKE.md. SQL e validacao enviados para a branch;
+dry run e materializacao BigQuery pendentes.
