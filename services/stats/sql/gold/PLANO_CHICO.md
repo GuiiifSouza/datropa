@@ -67,3 +67,7 @@ Sem JSONs brutos, dados pessoais, PDF ou credenciais em commit. Bronze corrigida
 Dependencia: chico_teste_partidas. Destino: chico_teste_stats_time_partida.
 Validacao local independente: 672 linhas/336 partidas/68 slugs de time, 336 vitorias e 336 derrotas, 0 empates, 13236 rounds-times, 6618 rounds ganhos. Rounds ataque=6618 e defesa=6618; vitorias ataque=3427 e defesa=3191. Todos os placares conferidos contra os vencedores dos rounds.
 SQL BigQuery ainda aguarda dry run; o time total e por mapa sera agregado sobre esta granularidade, preservando filtros da API.
+
+## Evidencia recebida: dry run dos times
+
+20/10/2026: Chico executou `stats_time_partida.sql` com dry run. BigQuery retornou `Query successfully validated` e estimativa de 232028 bytes. Materializacao e validacao da tabela de teste pendentes.
