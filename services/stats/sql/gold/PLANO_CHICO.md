@@ -97,3 +97,7 @@ Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao 
 ## Evidencias recebidas: dry runs de mapas e agentes
 
 20/10/2026: ambos retornaram `Query successfully validated` no Cloud Shell do Chico. stats_mapa.sql: 21709 bytes. stats_agente.sql: 386400 bytes. Materializacao e validacao conjunta ainda pendentes.
+
+## Evidencias recebidas: mapas e agentes executados
+
+20/10/2026: mapas=10 linhas e IDs, 336 partidas, alertas=0, referencias_invalidas=0; agentes=28 linhas e IDs, 3360 aparicoes, 1680 vitorias, alertas=0, referencias_invalidas=0, taxas_incorretas=0. Valores null em vitorias/taxas de mapas sao campos nao aplicaveis da validacao conjunta, nao erros.
