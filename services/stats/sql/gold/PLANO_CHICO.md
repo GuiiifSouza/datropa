@@ -157,3 +157,19 @@ apos plant, sendo 1349 desarmes e nove resultados de tempo esgotado.
 Nao presume tentativa de retake nem altera resultado original.
 Detalhes em POS_PLANT_RETAKE.md. SQL e validacao enviados para a branch;
 dry run e materializacao BigQuery pendentes.
+
+## Pos-plant/retake: evidencia recebida
+
+20/10/2026: dry run aprovado, 1937468 bytes. Validacao enviada pelo Chico:
+672 linhas/chaves, 336 partidas, 68 times, 13236 rounds-times,
+4653 oportunidades por lado, 3295 vitorias do ataque, 1358 da defesa,
+1349 desarmes, 9 vitorias da defesa sem desarme/por tempo;
+alertas, contadores_inconsistentes, taxas_incorretas e partidas_inconsistentes = 0.
+
+## Composicoes: preparadas
+
+composicao_time_partida.sql e validacao preparam 672 linhas por time/partida,
+com cinco slots ordenados e ID de mapa/lista estavel; filtros antes de agregar.
+Referencia local dos 336 JSONs: 198 pares mapa/composicao, 3360 slots,
+336 vitorias e 336 derrotas, nenhuma composicao incompleta.
+Detalhes em COMPOSICOES.md. Dry run e materializacao BigQuery pendentes.
