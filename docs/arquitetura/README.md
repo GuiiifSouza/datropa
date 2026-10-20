@@ -22,6 +22,7 @@ Tudo roda num projeto GCP só, com todos os serviços na mesma região. O front 
 | App | Firestore | Usuários, estratégias salvas da prancheta (código curto) e cache de estatísticas |
 | IA | Vertex AI (Gemini) | Agente do coach com function calling, scouting e resumo de partidas |
 | Imagens | Artifact Registry | Imagens dos containers de cada serviço |
+| Limite de custo | Orçamento + Pub/Sub `billing-cap` + Cloud Run function `limite-custo` | Desliga o billing do projeto quando o gasto do mês chega a R$ 400. Fora do diagrama. Detalhes em [infra/README.md](../../infra/README.md) |
 
 ## Fluxos
 
@@ -40,7 +41,7 @@ Os números batem com as setas do diagrama.
 
 ### Ingestão de partidas (verde)
 
-7. Os JSONs da base do hackathon sobem para o bucket `raw-matches` (a base é fechada: só os arquivos da organização).
+7. Os JSONs da base do hackathon sobem para o bucket `datropa-raw-matches` (a base é fechada: só os arquivos da organização).
 8. O Eventarc avisa o `ingest` que chegou arquivo novo.
 9. O `ingest` carrega o NDJSON no bronze e atualiza as tabelas gold.
 
