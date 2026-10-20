@@ -49,3 +49,13 @@ O destino e exclusivamente de teste. Nao promover tabelas finais ou alterar cont
 ## Evidencia recebida: teste executado
 
 20/10/2026: Chico executou a validacao na tabela de teste. Resultado: linhas=3360, chaves_unicas=3360, partidas=336, alertas=0, rounds_jogador=66180, kills=46371, deaths=46428, assists=17839, dano_total=8906484, first_bloods=6588, kd_incorreto=0, hs_fora_da_faixa=0, diferencas_kills=0, diferencas_deaths=308, diferencas_assists=134. Todos esses totais coincidem com o calculo independente nos JSONs. Nenhuma tabela final publicada.
+
+## Ranking geral
+
+`ranking_jogador.sql` agrega a tabela jogador-partida e recalcula taxas pelos totais.
+Nome/tag da ultima partida (desempate por ID). time_id so preenchido quando o jogador tem um unico time no recorte.
+Estado: preparado, aguardando dry run. Destino: `valorant.chico_teste_ranking_jogador`.
+Referencia local atualizada: 411 jogadores validos distintos na base completa de 336; nao usar 406 da documentacao antiga de 330.
+API com filtros deve usar a tabela jogador-partida, aplicar filtros de torneio/mapa/agente/time/data e entao a mesma agregacao; filtrar este ranking total depois nao produz resultados corretos.
+SQL nao define ordem de armazenamento: API ordena por kills/kd/adr e jogador_id de desempate conforme contrato.
+Datas de partida nao representam hora de atualizacao da gold; meta.atualizado_em continua null ate haver metadado de carga.
