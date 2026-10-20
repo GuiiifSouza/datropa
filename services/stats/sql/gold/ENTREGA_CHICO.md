@@ -4,7 +4,8 @@ Branch: chico/gold-principal. Pasta: services/stats/sql/gold/.
 Estado: 13 tabelas de TESTE criadas; validacoes individuais executadas e
 21 verificacoes conjuntas aprovadas pelo Chico no Cloud Shell.
 Nenhum merge ou publicacao final realizado por esta entrega.
-Nao declarar toda a parte concluida: mapas/conversao e integracao pendentes.
+Plants conferidos pelo Chico nos dez mapas; Summit incluido no SQL.
+Atualizacao dessa tabela no BigQuery, contrato da conversao e integracao pendentes.
 
 ## Evidencia conjunta
 
@@ -62,9 +63,11 @@ Todos os nomes abaixo possuem o prefixo chico_teste_.
 ### Chico + Lhobregat/Rhuan
 Receber imagens/URLs dos minimapas exatos, com orientacao, recortes e margens.
 Validar pelo menos tres plants por mapa sobre essas imagens.
-Nove matrizes do PDF sao candidatas, nao publicadas; Summit/plummet sem calibracao.
+Nove matrizes do PDF e a de Summit da Valorant-API tiveram os plants conferidos
+pelo Chico. Summit deixou de estar sem formula. Veja MAPAS_COORDENADAS.md.
 Ter u/v entre 0 e 1 nao comprova alinhamento.
-Transformacao publica e minimapa_url continuam NULL.
+Transformacao publica continua NULL ate alinhar eixos no contrato.
+Somente a URL de Summit foi fornecida e registrada; faltam URLs/versoes das outras imagens.
 A disponibilidade/uso de metadados externos depende do alinhamento do time com
 a organizacao conforme docs/plano-de-acao.md.
 
