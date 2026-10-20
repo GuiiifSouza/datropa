@@ -119,3 +119,22 @@ Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao 
 `eventos_round.sql`: IDs SHA256 de partida/indice do round/posicao do evento na origem; ordem estavel por tempo e desempate deterministico. Coordenadas originais do jogo, sem transformacao. Abate usa posicao da vitima; plant/defuse usa spike. Snapshots so de abate/plant quando disponiveis; desarme tem array vazio, sem inventar posicoes. Arma so quando damageType=Weapon, sem converter habilidade em UUID de arma.
 Preserva self-kills e fogo amigo com flags, distinguindo abate_adversario. Para calor de abates atribuiveis ao autor/time, filtrar abate_adversario; revisar a semantica na integracao, para nao misturar fogo amigo/ambiente com combate adversario. Sem mudanca no envelope publico nesta etapa.
 Referencia local: 52755 eventos, 46753 abates/mortes (46371 contra adversario, 373 self-kills e 9 outros entre jogadores), 4653 plants, 1349 desarmes. Todos os atores/vitimas da origem pertencem aos jogadores validos; coordenadas de evento e tempos de abate presentes. Funcoes, colecoes e schema SQL ainda precisam de dry run BigQuery. Destino: chico_teste_eventos_round; dependencias: chico_teste_rounds e chico_teste_stats_jogador_partida.
+
+## Eventos: correcao e validacao recebidas
+
+20/10/2026: arrays correlacionados com JOIN substituidos por agregacoes separadas.
+Chico enviou dry run aprovado: 43823226 bytes.
+Validacao da tabela: eventos=52755, ids_unicos=52755, partidas=336,
+abates=46753, plants=4653, desarmes=1349, self_kills=373, fogo_amigo=9,
+abates_adversarios=46371, alertas=0, snapshots_defuse_inventados=0,
+ordens_unicas=52755. Ainda apenas destino de teste.
+
+## Catalogo e conversao dos mapas: preparados
+
+mapas.sql e validacoes/mapas_teste.sql preparados para dez mapas e 336 partidas.
+Nove matrizes candidatas do PDF; Summit sem calibracao. Transformacao publica
+e minimapa_url NULL: troca de eixos nao cabe na proposta atual do contrato.
+Detalhes e pendencias em MAPAS_COORDENADAS.md; amostras de tres plants por mapa
+em validacoes/mapas_amostras.sql. Nao chamar conversao de concluida ate conferir
+os minimapas exatos com Lhobregat e alinhar o contrato com Gugu.
+Dry run, materializacao e validacao visual desta etapa pendentes.
