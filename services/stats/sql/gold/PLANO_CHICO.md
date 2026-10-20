@@ -105,3 +105,7 @@ Destinos de teste: chico_teste_stats_mapa e chico_teste_stats_agente. Validacao 
 ## Rounds: preparados
 
 `rounds.sql`: 6618 linhas, numeros publicos base 1, time atacante/defensor pelo papel real, resultado normalizado, plant e desarme. Dependencia de teste chico_teste_partidas; destino chico_teste_rounds. Conferencia local nos JSONs: 4653 plants, 1349 desarmes, 3427 vitorias no ataque, 3191 na defesa; roundNum sempre igual ao indice. Regra do PDF identifica 6 rounds com >=3 self-kills validas nos primeiros 15s. Flag preservada sem excluir nenhum round da API ou dos agregados existentes. Dry run, execucao e auditoria dos alertas pendentes.
+
+## Evidencia recebida: dry run dos rounds
+
+20/10/2026: Chico executou `rounds.sql` com dry run. Resultado: `Query successfully validated`, estimativa de 8787952 bytes. Execucao e validacao dos resultados pendentes.
