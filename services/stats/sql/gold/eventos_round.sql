@@ -19,21 +19,14 @@ WITH jogadores AS (
     k.timeSinceRoundStartMillis AS tempo_ms,
     k.timeSinceGameStartMillis AS tempo_jogo_ms,
     NULLIF(k.killer, '') AS ator_id, NULLIF(k.victim, '') AS vitima_id,
-    ARRAY(SELECT DISTINCT j.jogador_id FROM UNNEST(k.assistants) a
-      JOIN jogadores j ON j.partida_id = o.partida_id AND j.jogador_id = a
-      ORDER BY j.jogador_id) AS assistente_ids,
+    k.assistants AS assistentes_origem,
     IF(k.finishingDamage.damageType = 'Weapon', LOWER(NULLIF(k.finishingDamage.damageItem, '')), NULL) AS arma_id,
     k.finishingDamage.damageType AS dano_final_tipo,
     k.finishingDamage.damageItem AS dano_final_item_origem,
     CAST(NULL AS STRING) AS site,
     IF(k.victimLocation.x IS NULL OR k.victimLocation.y IS NULL, NULL,
       STRUCT(CAST(k.victimLocation.x AS FLOAT64) AS x, CAST(k.victimLocation.y AS FLOAT64) AS y)) AS posicao,
-    ARRAY(SELECT AS STRUCT j.jogador_id, j.time_id, j.agente_id,
-      STRUCT(CAST(l.location.x AS FLOAT64) AS x, CAST(l.location.y AS FLOAT64) AS y) AS posicao
-      FROM UNNEST(k.playerLocations) l WITH OFFSET li
-      JOIN jogadores j ON j.partida_id = o.partida_id AND j.jogador_id = l.puuid
-      WHERE l.location.x IS NOT NULL AND l.location.y IS NOT NULL
-      ORDER BY li) AS jogadores
+    k.playerLocations AS posicoes_origem
   FROM origem o
   CROSS JOIN UNNEST(o.r.playerStats) s WITH OFFSET si
   CROSS JOIN UNNEST(s.kills) k WITH OFFSET ki
@@ -47,12 +40,7 @@ WITH jogadores AS (
     CAST(NULL AS STRING), CAST(NULL AS STRING), CAST(NULL AS STRING), o.r.plantSite,
     IF(o.r.plantLocation.x IS NULL OR o.r.plantLocation.y IS NULL, NULL,
       STRUCT(CAST(o.r.plantLocation.x AS FLOAT64) AS x, CAST(o.r.plantLocation.y AS FLOAT64) AS y)),
-    ARRAY(SELECT AS STRUCT j.jogador_id, j.time_id, j.agente_id,
-      STRUCT(CAST(l.location.x AS FLOAT64) AS x, CAST(l.location.y AS FLOAT64) AS y) AS posicao
-      FROM UNNEST(o.r.plantPlayerLocations) l WITH OFFSET li
-      JOIN jogadores j ON j.partida_id = o.partida_id AND j.jogador_id = l.puuid
-      WHERE l.location.x IS NOT NULL AND l.location.y IS NOT NULL
-      ORDER BY li)
+    o.r.plantPlayerLocations
   FROM origem o
   WHERE o.r.plantRoundTime IS NOT NULL AND NULLIF(o.r.plantSite, '') IS NOT NULL
 
@@ -65,12 +53,38 @@ WITH jogadores AS (
     CAST(NULL AS STRING), CAST(NULL AS STRING), CAST(NULL AS STRING), NULLIF(o.r.plantSite, ''),
     IF(o.r.defuseLocation.x IS NULL OR o.r.defuseLocation.y IS NULL, NULL,
       STRUCT(CAST(o.r.defuseLocation.x AS FLOAT64) AS x, CAST(o.r.defuseLocation.y AS FLOAT64) AS y)),
-    ARRAY<STRUCT<jogador_id STRING, time_id STRING, agente_id STRING, posicao STRUCT<x FLOAT64, y FLOAT64>>>[]
+    o.r.plantPlayerLocations
   FROM origem o WHERE NULLIF(o.r.bombDefuser, '') IS NOT NULL
+), assistencias AS (
+  -- JOIN fora de ARRAY correlacionado: evita a limitacao do BigQuery.
+  SELECT e.partida_id, e.round_indice, e.chave_origem,
+    ARRAY_AGG(DISTINCT j.jogador_id ORDER BY j.jogador_id) AS assistente_ids
+  FROM eventos e
+  CROSS JOIN UNNEST(e.assistentes_origem) a
+  JOIN jogadores j ON j.partida_id = e.partida_id AND j.jogador_id = a
+  GROUP BY e.partida_id, e.round_indice, e.chave_origem
+), posicoes AS (
+  SELECT e.partida_id, e.round_indice, e.chave_origem,
+    ARRAY_AGG(STRUCT(j.jogador_id, j.time_id, j.agente_id,
+      STRUCT(CAST(l.location.x AS FLOAT64) AS x,
+        CAST(l.location.y AS FLOAT64) AS y) AS posicao) ORDER BY li) AS jogadores
+  FROM eventos e
+  CROSS JOIN UNNEST(e.posicoes_origem) l WITH OFFSET li
+  JOIN jogadores j ON j.partida_id = e.partida_id AND j.jogador_id = l.puuid
+  WHERE e.tipo != 'defuse'
+    AND l.location.x IS NOT NULL AND l.location.y IS NOT NULL
+  GROUP BY e.partida_id, e.round_indice, e.chave_origem
 ), identificados AS (
-  SELECT e.*, a.time_id AS ator_time_id, v.time_id AS vitima_time_id,
+  SELECT e.* EXCEPT(assistentes_origem, posicoes_origem),
+    IFNULL(ast.assistente_ids, ARRAY<STRING>[]) AS assistente_ids,
+    IFNULL(p.jogadores,
+      ARRAY<STRUCT<jogador_id STRING, time_id STRING, agente_id STRING,
+        posicao STRUCT<x FLOAT64, y FLOAT64>>>[]) AS jogadores,
+    a.time_id AS ator_time_id, v.time_id AS vitima_time_id,
     a.agente_id AS ator_agente_id
   FROM eventos e
+  LEFT JOIN assistencias ast USING (partida_id, round_indice, chave_origem)
+  LEFT JOIN posicoes p USING (partida_id, round_indice, chave_origem)
   LEFT JOIN jogadores a ON a.partida_id = e.partida_id AND a.jogador_id = e.ator_id
   LEFT JOIN jogadores v ON v.partida_id = e.partida_id AND v.jogador_id = e.vitima_id
 )
