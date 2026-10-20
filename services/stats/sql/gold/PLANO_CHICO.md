@@ -191,3 +191,22 @@ Incompletos e time/partida todo zero ficam sem categoria, sem exclusao silencios
 Referencia local: 13236 linhas, eco=2837/923 vitorias, force=2888/1413,
 full=7511/4282; zero dados incompletos. Detalhes em ECONOMIA.md.
 SQL e validacao enviados; dry run e execucao BigQuery pendentes.
+
+## Economia: evidencia recebida
+
+20/10/2026: dry run aprovado, 9557866 bytes. Validacao corrigida para
+nao usar alias reservado FULL. Saida enviada pelo Chico: 13236 linhas/chaves,
+336 partidas, 68 times, 6618 rounds por lado e 6618 vitorias;
+eco=2837/923, force=2888/1413, full=7511/4282.
+rounds_sem_classificacao, economia_incompleta, alertas,
+classificacoes_inconsistentes e rounds_inconsistentes = 0.
+
+## Conferencia conjunta: preparada
+
+validacoes/conjunto_teste.sql verifica as contagens das 13 tabelas e referencias
+entre partida, round, eventos, jogadores, times, composicao e economia,
+alem de reconciliar ranking e pos-plant com as fontes gold.
+Esperadas 21 verificacoes com passou=true. Dry run e execucao pendentes.
+Isso nao conclui a calibracao de mapas nem a integracao API/front.
+Extensoes do PDF (KAST, trocas, isolamento, WPA/percentis) nao foram implementadas
+nesta etapa; revisar prioridade/escopo explicitamente antes de declarar entrega total.
