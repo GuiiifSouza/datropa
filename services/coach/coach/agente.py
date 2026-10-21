@@ -56,8 +56,17 @@ def _config() -> types.GenerateContentConfig:
 class Conversa:
     """Uma conversa com histórico. Cada `perguntar` pode chamar várias tools."""
 
-    def __init__(self):
-        self.historico: list[types.Content] = []
+    def __init__(self, turnos: list[tuple[str, str]] | None = None):
+        """`turnos`: conversa anterior em texto, [("usuario"|"coach", texto), ...].
+
+        Na rota HTTP o cliente manda o histórico; os resultados de tool não
+        vêm junto, então o agente consulta de novo se precisar de número.
+        """
+        self.historico: list[types.Content] = [
+            types.Content(role="user" if papel == "usuario" else "model",
+                          parts=[types.Part.from_text(text=texto)])
+            for papel, texto in (turnos or [])
+        ]
         self._config = _config()
 
     def perguntar(self, pergunta: str) -> Resposta:

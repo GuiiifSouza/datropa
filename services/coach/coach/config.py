@@ -21,7 +21,18 @@ MAX_BYTES_BILLED = int(os.environ.get("COACH_MAX_BYTES_BILLED", str(200 * 1024**
 # Quantas rodadas de tool o agente pode fazer numa pergunta.
 MAX_PASSOS = int(os.environ.get("COACH_MAX_PASSOS", "6"))
 
-_IDENT = re.compile(r"^[A-Za-z0-9_\-]+$")
+# HTTP
+FIREBASE_PROJETO = os.environ.get("COACH_FIREBASE_PROJETO", PROJETO)
+# Só para rodar local sem login. Ignorado no Cloud Run (K_SERVICE definido).
+AUTH_DESLIGADA = os.environ.get("COACH_AUTH_DESLIGADA") == "1" and not os.environ.get("K_SERVICE")
+CORS_ORIGENS = [o for o in os.environ.get("COACH_CORS_ORIGENS", "").split(",") if o]
+MAX_CARACTERES_PERGUNTA = 1000
+MAX_TURNOS_HISTORICO = 10
+# Perguntas por usuário por janela, por instância. Protege a cota do Gemini e do BigQuery.
+LIMITE_PERGUNTAS = int(os.environ.get("COACH_LIMITE_PERGUNTAS", "20"))
+JANELA_LIMITE_S = int(os.environ.get("COACH_JANELA_LIMITE_S", "600"))
+
+_IDENT =re.compile(r"^[A-Za-z0-9_\-]+$")
 
 
 def tabela(nome: str) -> str:

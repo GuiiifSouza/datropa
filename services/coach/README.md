@@ -10,6 +10,7 @@ Dono: Guilherme. Escopo e regras em [AGENTS.md](AGENTS.md).
 - **`google-genai`** (SDK novo do Gemini) apontando para o **Vertex AI**, modelo `gemini-2.5-flash`, projeto `datropa`, região `southamerica-east1`. É o único Gemini disponível na região.
 - **Function calling com loop próprio** (`coach/agente.py`), sem o automático do SDK: limita os passos, registra cada tool chamada e devolve o rastro junto com a resposta.
 - **`google-cloud-bigquery`** para as consultas, com credenciais ADC (local: `gcloud auth application-default login`; no Cloud Run: a `sa-coach`).
+- **FastAPI + uvicorn** para a rota HTTP, em container (`Dockerfile`, `python:3.12-slim` + uv).
 
 Por que não o ADK: com três a dez tools e um loop simples, o SDK direto é menos dependência e menos mágica para depurar no prazo do hackathon. Se precisar de multiagente depois, o registro de tools migra fácil.
 
@@ -80,10 +81,67 @@ COACH_TESTE_REAL=1 uv run pytest tests/test_perguntas.py -s   # perguntas reais 
 
 O teste real confere que o agente chamou as tools esperadas, sem erro, e que todo número da resposta aparece no resultado das tools.
 
-## Falta para o Cloud Run
+## Rota HTTP
 
-- Rota HTTP (`POST /api/coach/perguntar`) com validação do JWT do Firebase e Dockerfile.
-- Histórico da conversa por usuário (hoje fica em memória na CLI).
+O Firebase Hosting reescreve `/api/coach/**` para o Cloud Run, com o caminho completo.
+
+```
+POST /api/coach/perguntar
+Authorization: Bearer <ID token do Firebase>
+Content-Type: application/json
+
+{"pergunta": "como joga o time Turuna?",
+ "historico": [{"papel": "usuario", "texto": "..."}, {"papel": "coach", "texto": "..."}]}
+```
+
+Resposta (envelope de `docs/api.md`):
+
+```json
+{"data": {"resposta": "texto em português",
+          "tools": [{"nome": "stats_time", "argumentos": {"time_id": "..."}, "resultado": {}}]},
+ "meta": {"modelo": "gemini-2.5-flash", "atualizado_em": null}}
+```
+
+- **JWT do Firebase validado no serviço** (`coach/auth.py`): assinatura pelas chaves públicas do Google (com cache), `exp`, `aud` = projeto, `iss` = `https://securetoken.google.com/<projeto>` e `sub`. Sem token ou token inválido: 401 `UNAUTHENTICATED`.
+- O serviço não guarda estado. O front manda o `historico` em texto (até 20 turnos). Os resultados de tool não voltam no histórico, então o agente consulta de novo quando precisa de número.
+- `tools` traz o que o agente consultou, para o front mostrar a fonte dos números.
+- Limite de 20 perguntas por usuário a cada 10 minutos, por instância: 429 `RATE_LIMITED` com `Retry-After`.
+- Corpo com campo desconhecido, pergunta vazia ou com mais de 1000 caracteres: 400 `INVALID_ARGUMENT`. Falha do Gemini ou do BigQuery: 503 `DATA_UNAVAILABLE`.
+
+Variáveis da rota, além das de cima:
+
+| Variável | Padrão | Para quê |
+|---|---|---|
+| `COACH_FIREBASE_PROJETO` | igual a `COACH_PROJETO` | `aud` e `iss` esperados no token |
+| `COACH_CORS_ORIGENS` | vazio | Origens liberadas, separadas por vírgula (ex.: `http://localhost:5173`). Pelo Hosting não precisa |
+| `COACH_LIMITE_PERGUNTAS`, `COACH_JANELA_LIMITE_S` | `20`, `600` | Limite por usuário |
+| `COACH_AUTH_DESLIGADA` | — | `1` desliga o JWT para testar local. Ignorada no Cloud Run (`K_SERVICE` definido) |
+
+Rodar local:
+
+```bash
+COACH_AUTH_DESLIGADA=1 uv run uvicorn coach.app:app --port 8081
+curl -s -X POST localhost:8081/api/coach/perguntar -H 'Content-Type: application/json' \
+  -d '{"pergunta": "quem é o melhor jogador da Azure Bears Golden?"}'
+```
+
+Container:
+
+```bash
+docker build -t coach .
+docker run -p 8081:8080 -e COACH_AUTH_DESLIGADA=1 \
+  -v ~/.config/gcloud/application_default_credentials.json:/adc.json:ro \
+  -e GOOGLE_APPLICATION_CREDENTIALS=/adc.json coach
+```
+
+## Deploy
+
+Push na `main` que mexe em `services/coach/**` dispara `.github/workflows/deploy-coach.yml`: build desta pasta, push no Artifact Registry e `gcloud run deploy coach` com a `sa-coach`, `--max-instances 2`, em `southamerica-east1`. Os padrões de `coach/config.py` já servem para produção, então o deploy não precisa de `--set-env-vars`.
+
+O serviço sobe privado. Para o Hosting conseguir chamar, o Guilherme libera o invoker público uma vez (comando em `infra/README.md`, "Pendências"); o JWT continua sendo validado no serviço.
+
+## Falta
+
 - Tools de quarta: coletivas (`comparar_times`, `economia_time`, `pos_plant_retake`, `composicoes`), `resumo_partida`, `abrir_na_prancheta` e scouting.
 
 ## Catálogos
