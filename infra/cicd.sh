@@ -103,9 +103,10 @@ for s in sa-stats sa-coach sa-ingest; do
     --member "serviceAccount:$(sa sa-deploy)" --role roles/iam.serviceAccountUser --format=none
 done
 
-log "sa-deploy: IAM do Cloud Run só em stats, coach e ingest (allUsers e invoker do Eventarc)"
-# Papel próprio em vez de run.admin: só lê e grava a policy do serviço, e a condição
-# deixa de fora qualquer outro serviço do projeto (ex.: a função limite-custo).
+log "sa-deploy: IAM dos serviços do Cloud Run (allUsers e invoker do Eventarc)"
+# Papel próprio em vez de run.admin: só lê e grava a policy de serviço do Cloud Run.
+# Fica no projeto inteiro: o Cloud Run não avalia condição por nome de serviço, e o
+# run.developer acima já deixa a sa-deploy atualizar qualquer serviço do projeto.
 PAPEL_IAM_RUN=deployRunIam
 PERMISSOES_IAM_RUN=run.services.getIamPolicy,run.services.setIamPolicy
 if gcloud iam roles describe "$PAPEL_IAM_RUN" --project "$PROJETO" >/dev/null 2>&1; then
@@ -115,9 +116,7 @@ else
   gcloud iam roles create "$PAPEL_IAM_RUN" --project "$PROJETO" --stage GA \
     --title "Deploy: IAM dos serviços do Cloud Run" --permissions "$PERMISSOES_IAM_RUN" --format=none
 fi
-gcloud projects add-iam-policy-binding "$PROJETO" --member "serviceAccount:$(sa sa-deploy)" \
-  --role "projects/$PROJETO/roles/$PAPEL_IAM_RUN" --quiet --format=none \
-  --condition='^;^title=so-servicos-do-app;expression=resource.name.endsWith("/services/stats") || resource.name.endsWith("/services/coach") || resource.name.endsWith("/services/ingest")'
+projeto_role "serviceAccount:$(sa sa-deploy)" "projects/$PROJETO/roles/$PAPEL_IAM_RUN"
 # Cria o gatilho do Eventarc do ingest no CD.
 projeto_role "serviceAccount:$(sa sa-deploy)" roles/eventarc.developer
 

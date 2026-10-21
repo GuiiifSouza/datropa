@@ -63,7 +63,7 @@ Criadas por [`cicd.sh`](cicd.sh), menos `sa-build` e `sa-limite-custo`. O script
 | `sa-stats` | Cloud Run `stats` | `READER` no dataset `valorant`; `bigquery.jobUser` e `datastore.user` no projeto |
 | `sa-coach` | Cloud Run `coach` | `READER` no dataset `valorant`; `bigquery.jobUser` e `aiplatform.user` no projeto |
 | `sa-ingest` | Cloud Run `ingest` | `storage.objectViewer` no bucket `datropa-raw-matches`; `WRITER` no dataset `valorant`; `bigquery.jobUser` e `eventarc.eventReceiver` no projeto |
-| `sa-deploy` | GitHub Actions, via WIF | `run.developer` e `eventarc.developer` no projeto; `deployRunIam` (papel próprio: ler e gravar IAM de serviço do Cloud Run) só em `stats`, `coach` e `ingest`, por condição; `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
+| `sa-deploy` | GitHub Actions, via WIF | `run.developer` e `eventarc.developer` no projeto; `deployRunIam` no projeto (papel próprio: só ler e gravar IAM de serviço do Cloud Run, para o `allUsers` e o invoker do Eventarc); `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
 | `sa-build` | Build das funções e containers. Substitui a conta padrão do Compute | |
 | `sa-limite-custo` | Roda a função de corte | `billing.projectManager` no projeto |
 | Agente do Cloud Storage (`service-19667506828@gs-project-accounts…`) | Publica os eventos do bucket para o Eventarc | `pubsub.publisher` no projeto |
