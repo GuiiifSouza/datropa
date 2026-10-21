@@ -1,6 +1,12 @@
 # Base do hackathon (baixar do Drive, ver docs/dados.md)
 data/
 
+# Saidas locais da gold com dados de partida (publicar_gold.py e testes de mortes)
+evidencias_gold_oficial/
+testes_mortes_revisados/
+teste_*_mortes.html
+testes_mortes_minimapas/
+
 # Segredos
 .env
 .env.*

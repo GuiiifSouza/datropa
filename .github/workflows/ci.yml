@@ -1,0 +1,49 @@
+# Checagens de PR. Não autentica no GCP: o WIF só aceita a branch main.
+name: ci
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: actionlint
+        uses: docker://rhysd/actionlint:1.7.7
+        with:
+          args: -color
+      - name: shellcheck
+        run: find infra -name '*.sh' -print0 | xargs -0 -r shellcheck
+
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        servico: [stats, coach, ingest]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # o checkout do PR é um merge; HEAD^1 é a base
+      - name: Build da imagem (sem push)
+        env:
+          SERVICO: ${{ matrix.servico }}
+        run: |
+          pasta="services/$SERVICO"
+          if [ ! -f "$pasta/Dockerfile" ]; then
+            echo "::notice::$pasta ainda não tem Dockerfile. Build pulado."
+            exit 0
+          fi
+          if git diff --quiet HEAD^1 HEAD -- "$pasta"; then
+            echo "$pasta não mudou neste PR. Build pulado."
+            exit 0
+          fi
+          docker build -t "$SERVICO:pr" "$pasta"
