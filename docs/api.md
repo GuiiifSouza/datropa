@@ -828,3 +828,29 @@ Estimativas e totais dependem da carga; nova carga exige validação.
 
 Este documento distingue implementação de planejamento.
 Uma rota listada como pendente ainda não está disponível.
+## Atualização de implementação — detalhe de jogador
+
+GET /api/stats/jogadores/{jogador_id} está implementado.
+Esta atualização substitui a indicação anterior de pendência
+para essa rota.
+
+Filtros disponíveis: torneio_id, mapa_id, agente_id,
+data_inicio e data_fim. Datas inclusivas em UTC.
+
+Validados pela API: jogador existente, filtro Ascent, 404 para
+jogador inexistente, recorte vazio e cache HIT.
+
+A rota compartilha com o ranking o cache em memória e o limite
+de quatro execuções simultâneas por processo.
+
+O formato dos identificadores é validado. A validação de existência
+dos IDs de filtros nos catálogos continua pendente.
+
+O SQL recebe todos os parâmetros como STRING, conforme a entrega
+do Chico; datas são validadas pela API antes do envio.
+
+A consulta original permanece em sql/gold/consultas_api/.
+A cópia utilizada pelo runtime fica em queries/jogador_detalhe.sql.
+Mudanças na origem precisam ser sincronizadas e testadas na cópia.
+
+Demais rotas ainda não implementadas permanecem planejadas.

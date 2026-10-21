@@ -180,3 +180,26 @@ antigas ao trocar filtros e mostrar falhas por componente.
 Falhas não devem ser convertidas em estatísticas zeradas.
 
 Infraestrutura e deploy ficam alinhados com Guilherme.
+## Atualização — detalhe de jogador integrado
+
+Implementada a rota pública GET /api/stats/jogadores/{jogador_id},
+usando a consulta preparada por Chico e copiada para
+queries/jogador_detalhe.sql.
+
+Aceita torneio_id, mapa_id, agente_id, data_inicio e data_fim.
+Compartilha cache e limite de quatro execuções com o ranking.
+
+Testado pela API no Cloud Shell:
+- duduziN sem filtros: 36 partidas, 468 kills, 437 deaths, 258 assists.
+- Ascent: 12 partidas, 168 kills, 135 deaths, 78 assists.
+- Jogador inexistente: 404.
+- Período sem partidas: identidade preservada, contagens zero,
+  taxas null e listas vazias.
+- Repetição do recorte vazio: cache HIT e HTTP 200.
+- Ranking geral preservado: Kaytoh com 628 kills e total 411.
+
+Imagem Docker reconstruída e status respondeu 200.
+BigQuery dentro do container continua pendente de validação.
+
+Esta atualização substitui as referências anteriores que indicavam
+a rota de jogador como pendente. Demais rotas continuam pendentes.
