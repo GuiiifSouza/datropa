@@ -18,9 +18,12 @@ Por que não o ADK: com três a dez tools e um loop simples, o SDK direto é men
 
 ```
 pergunta → Gemini (function calling)
-            ├─ buscar_entidade(texto)          → id do time/jogador
-            ├─ stats_time(time_id, mapa?)       → números da gold
-            ├─ stats_jogador(jogador_id, ...)   → números da gold
+            ├─ buscar_entidade(texto)                → id do time/jogador
+            ├─ stats_time / stats_jogador            → números da gold
+            ├─ comparar_times / scouting_time        → análise de confronto e de adversário
+            ├─ economia_time / pos_plant_retake / composicoes → análise coletiva
+            ├─ resumo_partida(partida_id | time_id)  → uma partida round a round
+            ├─ abrir_na_prancheta(partida_id, round) → eventos do round + link da prancheta
             └─ resposta em português, citando os números das tools
 ```
 
@@ -36,8 +39,42 @@ pergunta → Gemini (function calling)
 | `buscar_entidade` | `texto`, `tipo?` (time, jogador, mapa, agente) | `stats_time`, `ranking_jogador` | Candidatos por nome, com busca aproximada (sem acento, contém, `EDIT_DISTANCE` por palavra). Mapa e agente saem dos catálogos locais |
 | `stats_jogador` | `jogador_id`, `mapa?`, `agente?` | `stats_jogador_partida` | Partidas, vitórias, K/D/A, K/D, ADR, HS%, first bloods/deaths, top 5 agentes e quebra por mapa |
 | `stats_time` | `time_id`, `mapa?` | `stats_time`, `stats_time_partida`, `stats_jogador_partida` | Resumo geral, por mapa (fortes e fracos), ataque/defesa, elenco com números de cada jogador e últimas 5 partidas |
+| `comparar_times` | `time_a_id`, `time_b_id`, `mapa?` | `stats_time_partida`, `pos_plant_retake_partida`, `stats_jogador_partida`, `economia_time_round` | Os dois lado a lado (vitórias, % rounds, ataque/defesa, K/D do time, ADR médio, first blood %, pós-plant, retake, taxa por compra), resultado por mapa e confrontos diretos |
+| `economia_time` | `time_id`, `mapa?` | `economia_time_round` | Rounds e vitórias por compra (pistol, eco, force, full), por lado, contra cada compra do adversário e no round depois do pistol |
+| `pos_plant_retake` | `time_id`, `mapa?` | `pos_plant_retake_partida`, `rounds` | Conversão pós-plant e vitórias da defesa depois de sofrer plant (geral e por mapa), % de rounds de ataque com plant e plants por site |
+| `composicoes` | `time_id?`, `mapa?` | `composicao_time_partida` | As 10 composições mais usadas (do time ou do campeonato), com agentes, funções, aparições e taxa de vitória |
+| `resumo_partida` | `partida_id?` ou `time_id` + `adversario_id?` + `mapa?` | `partidas`, `stats_time_partida`, `stats_jogador_partida`, `rounds`, `economia_time_round` | Placar, placar no intervalo, jogadores (ACS, K/D/A, ADR, HS%), round a round com compras, destaques com critério explícito. `mvp` fica `null` (sem critério oficial na gold) |
+| `scouting_time` | `time_id`, `mapa?` | as consultas de `stats_time`, `composicoes`, `economia_time` e `pos_plant_retake`, em paralelo | Mapas, lado forte (geral e por mapa), composição mais usada por mapa, economia, pós-plant/retake, site preferido no ataque e jogadores-chave |
+| `abrir_na_prancheta` | `partida_id`, `round` (base 1) | `partidas`, `rounds`, `mapas`, `eventos_round`, `stats_jogador_partida` | Link da prancheta, linha do tempo do round (abates, plant, defuse com descrição em texto, posição e snapshot dos jogadores) e a transformação do mapa |
 
-As métricas seguem a gold do chico (`services/stats/sql/gold/oficial/`, PR #7): filtro antes de agregar, razões recalculadas pelos totais, ADR e HS% `null` quando o recorte tem registro com alerta.
+As métricas seguem a gold do chico (`services/stats/sql/gold/oficial/`, PR #7): filtro antes de agregar, razões recalculadas pelos totais, ADR e HS% `null` quando o recorte tem registro com alerta. Economia segue `equipamento_time_10000_20000_pistol_v2` (`ECONOMIA.md`), pós-plant/retake segue `resultado_apos_plant_v1` (`POS_PLANT_RETAKE.md`: mede resultado, não prova tentativa de retake) e composição só conta `composicao_valida` (`COMPOSICOES.md`).
+
+### Bytes por consulta (dry run em 21/10/2026, gold `gold_336_v1`)
+
+| Consulta | Bytes |
+|---|---|
+| `comparar_times.indicadores` / `.por_mapa` / `.confrontos` | 1,57 MiB / 0,09 MiB / 0,15 MiB |
+| `economia_time.por_categoria` / `.contra_adversario` / `.pos_pistol` | 2,12 MiB / 2,47 MiB / 1,50 MiB |
+| `pos_plant_retake.totais` / `.por_site` | 0,11 MiB / 1,40 MiB |
+| `composicoes.agregado` | 0,22 MiB |
+| `resumo_partida.partida` / `.buscar` / `.jogadores` / `.rounds` | 0,11 MiB / 0,16 MiB / 1,03 MiB / 3,38 MiB |
+| `abrir_na_prancheta.round` / `.eventos` | 1,80 MiB / **47,35 MiB** |
+
+`scouting_time` não tem SQL próprio: soma as consultas que usa (cerca de 6 MiB). `abrir_na_prancheta.eventos` lê a coluna `jogadores` de `eventos_round` inteira, porque a tabela não é particionada nem clusterizada; fica bem abaixo do teto de 200 MB. Se o chico clusterizar `eventos_round` por `partida_id`, o custo real cai bastante sem mudar o coach.
+
+## Prancheta: contrato proposto do link
+
+**Proposto, ainda não confirmado pelo front (Lhobregat).** Segue a sugestão de `docs/api.md`, seção 6.
+
+```
+/prancheta?partida_id=<partida_id>&round=<n>
+```
+
+- `partida_id`: `partida_id` da gold (o `matchId` do JSON), com URL encoding.
+- `round`: número público, começando em 1 (o `round` da gold; não somar 1).
+- `abrir_na_prancheta` devolve `prancheta.url` (relativo) e `prancheta.url_completa` (`COACH_FRONT_URL` + caminho). O coach só gera o link depois de conferir que a partida e o round existem.
+- A tela pode carregar o round pela rota do `stats` (`GET /partidas/{partida_id}/rounds/{round}/eventos`). O resultado da tool também traz os eventos no mesmo formato da gold (posições em coordenada do jogo, arredondadas para inteiro, mais `transformacao_mapa` com os seis coeficientes), dentro de `data.tools[].resultado` da resposta do coach.
+- Se o front escolher outro caminho, muda só `link_prancheta` em `coach/tools/abrir_na_prancheta.py`.
 
 ### Adicionar uma tool
 
@@ -59,6 +96,7 @@ O nome das tabelas vem da configuração, nunca do modelo:
 | `COACH_TABELA_<NOME>` | — | Sobrescreve uma tabela só, ex.: `COACH_TABELA_STATS_TIME=stats_time_v2` |
 | `COACH_MAX_BYTES_BILLED` | `209715200` | Teto por consulta |
 | `COACH_MAX_PASSOS` | `6` | Rodadas de tool por pergunta |
+| `COACH_FRONT_URL` | `https://devs.datropa.com` | Base do link absoluto da prancheta |
 
 ## Rodar local
 
@@ -143,7 +181,9 @@ O serviço sobe privado. Para o Hosting conseguir chamar, o Guilherme libera o i
 ## Falta
 
 - **Teste ponta a ponta com token real do Firebase**, pelo front, quando o rewrite `/api/coach/**` estiver no Hosting. Até agora a validação do JWT foi testada com chave própria nos testes e com token falso no serviço no ar (401). Conferir: login no front, pergunta na tela do coach, resposta 200 com números, e 401 depois do logout. Entra no teste de quarta 20h (deploy final e ponta a ponta).
-- Tools de quarta: coletivas (`comparar_times`, `economia_time`, `pos_plant_retake`, `composicoes`), `resumo_partida`, `abrir_na_prancheta` e scouting.
+- **Confirmar com o Lhobregat o caminho da prancheta** (`/prancheta?partida_id=&round=`, seção acima). Até lá o link é proposta.
+- **Perguntas reais das tools de quarta** (`COACH_TESTE_REAL=1 uv run pytest tests/test_perguntas.py -s`): as tools foram rodadas direto contra a gold (`coach.cli --tool`), mas o agente com Gemini escolhendo as tools novas ainda não foi testado. Entra junto com as 10 perguntas da demo do gugu.
+- MVP e rounds decisivos seguem sem critério oficial: `resumo_partida` devolve `mvp: null` e destaques com critério explícito.
 
 ## Catálogos
 
