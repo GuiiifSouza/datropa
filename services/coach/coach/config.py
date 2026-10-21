@@ -18,6 +18,10 @@ GOLD_PREFIXO = os.environ.get("COACH_GOLD_PREFIXO", "")
 # deixar uma consulta errada varrer a cota de 100 GiB/dia.
 MAX_BYTES_BILLED = int(os.environ.get("COACH_MAX_BYTES_BILLED", str(200 * 1024**2)))
 
+# Base do link da prancheta devolvido por abrir_na_prancheta (contrato proposto, a
+# confirmar com o front).
+FRONT_URL = os.environ.get("COACH_FRONT_URL", "https://devs.datropa.com").rstrip("/")
+
 # Quantas rodadas de tool o agente pode fazer numa pergunta.
 MAX_PASSOS = int(os.environ.get("COACH_MAX_PASSOS", "6"))
 

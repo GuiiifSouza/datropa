@@ -10,7 +10,11 @@ from coach.tools import REGISTRO
 
 
 def test_tools_ligadas():
-    assert set(REGISTRO) == {"buscar_entidade", "stats_jogador", "stats_time"}
+    assert set(REGISTRO) == {
+        "buscar_entidade", "stats_jogador", "stats_time",
+        "comparar_times", "economia_time", "pos_plant_retake", "composicoes",
+        "resumo_partida", "scouting_time", "abrir_na_prancheta",
+    }
     assert "consulta_livre" not in REGISTRO
 
 

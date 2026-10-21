@@ -21,6 +21,15 @@ PERGUNTAS = [
     ("Quem é o melhor jogador da Azure Bears Golden?", {"buscar_entidade", "stats_time"}),
     ("Em qual mapa a CEUB Octopus Vulgaris vai melhor e em qual sofre mais?", {"buscar_entidade", "stats_time"}),
     ("Qual o melhor jogador da UFMT Turuna? Me mostra os números dele de Jett.", {"buscar_entidade", "stats_jogador"}),
+    ("Compara a UFMT Turuna com a Unicamp Tritons Black.", {"buscar_entidade", "comparar_times"}),
+    ("Como a UFMT Turuna se sai nos rounds de eco e de force?", {"buscar_entidade", "economia_time"}),
+    ("A Unicamp Tritons Black converte bem depois de plantar? E no retake?", {"buscar_entidade", "pos_plant_retake"}),
+    ("Qual composição mais ganha em Lotus?", {"composicoes"}),
+    ("Quero estudar a Unicamp Tritons Black para o próximo jogo. Como eles jogam?",
+     {"buscar_entidade", "scouting_time"}),
+    ("Resume o último jogo da UFMT Turuna contra a Unicamp Tritons Black.", {"buscar_entidade", "resumo_partida"}),
+    ("Abre na prancheta o round 3 do jogo da UFMT Turuna contra a Unicamp Tritons Black.",
+     {"buscar_entidade", "resumo_partida", "abrir_na_prancheta"}),
 ]
 
 _NUM = re.compile(r"(?<![\w.,])\d+(?:[.,]\d+)?")
