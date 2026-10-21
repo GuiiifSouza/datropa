@@ -21,13 +21,16 @@ times AS (
     COUNTIF(venceu IS TRUE) AS vitorias,
     COUNTIF(perdeu IS TRUE) AS derrotas,
     COUNTIF(empate IS TRUE) AS empates,
-    100.0 * SAFE_DIVIDE(
-      COUNTIF(venceu IS TRUE),
+    IF(
       COUNTIF(
-        venceu IS TRUE
-        OR perdeu IS TRUE
-        OR empate IS TRUE
-      )
+        status_qualidade != 'ok'
+        OR status_qualidade IS NULL
+      ) = 0,
+      100.0 * SAFE_DIVIDE(
+        COUNTIF(venceu IS TRUE),
+        COUNT(DISTINCT partida_id)
+      ),
+      NULL
     ) AS taxa_vitoria_pct
   FROM base
   GROUP BY time_id
