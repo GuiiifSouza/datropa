@@ -20,6 +20,7 @@ from app.validacoes import (
 router = APIRouter()
 
 PARTIDAS_LISTA_SQL = carregar_sql("partidas_lista.sql")
+PARTIDA_DETALHE_SQL = carregar_sql("partida_detalhe.sql")
 
 
 @router.get("/api/stats/partidas")
@@ -31,6 +32,7 @@ def listar_partidas(
     mapa_id: str | None = None,
     torneio_id: str | None = None,
     time_id: str | None = None,
+    jogador_id: str | None = None,
     data_inicio: str | None = None,
     data_fim: str | None = None,
 ):
@@ -42,6 +44,7 @@ def listar_partidas(
             "mapa_id",
             "torneio_id",
             "time_id",
+            "jogador_id",
             "data_inicio",
             "data_fim",
         },
@@ -51,8 +54,9 @@ def listar_partidas(
         "mapa_id": mapa_id,
         "torneio_id": torneio_id,
         "time_id": time_id,
+        "jogador_id": jogador_id,
     }
-
+    
     validar_identificadores(identificadores)
     inicio, fim = validar_periodo(data_inicio, data_fim)
 
@@ -64,6 +68,7 @@ def listar_partidas(
         mapa_id,
         torneio_id,
         time_id,
+        jogador_id,
         inicio,
         fim,
     )
@@ -137,4 +142,78 @@ def listar_partidas(
             503,
             "DATA_UNAVAILABLE",
             "Partidas temporariamente indisponíveis.",
+        )
+
+    PARTIDA_DETALHE_SQL = carregar_sql("partida_detalhe.sql")
+
+
+@router.get("/api/stats/partidas/{partida_id}")
+@coordenar_consultas
+def detalhe_partida(
+    request: Request,
+    partida_id: str,
+):
+    validar_parametros(request, set())
+    validar_identificadores({"partida_id": partida_id})
+
+    chave_cache = (
+        "gold_336_v1",
+        "partida_detalhe_publico_v1",
+        partida_id,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info(
+            "Detalhe partida: cache HIT"
+        )
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info(
+        "Detalhe partida: cache MISS"
+    )
+
+    config = bigquery.QueryJobConfig(
+        maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
+        query_parameters=[
+            bigquery.ScalarQueryParameter(
+                "partida_id", "STRING", partida_id
+            ),
+        ],
+    )
+
+    try:
+        with conexao_bigquery() as client:
+            rows = client.query(
+                PARTIDA_DETALHE_SQL,
+                job_config=config,
+            ).result(timeout=30)
+
+            partida = next(iter(rows), None)
+
+            if partida is None:
+                raise ApiError(
+                    404,
+                    "NOT_FOUND",
+                    "Partida não encontrada.",
+                )
+
+            resposta = {
+                "data": converter_resultado(partida),
+                "meta": {"atualizado_em": None},
+            }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
+
+    except ApiError:
+        raise
+
+    except Exception:
+        logging.exception("Falha ao consultar detalhe da partida")
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Dados da partida temporariamente indisponíveis.",
         )
