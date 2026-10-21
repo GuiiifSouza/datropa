@@ -1,0 +1,75 @@
+# Workflow reutilizável: build da imagem, push no Artifact Registry e deploy no Cloud Run.
+# Chamado por deploy-stats.yml, deploy-coach.yml e deploy-ingest.yml.
+# Só faz deploy se existir services/<serviço>/Dockerfile.
+name: deploy-servico
+
+on:
+  workflow_call:
+    inputs:
+      servico:
+        description: Nome da pasta em services/ e do serviço no Cloud Run
+        required: true
+        type: string
+
+env:
+  PROJETO: datropa
+  REGIAO: southamerica-east1
+  # Não é segredo: o provider só aceita token do repo GuiiifSouza/datropa na branch main (infra/cicd.sh).
+  WIF_PROVIDER: projects/19667506828/locations/global/workloadIdentityPools/github/providers/github-actions
+  SA_DEPLOY: sa-deploy@datropa.iam.gserviceaccount.com
+
+jobs:
+  checar:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      tem_dockerfile: ${{ steps.dockerfile.outputs.tem }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: dockerfile
+        env:
+          SERVICO: ${{ inputs.servico }}
+        run: |
+          if [ -f "services/$SERVICO/Dockerfile" ]; then
+            echo "tem=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "tem=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::services/$SERVICO ainda não tem Dockerfile. Deploy pulado."
+          fi
+
+  deploy:
+    needs: checar
+    if: needs.checar.outputs.tem_dockerfile == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SERVICO: ${{ inputs.servico }}
+      IMAGEM: southamerica-east1-docker.pkg.dev/datropa/servicos/${{ inputs.servico }}:${{ github.sha }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SA_DEPLOY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build e push da imagem
+        run: |
+          gcloud auth configure-docker "$REGIAO-docker.pkg.dev" --quiet
+          docker build -t "$IMAGEM" "services/$SERVICO"
+          docker push "$IMAGEM"
+
+      - name: Deploy no Cloud Run
+        run: |
+          gcloud run deploy "$SERVICO" \
+            --project "$PROJETO" \
+            --region "$REGIAO" \
+            --image "$IMAGEM" \
+            --service-account "sa-$SERVICO@$PROJETO.iam.gserviceaccount.com" \
+            --max-instances 2 \
+            --quiet

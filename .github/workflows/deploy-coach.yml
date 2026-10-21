@@ -1,0 +1,26 @@
+name: deploy-coach
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - services/coach/**
+      - .github/workflows/deploy-coach.yml
+      - .github/workflows/deploy-servico.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-coach
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-servico.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      servico: coach
