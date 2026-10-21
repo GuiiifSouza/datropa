@@ -55,8 +55,8 @@ O nome das tabelas vem da configuração, nunca do modelo:
 | `COACH_REGIAO` | `southamerica-east1` | Vertex AI e BigQuery |
 | `COACH_MODELO` | `gemini-2.5-flash` | Modelo |
 | `COACH_DATASET` | `valorant` | Dataset da gold |
-| `COACH_GOLD_PREFIXO` | vazio | `chico_teste_` aponta para as tabelas de teste |
-| `COACH_TABELA_<NOME>` | — | Sobrescreve uma tabela só, ex.: `COACH_TABELA_STATS_TIME=chico_teste_stats_time` |
+| `COACH_GOLD_PREFIXO` | vazio | Prefixo nos nomes da gold, para apontar para outra versão das tabelas |
+| `COACH_TABELA_<NOME>` | — | Sobrescreve uma tabela só, ex.: `COACH_TABELA_STATS_TIME=stats_time_v2` |
 | `COACH_MAX_BYTES_BILLED` | `209715200` | Teto por consulta |
 | `COACH_MAX_PASSOS` | `6` | Rodadas de tool por pergunta |
 

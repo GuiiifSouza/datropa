@@ -57,7 +57,8 @@ Os logs permanecem com Chico; nao incluir saidas extensas ou JSONs de partida no
 ## Republicacao de 21/10/2026 (Guilherme)
 
 Tres tabelas folha republicadas com WRITE_TRUNCATE; nenhuma outra tabela le delas.
-Backup antes, por copia: `<tabela>_bkp_v1_20261021` no mesmo dataset.
+Backup antes, por copia (`<tabela>_bkp_v1_20261021`), apagado depois de conferir as validacoes.
+Na mesma limpeza sairam as 13 tabelas chico_teste_.
 
 | Tabela | Mudanca | Dry run (bytes) |
 |---|---|---:|

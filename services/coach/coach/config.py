@@ -1,8 +1,8 @@
 """Configuração do coach por variável de ambiente.
 
-Os nomes das tabelas gold vêm daqui, nunca do modelo. Para apontar para as
-tabelas de teste do chico, use COACH_GOLD_PREFIXO=chico_teste_ (ou sobrescreva
-uma tabela só com COACH_TABELA_<NOME>, por exemplo COACH_TABELA_STATS_TIME).
+Os nomes das tabelas gold vêm daqui, nunca do modelo. Para apontar para outra
+versão das tabelas, use COACH_GOLD_PREFIXO (ou sobrescreva uma tabela só com
+COACH_TABELA_<NOME>, por exemplo COACH_TABELA_STATS_TIME).
 """
 
 import os

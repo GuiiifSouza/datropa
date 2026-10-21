@@ -17,7 +17,7 @@ API, cache, coach e produto integrado ainda nao foram validados nesta entrega.
 - [x] Documentar spike, quedas e contexto da arena do Iso; revisar avisos dos HTMLs.
 - [x] Registrar regras para Gustavo/Gugu, sem depender de nova decisao dele.
 - [x] Preparar PR, evidencias e limpeza dos SQLs/planos de teste obsoletos.
-- [x] Preservar historico Git e tabelas de teste no BigQuery.
+- [x] Preservar historico Git. Tabelas de teste no BigQuery apagadas pelo Guilherme em 21/10/2026.
 
 ## Tabelas oficiais
 | Tabela | Linhas |
@@ -82,6 +82,5 @@ Para conferir tabelas ja publicadas:
 python3 services/stats/sql/gold/oficial/publicar_gold.py verificar
 python3 services/stats/sql/gold/oficial/publicar_gold.py validar
 ```
-Nao repetir publicar nos destinos existentes; nenhuma tabela foi apagada na limpeza.
+Nao repetir publicar nos destinos existentes.
 SQLs/planos de teste removidos do checkout continuam no historico Git.
-Nao apagar tabelas de teste antes da conferencia integrada.
