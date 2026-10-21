@@ -2,6 +2,7 @@ import logging
 import re
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -125,6 +126,7 @@ def ranking(
     request: Request,
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
+    ordem: Literal["kills_desc", "kd_desc", "adr_desc"] = "kills_desc",
     mapa_id: str | None = None,
     agente_id: str | None = None,
     time_id: str | None = None,
@@ -137,6 +139,7 @@ def ranking(
         {
             "page",
             "page_size",
+            "ordem",
             "mapa_id",
             "agente_id",
             "time_id",
@@ -207,6 +210,19 @@ def ranking(
             ]
         )
 
+    ordenacoes = {
+        "kills_desc": "kills DESC NULLS LAST, jogador_id",
+        "kd_desc": "kd DESC NULLS LAST, jogador_id",
+        "adr_desc": "adr DESC NULLS LAST, jogador_id",
+    }
+
+    sql_base = RANKING_FILTRADO_SQL if tem_filtros else RANKING_SQL
+
+    sql = sql_base.replace(
+        "ORDER BY kills DESC NULLS LAST, jogador_id",
+        f"ORDER BY {ordenacoes[ordem]}",
+    )
+
     try:
         config = bigquery.QueryJobConfig(
             maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
@@ -219,7 +235,7 @@ def ranking(
         ) as client:
             if tem_filtros:
                 rows = client.query(
-                    RANKING_FILTRADO_SQL,
+                    sql,
                     job_config=config,
                 ).result(timeout=30)
 
@@ -232,7 +248,7 @@ def ranking(
 
             else:
                 rows = client.query(
-                    RANKING_SQL,
+                    sql,
                     job_config=config,
                 ).result(timeout=30)
 
