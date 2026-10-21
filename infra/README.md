@@ -17,7 +17,7 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 | Firebase | web app `datropa-front` | Login por e-mail e senha. Hosting em `datropa.web.app` |
 | Artifact Registry | `servicos` (Docker) | Imagens em `southamerica-east1-docker.pkg.dev/datropa/servicos/<serviço>`. Guarda as 5 mais novas de cada serviço e apaga o resto com mais de 7 dias |
 | WIF | pool `github`, provider `github-actions` | Só aceita token do repo `GuiiifSouza/datropa` (pelo id `1426256768`) na branch `main`. O GitHub Actions entra como `sa-deploy` |
-| Cloud Run | `coach` | `https://coach-amnaanrzga-rj.a.run.app`, com a `sa-coach`. Invoker público (`allUsers`) desde 20/10/2026; o serviço valida o JWT do Firebase. Deploy pelo `deploy-coach.yml` |
+| Cloud Run | `coach` | `https://coach-amnaanrzga-rj.a.run.app`, com a `sa-coach`. Invoker público (`allUsers`), que o próprio CD garante a cada deploy; o serviço valida o JWT do Firebase. Deploy pelo `deploy-coach.yml` |
 
 A config do web app do Firebase é pública, mas não entra no repo. Peça no canal.
 
@@ -63,9 +63,10 @@ Criadas por [`cicd.sh`](cicd.sh), menos `sa-build` e `sa-limite-custo`. O script
 | `sa-stats` | Cloud Run `stats` | `READER` no dataset `valorant`; `bigquery.jobUser` e `datastore.user` no projeto |
 | `sa-coach` | Cloud Run `coach` | `READER` no dataset `valorant`; `bigquery.jobUser` e `aiplatform.user` no projeto |
 | `sa-ingest` | Cloud Run `ingest` | `storage.objectViewer` no bucket `datropa-raw-matches`; `WRITER` no dataset `valorant`; `bigquery.jobUser` e `eventarc.eventReceiver` no projeto |
-| `sa-deploy` | GitHub Actions, via WIF | `run.developer` no projeto; `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
+| `sa-deploy` | GitHub Actions, via WIF | `run.developer` e `eventarc.developer` no projeto; `deployRunIam` (papel próprio: ler e gravar IAM de serviço do Cloud Run) só em `stats`, `coach` e `ingest`, por condição; `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
 | `sa-build` | Build das funções e containers. Substitui a conta padrão do Compute | |
 | `sa-limite-custo` | Roda a função de corte | `billing.projectManager` no projeto |
+| Agente do Cloud Storage (`service-19667506828@gs-project-accounts…`) | Publica os eventos do bucket para o Eventarc | `pubsub.publisher` no projeto |
 
 As contas `firebase-adminsdk-*`, a padrão do Compute e a do Cloud Build foram criadas pelo Google ao ligar as APIs. Nenhum serviço nosso usa elas. Nenhuma conta tem chave JSON.
 
@@ -76,39 +77,23 @@ Workflows em [`.github/workflows/`](../.github/workflows/):
 | Workflow | Quando roda | O que faz |
 |---|---|---|
 | `ci.yml` | Todo PR | `actionlint`, `shellcheck` em `infra/` e `docker build` (sem push) dos serviços que mudaram e têm `Dockerfile`. Não autentica no GCP |
-| `deploy-stats.yml`, `deploy-coach.yml`, `deploy-ingest.yml` | Push na `main` que mexe em `services/<serviço>/`, ou manual | Chama `deploy-servico.yml`: build, push no Artifact Registry e `gcloud run deploy` com a SA do serviço, `--max-instances 2`, em `southamerica-east1`. Sem `Dockerfile`, o deploy é pulado |
+| `deploy-stats.yml`, `deploy-coach.yml`, `deploy-ingest.yml` | Push na `main` que mexe em `services/<serviço>/`, ou manual | Chama `deploy-servico.yml`: build, push no Artifact Registry e `gcloud run deploy` com a SA do serviço, `--max-instances 2`, em `southamerica-east1`. Sem `Dockerfile`, o deploy é pulado. Depois do deploy: `stats` e `coach` ficam com `allUsers` como invoker (o Hosting precisa; o serviço valida o JWT). `ingest` fica privado, e o CD garante o invoker da `sa-ingest` e o gatilho `ingest-partidas` do Eventarc |
 | `deploy-front.yml` | Desligado | Esqueleto do deploy no Firebase Hosting. Liga quando existir `front/` |
 
-O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do commit como tag.
+O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do commit como tag. O deploy é automático: o primeiro sai sozinho no push que trouxer o `Dockerfile` do serviço para a `main`.
+
+**Proteção da `main`:** merge só com os checks `lint`, `build (stats)`, `build (coach)` e `build (ingest)` verdes. Sem force push e sem apagar a branch. Admin (o Guilherme) ainda consegue passar por cima numa emergência. Mudou o nome de um job no `ci.yml`? Atualize os checks exigidos em Settings > Branches, senão todo PR fica travado esperando um check que não existe mais.
+
+**Gatilho do `ingest`:** dispara para todo arquivo novo no bucket, inclusive o NDJSON em `bronze/`. O `ingest` precisa ignorar o que não estiver em `partidas/`.
 
 ## Pendências
-
-- **Cloud Run público para o Hosting.** A `sa-deploy` não mexe em IAM de serviço. O `coach` já foi liberado. Falta o `stats`, depois do primeiro deploy dele (o serviço continua validando o JWT do Firebase):
-
-  ```bash
-  gcloud run services add-iam-policy-binding stats --project datropa --region southamerica-east1 \
-    --member allUsers --role roles/run.invoker
-  ```
-
-  `ingest` fica privado.
-- **Gatilho do Eventarc para o `ingest`**, depois do primeiro deploy dele:
-
-  ```bash
-  GCS_SA=$(gcloud storage service-agent --project datropa)
-  gcloud projects add-iam-policy-binding datropa --member "serviceAccount:$GCS_SA" --role roles/pubsub.publisher
-  gcloud run services add-iam-policy-binding ingest --project datropa --region southamerica-east1 \
-    --member serviceAccount:sa-ingest@datropa.iam.gserviceaccount.com --role roles/run.invoker
-  gcloud eventarc triggers create ingest-partidas --project datropa --location southamerica-east1 \
-    --destination-run-service ingest --destination-run-region southamerica-east1 \
-    --event-filters type=google.cloud.storage.object.v1.finalized \
-    --event-filters bucket=datropa-raw-matches \
-    --service-account sa-ingest@datropa.iam.gserviceaccount.com
-  ```
 
 - **Dockerfile** em `services/stats` e `services/ingest`. Sem ele o deploy não roda. O `coach` já tem.
 - **Deploy do front:** `roles/firebasehosting.admin` para a `sa-deploy` e ligar `deploy-front.yml` quando o `front/` tiver esqueleto. Preview por PR precisa de outro provider no WIF.
 - **Variáveis e segredos dos serviços**: entram como `--set-env-vars` no deploy quando os serviços disserem do que precisam. O `coach` não precisa: os padrões dele (projeto Firebase `datropa`, `gemini-2.5-flash`) já são os de produção.
-- DNS de `devs.datropa.com` e domínio no Hosting.
 - Login com Google no Firebase (Authentication > Sign-in method > Google, pelo console).
 - Regras do Firestore.
-- Proteção da branch `main` exigindo o `ci` verde.
+
+## Dívida técnica
+
+- **DNS de `devs.datropa.com`** e domínio no Hosting. Por enquanto o front fica em `datropa.web.app`.

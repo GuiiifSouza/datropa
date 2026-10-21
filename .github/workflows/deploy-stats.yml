@@ -24,3 +24,4 @@ jobs:
       id-token: write
     with:
       servico: stats
+      publico: true

@@ -10,6 +10,16 @@ on:
         description: Nome da pasta em services/ e do serviço no Cloud Run
         required: true
         type: string
+      publico:
+        description: Libera allUsers como invoker (o Hosting reescreve /api para o serviço; o serviço valida o JWT)
+        required: false
+        type: boolean
+        default: false
+      eventarc:
+        description: Garante o gatilho do Eventarc para arquivo novo no bucket datropa-raw-matches
+        required: false
+        type: boolean
+        default: false
 
 env:
   PROJETO: datropa
@@ -73,3 +83,31 @@ jobs:
             --service-account "sa-$SERVICO@$PROJETO.iam.gserviceaccount.com" \
             --max-instances 2 \
             --quiet
+
+      - name: Acesso público
+        if: inputs.publico
+        run: |
+          gcloud run services add-iam-policy-binding "$SERVICO" \
+            --project "$PROJETO" --region "$REGIAO" \
+            --member allUsers --role roles/run.invoker --quiet --format=none
+
+      - name: Gatilho do Eventarc
+        if: inputs.eventarc
+        env:
+          GATILHO: ${{ inputs.servico }}-partidas
+          BUCKET: datropa-raw-matches
+        run: |
+          SA="sa-$SERVICO@$PROJETO.iam.gserviceaccount.com"
+          gcloud run services add-iam-policy-binding "$SERVICO" \
+            --project "$PROJETO" --region "$REGIAO" \
+            --member "serviceAccount:$SA" --role roles/run.invoker --quiet --format=none
+          if gcloud eventarc triggers describe "$GATILHO" --project "$PROJETO" --location "$REGIAO" >/dev/null 2>&1; then
+            echo "Gatilho $GATILHO já existe."
+          else
+            gcloud eventarc triggers create "$GATILHO" \
+              --project "$PROJETO" --location "$REGIAO" \
+              --destination-run-service "$SERVICO" --destination-run-region "$REGIAO" \
+              --event-filters type=google.cloud.storage.object.v1.finalized \
+              --event-filters "bucket=$BUCKET" \
+              --service-account "$SA"
+          fi
