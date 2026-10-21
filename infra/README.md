@@ -17,6 +17,7 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 | Firebase | web app `datropa-front` | Login por e-mail e senha. Hosting em `datropa.web.app` |
 | Artifact Registry | `servicos` (Docker) | Imagens em `southamerica-east1-docker.pkg.dev/datropa/servicos/<serviço>`. Guarda as 5 mais novas de cada serviço e apaga o resto com mais de 7 dias |
 | WIF | pool `github`, provider `github-actions` | Só aceita token do repo `GuiiifSouza/datropa` (pelo id `1426256768`) na branch `main`. O GitHub Actions entra como `sa-deploy` |
+| Cloud Run | `coach` | `https://coach-amnaanrzga-rj.a.run.app`, com a `sa-coach`. Invoker público (`allUsers`) desde 20/10/2026; o serviço valida o JWT do Firebase. Deploy pelo `deploy-coach.yml` |
 
 A config do web app do Firebase é pública, mas não entra no repo. Peça no canal.
 
@@ -82,13 +83,11 @@ O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do co
 
 ## Pendências
 
-- **Cloud Run público para o Hosting.** A `sa-deploy` não mexe em IAM de serviço. Depois do primeiro deploy de `stats` e `coach`, o Guilherme libera o acesso (o serviço continua validando o JWT do Firebase):
+- **Cloud Run público para o Hosting.** A `sa-deploy` não mexe em IAM de serviço. O `coach` já foi liberado. Falta o `stats`, depois do primeiro deploy dele (o serviço continua validando o JWT do Firebase):
 
   ```bash
-  for s in stats coach; do
-    gcloud run services add-iam-policy-binding $s --project datropa --region southamerica-east1 \
-      --member allUsers --role roles/run.invoker
-  done
+  gcloud run services add-iam-policy-binding stats --project datropa --region southamerica-east1 \
+    --member allUsers --role roles/run.invoker
   ```
 
   `ingest` fica privado.
@@ -106,9 +105,9 @@ O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do co
     --service-account sa-ingest@datropa.iam.gserviceaccount.com
   ```
 
-- **Dockerfile** em `services/stats`, `services/coach` e `services/ingest`. Sem ele o deploy não roda.
+- **Dockerfile** em `services/stats` e `services/ingest`. Sem ele o deploy não roda. O `coach` já tem.
 - **Deploy do front:** `roles/firebasehosting.admin` para a `sa-deploy` e ligar `deploy-front.yml` quando o `front/` tiver esqueleto. Preview por PR precisa de outro provider no WIF.
-- **Variáveis e segredos dos serviços** (ID do projeto Firebase, modelo do Gemini): entram como `--set-env-vars` no deploy quando os serviços disserem do que precisam.
+- **Variáveis e segredos dos serviços**: entram como `--set-env-vars` no deploy quando os serviços disserem do que precisam. O `coach` não precisa: os padrões dele (projeto Firebase `datropa`, `gemini-2.5-flash`) já são os de produção.
 - DNS de `devs.datropa.com` e domínio no Hosting.
 - Login com Google no Firebase (Authentication > Sign-in method > Google, pelo console).
 - Regras do Firestore.
