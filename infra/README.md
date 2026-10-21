@@ -61,7 +61,7 @@ Ao subir serviço no Cloud Run, use `--max-instances` baixo (2 ou 3).
 - **Sem `front/package.json`**, o CI publica a página provisória de [`hosting-placeholder/`](hosting-placeholder/), para os rewrites já valerem.
 - **Rota completa vai para o serviço:** `/api/coach/perguntar` chega no coach como `/api/coach/perguntar`. Cada serviço declara as rotas com o prefixo `/api/<serviço>`.
 - **Rewrite para serviço que não existe:** o Hosting recusa o deploy ("Cloud Run service `stats` does not exist in region", conferido em 21/10). Por isso o `deploy-front.yml` tira do deploy os rewrites de serviço que ainda não estão no ar e roda de novo depois de cada `deploy-stats` com sucesso. Enquanto o `stats` não sobe, `/api/stats/**` cai no fallback da SPA e devolve o `index.html`.
-- `index.html` sai com `Cache-Control: no-cache`; `/assets/**` (arquivos com hash do Vite), com cache de um ano.
+- Tudo sai com `Cache-Control: no-cache` (inclusive as rotas da SPA, como `/p/abc`, que sem isso ficavam 1 hora no cache do navegador e mostravam versão velha depois de deploy), menos `/assets/**` (arquivos com hash do Vite), com cache de um ano.
 
 ## Firestore: modelo de dados
 
