@@ -103,6 +103,31 @@ for s in sa-stats sa-coach sa-ingest; do
     --member "serviceAccount:$(sa sa-deploy)" --role roles/iam.serviceAccountUser --format=none
 done
 
+log "sa-deploy: IAM do Cloud Run só em stats, coach e ingest (allUsers e invoker do Eventarc)"
+# Papel próprio em vez de run.admin: só lê e grava a policy do serviço, e a condição
+# deixa de fora qualquer outro serviço do projeto (ex.: a função limite-custo).
+PAPEL_IAM_RUN=deployRunIam
+PERMISSOES_IAM_RUN=run.services.getIamPolicy,run.services.setIamPolicy
+if gcloud iam roles describe "$PAPEL_IAM_RUN" --project "$PROJETO" >/dev/null 2>&1; then
+  gcloud iam roles update "$PAPEL_IAM_RUN" --project "$PROJETO" \
+    --permissions "$PERMISSOES_IAM_RUN" --quiet --format=none
+else
+  gcloud iam roles create "$PAPEL_IAM_RUN" --project "$PROJETO" --stage GA \
+    --title "Deploy: IAM dos serviços do Cloud Run" --permissions "$PERMISSOES_IAM_RUN" --format=none
+fi
+gcloud projects add-iam-policy-binding "$PROJETO" --member "serviceAccount:$(sa sa-deploy)" \
+  --role "projects/$PROJETO/roles/$PAPEL_IAM_RUN" --quiet --format=none \
+  --condition='^;^title=so-servicos-do-app;expression=resource.name.endsWith("/services/stats") || resource.name.endsWith("/services/coach") || resource.name.endsWith("/services/ingest")'
+# Cria o gatilho do Eventarc do ingest no CD.
+projeto_role "serviceAccount:$(sa sa-deploy)" roles/eventarc.developer
+
+log "Eventarc: o agente do Cloud Storage publica os eventos do bucket"
+# `storage service-agent` só informa o e-mail; quem cria a conta é o `services identity create`.
+gcloud beta services identity create --service storage.googleapis.com --project "$PROJETO" --format=none
+# A saída vem com quebra de linha e espaços na frente do e-mail.
+AGENTE_GCS=$(gcloud storage service-agent --project "$PROJETO" | tr -d '[:space:]')
+projeto_role "serviceAccount:$AGENTE_GCS" roles/pubsub.publisher
+
 log "Workload Identity Federation"
 if gcloud iam workload-identity-pools describe "$POOL" --project "$PROJETO" --location global >/dev/null 2>&1; then
   echo "pool $POOL já existe"
