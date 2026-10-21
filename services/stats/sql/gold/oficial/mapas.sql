@@ -22,9 +22,8 @@ WITH referencia AS (
   GROUP BY mapa_id
 )
 SELECT p.mapa_id AS id, p.mapa_id, p.mapa_id_origem, r.nome, p.partidas,
-  IF(p.mapa_id = 'plummet',
-    'https://media.valorant-api.com/maps/756da597-416b-c0f2-f47b-afbdf28670bc/displayicon.png',
-    CAST(NULL AS STRING)) AS minimapa_url,
+  -- Imagem fica com o front, com licenca registrada; nada de hotlink de terceiros.
+  CAST(NULL AS STRING) AS minimapa_url,
   -- Matriz publica oficial: u depende de y e v depende de x.
   IF(r.xm IS NULL, NULL,
     STRUCT(0.0 AS u_x, r.xm AS u_y, r.xa AS u_offset,

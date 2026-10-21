@@ -1,6 +1,6 @@
 -- VERSAO OFICIAL gold_336_v1. Destino: datropa.valorant.economia_time_round
 -- Fontes e validacoes de teste preservadas na pasta superior.
--- Uma linha por time/round; classificacao por equipamento total, regra versionada.
+-- Uma linha por time/round; pistol pelo numero do round, demais por equipamento total.
 WITH jogadores AS (
   SELECT partida_id, jogador_id, time_id
   FROM `datropa.valorant.stats_jogador_partida`
@@ -45,8 +45,11 @@ WITH jogadores AS (
 ), classificada AS (
   SELECT *,
     IF(economia_completa, equipamento_total_origem, NULL) AS equipamento_total,
+    -- Pistol (rounds 1 e 13) fica separado: senao toda abertura de half vira eco.
+    `round` IN (1, 13) AS pistol,
     CASE WHEN NOT COALESCE(economia_completa, FALSE) THEN NULL
       WHEN NOT tem_equipamento_positivo_na_partida THEN NULL
+      WHEN `round` IN (1, 13) THEN 'pistol'
       WHEN equipamento_total_origem < 10000 THEN 'eco'
       WHEN equipamento_total_origem < 20000 THEN 'force'
       ELSE 'full' END AS categoria,
@@ -58,5 +61,5 @@ WITH jogadores AS (
   FROM cobertura
 )
 SELECT * EXCEPT(qualidade_round),
-  'equipamento_time_10000_20000_v1' AS classificacao_versao
+  'equipamento_time_10000_20000_pistol_v2' AS classificacao_versao
 FROM classificada;

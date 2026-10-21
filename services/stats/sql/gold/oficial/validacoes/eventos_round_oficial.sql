@@ -7,6 +7,7 @@ SELECT COUNT(*) AS eventos,
   COUNTIF(fogo_amigo) AS fogo_amigo,
   COUNTIF(abate_adversario) AS abates_adversarios,
   COUNTIF(status_qualidade != 'ok') AS alertas,
-  COUNTIF(tipo = 'defuse' AND ARRAY_LENGTH(jogadores) != 0) AS snapshots_defuse_inventados,
+  -- Defuse usa defusePlayerLocations; referencia dos JSONs: 3333 posicoes nos 1349 defuses.
+  SUM(IF(tipo = 'defuse', ARRAY_LENGTH(jogadores), 0)) AS posicoes_defuse,
   COUNT(DISTINCT TO_JSON_STRING(STRUCT(partida_id, round_indice, ordem))) AS ordens_unicas
 FROM `datropa.valorant.eventos_round`;

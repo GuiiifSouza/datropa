@@ -8,11 +8,14 @@ A API le somente a gold; nenhum acesso bronze em rota.
 Usa SOMA de economy.loadoutValue dos cinco jogadores validos no round.
 Nao confundir com economy.spent (gasto), remaining (saldo) ou dinheiro disponivel.
 Preserva gastos/saldos separadamente quando os cinco valores estao completos.
-Regra equipamento_time_10000_20000_v1, baseada nos limites sugeridos no PDF:
+Regra equipamento_time_10000_20000_pistol_v2, baseada nos limites sugeridos no PDF:
+pistol: rounds 1 e 13, qualquer equipamento (coluna booleana pistol);
 eco: total < 10000; force: 10000 <= total < 20000; full: total >= 20000.
 E uma classificacao por equipamento, nao prova da intencao de compra.
 Compras mistas entram pela soma; nao inferir que os cinco tinham compra igual.
-Pistols ficam nessas mesmas tres faixas; nao criar quarta categoria no contrato atual.
+Pistol virou categoria propria na v2: na v1 os 1344 pistols caiam todos em eco
+(maior loadout de pistol na base: 4550) e a taxa de eco subia de 16,8% para 32,5%.
+Overtime nao tem pistol.
 Nao filtrar rounds atipicos nesta versao.
 Limites oficializados em gold_336_v1 conforme autorizacao relatada por Chico.
 
@@ -31,7 +34,8 @@ Distinguir nenhuma partida no recorte de dados ainda nao publicados.
 
 ## Referencia independente dos JSONs
 13236 registros, 6618 rounds, 336 partidas e 68 times.
-Eco=2837 (923 vitorias); force=2888 (1413); full=7511 (4282).
+Pistol=1344 (672 vitorias); eco=1493 (251); force=2888 (1413); full=7511 (4282).
+Na v1 (pistol dentro de eco): eco=2837 (923).
 Total 6618 vitorias. Nenhum equipamento incompleto nem time/partida todo zero.
 
 

@@ -55,7 +55,7 @@ WITH jogadores AS (
     CAST(NULL AS STRING), CAST(NULL AS STRING), CAST(NULL AS STRING), NULLIF(o.r.plantSite, ''),
     IF(o.r.defuseLocation.x IS NULL OR o.r.defuseLocation.y IS NULL, NULL,
       STRUCT(CAST(o.r.defuseLocation.x AS FLOAT64) AS x, CAST(o.r.defuseLocation.y AS FLOAT64) AS y)),
-    o.r.plantPlayerLocations
+    o.r.defusePlayerLocations
   FROM origem o WHERE NULLIF(o.r.bombDefuser, '') IS NOT NULL
 ), assistencias AS (
   -- JOIN fora de ARRAY correlacionado: evita a limitacao do BigQuery.
@@ -73,8 +73,7 @@ WITH jogadores AS (
   FROM eventos e
   CROSS JOIN UNNEST(e.posicoes_origem) l WITH OFFSET li
   JOIN jogadores j ON j.partida_id = e.partida_id AND j.jogador_id = l.puuid
-  WHERE e.tipo != 'defuse'
-    AND l.location.x IS NOT NULL AND l.location.y IS NOT NULL
+  WHERE l.location.x IS NOT NULL AND l.location.y IS NOT NULL
   GROUP BY e.partida_id, e.round_indice, e.chave_origem
 ), identificados AS (
   SELECT e.* EXCEPT(assistentes_origem, posicoes_origem),

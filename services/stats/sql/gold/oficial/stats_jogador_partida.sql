@@ -1,7 +1,7 @@
 -- VERSAO OFICIAL gold_336_v1. Destino: datropa.valorant.stats_jogador_partida
 -- Fontes e validacoes de teste preservadas na pasta superior.
 -- Uma linha por jogador valido por partida. SELECT, sem alterar a bronze.
--- Dependencia nesta etapa: partidas. Publicacao final pendente.
+-- Dependencia: partidas.
 -- K/D/A e rounds: resumo original. Contadores dos eventos separados para auditoria.
 WITH jogadores AS (
   SELECT b.matchInfo.matchId AS partida_id, p.puuid AS jogador_id,

@@ -1,5 +1,5 @@
 -- Esperado: 10 mapas, 336 partidas, 10 matrizes e validacoes de plants; zero sem calibracao.
--- Transformacao publica ainda NULL ate alinhar a convencao de eixos na API.
+-- minimapa_url fica NULL nos dez mapas: imagem servida pelo front.
 SELECT COUNT(*) AS mapas, COUNT(DISTINCT id) AS ids_unicos,
   SUM(partidas) AS partidas,
   COUNTIF(transformacao_candidata IS NOT NULL) AS matrizes_disponiveis,

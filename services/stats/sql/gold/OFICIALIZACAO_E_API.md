@@ -37,12 +37,13 @@ Origem superior esquerda; u horizontal e v vertical, normalizados na imagem.
 Publicar esses seis campos em /catalogos, sem converter para o antigo esquema
 de quatro campos e sem trocar eixos uma segunda vez.
 As dez matrizes testadas sao publicadas; transformacao_candidata fica para auditoria.
-As imagens exatas do front ainda precisam ser registradas; minimapa_url NULL
-nao autoriza inventar URL. Recorte/margens/rotacao diferentes exigem nova conferencia.
+As imagens exatas do front ainda precisam ser registradas; minimapa_url e NULL
+nos dez mapas: a imagem fica no front, com licenca registrada, sem hotlink. Recorte/margens/rotacao diferentes exigem nova conferencia.
 Publicar a matriz nao comprova alinhamento com qualquer imagem futura.
 
 ### Eventos: spike, queda e arena do Iso
 Preservar posicao e jogadores com coordenadas originais; snapshots sao parciais.
+Defuse traz o snapshot de defusePlayerLocations (antes vinha vazio).
 Expor dano_final_tipo, self_kill, fogo_amigo, abate_adversario, ator_time_id,
 vitima_time_id e ator_agente_id junto aos campos existentes.
 Round publico base 1; usar round da Gold, nao somar 1 novamente.
@@ -86,8 +87,9 @@ exato da explosao; resultado detonacao tambem nao exige uma vitima por explosao.
   conforme SQL. Nao alterar essa semantica sem nova versao.
 - ranking_jogador e historico sem filtros; ranking filtrado usa stats_jogador_partida.
 - stats_time contem escopos geral/mapa; nao soma-los juntos.
-- Economia equipamento_time_10000_20000_v1: soma do loadoutValue dos cinco;
-  eco <10000, force de 10000 a <20000, full >=20000. NULL e incompleto,
+- Economia equipamento_time_10000_20000_pistol_v2: rounds 1 e 13 sao pistol;
+  nos demais, soma do loadoutValue dos cinco: eco <10000, force de 10000 a <20000,
+  full >=20000. NULL e incompleto,
   nunca eco inventado. Compras mistas pela soma; nao mede intencao de compra.
 - Pos-plant: vitoria do ataque apos plant; retake: vitoria da defesa apos plant.
   Mede resultado, nao tentativa. Preservar vitorias por tempo, alem de desarmes.

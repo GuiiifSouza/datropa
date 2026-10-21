@@ -41,7 +41,7 @@ preservadas separadamente. Nao classificadas como erro de carga pelos checks.
 K/D/A oficial continua usando players.stats; nao reconstruir a partir da timeline.
 As causas completas das 308/134 divergencias nao foram reanalisadas nesta revisao.
 Eventos: 52755; abates/mortes 46753; adversarios 46371; plants 4653;
-desarmes 1349; self_kills 373; fogo_amigo 9. Snapshots inventados de defuse=0.
+desarmes 1349; self_kills 373; fogo_amigo 9. Na v1 o defuse ficava sem snapshot (ver abaixo).
 Rounds atipicos=6 preservados; nao confundir com seis partidas recuperadas.
 
 ## Integridade dos logs originais
@@ -53,3 +53,18 @@ Os logs permanecem com Chico; nao incluir saidas extensas ou JSONs de partida no
 
 - 20261020T235103256287Z_verificar.jsonl
   SHA256: caef7329b8114d0972742a8295b331602ba4e69e3967a96e6f04c1a7b4573f77
+
+## Republicacao de 21/10/2026 (Guilherme)
+
+Tres tabelas folha republicadas com WRITE_TRUNCATE; nenhuma outra tabela le delas.
+Backup antes, por copia: `<tabela>_bkp_v1_20261021` no mesmo dataset.
+
+| Tabela | Mudanca | Dry run (bytes) |
+|---|---|---:|
+| mapas | minimapa_url NULL nos dez mapas (sem hotlink da valorant-api) | 10638 |
+| eventos_round | defuse com snapshot de defusePlayerLocations (3333 posicoes) | 44143194 |
+| economia_time_round | categoria pistol nos rounds 1 e 13, regra equipamento_time_10000_20000_pistol_v2 | 9557866 |
+
+Validacoes depois da carga: linhas iguais (10, 52755, 13236), zero alertas,
+pistol=1344 (672 vitorias), eco=1493 (251), force=2888 (1413), full=7511 (4282),
+iguais a referencia calculada direto dos JSONs; conjunto_oficial 24/24 passou=true.

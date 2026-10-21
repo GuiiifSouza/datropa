@@ -28,10 +28,10 @@ https://valorant-api.com/v1/maps/756da597-416b-c0f2-f47b-afbdf28670bc
 Saida recebida: displayName=Summit; mapUrl=/Game/Maps/Plummet/Plummet;
 xMultiplier=0.000075; yMultiplier=-0.000075;
 xScalarToAdd=0.047401; yScalarToAdd=0.978891.
-Imagem usada:
-https://media.valorant-api.com/maps/756da597-416b-c0f2-f47b-afbdf28670bc/displayicon.png
-Guardar URL de Summit no catalogo; demais URLs nao foram fornecidas individualmente.
-Ainda registrar arquivos/URLs e versoes exatas dos outros nove minimapas no handoff.
+A imagem do teste veio do CDN da valorant-api. O catalogo nao guarda URL de
+terceiro: minimapa_url e NULL nos dez mapas e o front serve as proprias imagens,
+com licenca registrada (politica de IP da Riot). Registrar no handoff os arquivos
+e versoes exatas adotados, porque a matriz depende do recorte da imagem.
 
 ## Formula e contrato
 

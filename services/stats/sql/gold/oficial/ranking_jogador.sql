@@ -2,7 +2,7 @@
 -- Fontes e validacoes de teste preservadas na pasta superior.
 -- Ranking geral, sem filtros, uma linha por jogador.
 -- Para filtros da API, filtrar stats_jogador_partida ANTES de agregar.
--- Dependencia de teste; publicacao final pendente.
+-- Dependencia: stats_jogador_partida.
 WITH totais AS (
   SELECT jogador_id,
     (ARRAY_AGG(STRUCT(nome, tag) ORDER BY inicio DESC, partida_id DESC LIMIT 1))[OFFSET(0)] AS identidade,
