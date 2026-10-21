@@ -84,3 +84,15 @@ python3 services/stats/sql/gold/oficial/publicar_gold.py validar
 ```
 Nao repetir publicar nos destinos existentes.
 SQLs/planos de teste removidos do checkout continuam no historico Git.
+
+## Consultas para API — detalhe de jogador (21/10/2026)
+- [x] Preparar consultas_api/jogador_detalhe.sql parametrizado, somente na Gold.
+- [x] Entregar runner Bash, parametros e regras de entidade inexistente/recorte vazio.
+- [x] Dry run aprovado: 1.197.458 bytes estimados; zero bytes cobrados no dry run.
+- [x] Validar resumo sem filtros e filtros de mapa, agente, mapa+agente, torneio,
+  intervalo de datas e inicio=fim, com evidencias enviadas por Chico.
+- [x] Conferir jogador inexistente e recorte vazio.
+- [x] Registrar resultados e limites em consultas_api/README.md.
+- [ ] Revisar PR e integrar na API com Gugu; conferir JSON e erros HTTP.
+- [ ] Preparar consultas de time e partida em tarefas seguintes.
+Esta entrega contem SQL e documentacao; nao altera Dockerfile, rotas, cache ou ranking.
