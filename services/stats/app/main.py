@@ -3,6 +3,7 @@ import re
 from datetime import date
 from pathlib import Path
 from typing import Literal
+from threading import BoundedSemaphore
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -23,6 +24,7 @@ app = FastAPI(
 )
 
 MAXIMUM_BYTES_BILLED = 1073741824
+CONSULTAS_SIMULTANEAS = BoundedSemaphore(4)
 QUERIES_DIR = Path(__file__).resolve().parent.parent / "queries"
 
 RANKING_SQL = (QUERIES_DIR / "ranking.sql").read_text(
@@ -252,6 +254,14 @@ def ranking(
         f"ORDER BY {ordenacoes[ordem]}",
     )
 
+    if not CONSULTAS_SIMULTANEAS.acquire(blocking=False):
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Servidor ocupado. Tente novamente em alguns instantes.",
+        )
+
+
     try:
         config = bigquery.QueryJobConfig(
             maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
@@ -312,3 +322,5 @@ def ranking(
             "DATA_UNAVAILABLE",
             "Ranking temporariamente indisponível.",
         )
+    finally:
+        CONSULTAS_SIMULTANEAS.release()
