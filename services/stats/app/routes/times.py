@@ -132,3 +132,110 @@ def listar_times(
             "DATA_UNAVAILABLE",
             "Lista de times temporariamente indisponível.",
         )
+
+TIME_DETALHE_SQL = carregar_sql("time_detalhe.sql")
+
+
+@router.get("/api/stats/times/{time_id}")
+@coordenar_consultas
+def detalhe_time(
+    request: Request,
+    time_id: str,
+    mapa_id: str | None = None,
+    torneio_id: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+):
+    validar_parametros(
+        request,
+        {
+            "mapa_id",
+            "torneio_id",
+            "data_inicio",
+            "data_fim",
+        },
+    )
+
+    identificadores = {
+        "time_id": time_id,
+        "mapa_id": mapa_id,
+        "torneio_id": torneio_id,
+    }
+
+    validar_identificadores(identificadores)
+    inicio, fim = validar_periodo(data_inicio, data_fim)
+
+    chave_cache = (
+        "gold_336_v1",
+        "time_detalhe_publico_v1",
+        time_id,
+        mapa_id,
+        torneio_id,
+        inicio,
+        fim,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info(
+            "Detalhe time: cache HIT"
+        )
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info(
+        "Detalhe time: cache MISS"
+    )
+
+    config = bigquery.QueryJobConfig(
+        maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
+        query_parameters=[
+            *[
+                bigquery.ScalarQueryParameter(
+                    campo, "STRING", valor
+                )
+                for campo, valor in identificadores.items()
+            ],
+            bigquery.ScalarQueryParameter(
+                "data_inicio", "DATE", inicio
+            ),
+            bigquery.ScalarQueryParameter(
+                "data_fim", "DATE", fim
+            ),
+        ],
+    )
+
+    try:
+        with conexao_bigquery() as client:
+            rows = client.query(
+                TIME_DETALHE_SQL,
+                job_config=config,
+            ).result(timeout=30)
+
+            time = next(iter(rows), None)
+
+            if time is None:
+                raise ApiError(
+                    404,
+                    "NOT_FOUND",
+                    "Time não encontrado.",
+                )
+
+            resposta = {
+                "data": converter_resultado(time),
+                "meta": {"atualizado_em": None},
+            }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
+
+    except ApiError:
+        raise
+
+    except Exception:
+        logging.exception("Falha ao consultar detalhe do time")
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Dados do time temporariamente indisponíveis.",
+        )
