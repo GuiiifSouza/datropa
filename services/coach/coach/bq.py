@@ -26,7 +26,7 @@ CONSULTAS: dict[str, "Consulta"] = {}
 class Consulta:
     nome: str
     # Recebe a função `tabela` e devolve o SQL. Assim o nome da tabela segue a
-    # configuração (oficial ou chico_teste_) sem mexer no código da tool.
+    # configuração (oficial ou com prefixo) sem mexer no código da tool.
     sql: Callable[[Callable[[str], str]], str]
     # nome do parâmetro -> tipo do BigQuery (STRING, INT64, ...)
     tipos: dict[str, str]

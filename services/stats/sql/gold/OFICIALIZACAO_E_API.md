@@ -20,7 +20,7 @@ ranking_jogador; stats_time; stats_mapa; stats_agente; mapas; eventos_round;
 pos_plant_retake_partida; composicao_time_partida; economia_time_round.
 As consultas oficiais substituem TODAS as referencias internas chico_teste_.
 SQLs antigos de teste foram retirados desta versao; recuperaveis pelo historico Git.
-Tabelas de teste no BigQuery permanecem preservadas.
+Tabelas chico_teste_ no BigQuery foram apagadas em 21/10/2026; o dataset tem so a gold oficial.
 Somente oficial/*.sql e oficial/validacoes/*.sql sao roteiro de publicacao.
 Comentarios historicos copiados das fontes de teste nao mudam os destinos oficiais.
 
