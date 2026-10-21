@@ -142,6 +142,7 @@ O serviço sobe privado. Para o Hosting conseguir chamar, o Guilherme libera o i
 
 ## Falta
 
+- **Teste ponta a ponta com token real do Firebase**, pelo front, quando o rewrite `/api/coach/**` estiver no Hosting. Até agora a validação do JWT foi testada com chave própria nos testes e com token falso no serviço no ar (401). Conferir: login no front, pergunta na tela do coach, resposta 200 com números, e 401 depois do logout. Entra no teste de quarta 20h (deploy final e ponta a ponta).
 - Tools de quarta: coletivas (`comparar_times`, `economia_time`, `pos_plant_retake`, `composicoes`), `resumo_partida`, `abrir_na_prancheta` e scouting.
 
 ## Catálogos
