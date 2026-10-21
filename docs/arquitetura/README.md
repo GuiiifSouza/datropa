@@ -80,7 +80,7 @@ Tela no estilo do [valoplant.gg](https://valoplant.gg/pt/9193DF), feita no front
 | Peças | Arrastar ícone de agente e de habilidade para o mapa |
 | Desenho | Lápis, borracha, seta, texto |
 | Etapas | Sequência de 1 a N, com play para animar |
-| Salvar e compartilhar | Grava no Firestore e gera link curto (`devs.datropa.com/p/<código>`) |
+| Salvar e compartilhar | Grava no Firestore e gera link curto (`devs.datropa.com/p/<código>`). Abrir o link exige login. Modelo de dados em [infra/README.md](../../infra/README.md) |
 | Round real | Abre qualquer round da base: as posições dos 10 jogadores em cada abate, plant e defuse viram etapas (replay 2D) |
 | Mapa de calor | O mesmo componente de mapa pintando abates e plants por time ou jogador |
 
@@ -108,7 +108,7 @@ As posições vêm de `kills[].playerLocations`, `victimLocation`, `plantLocatio
 - Monorepo no GitHub: `/front` e `/services/<nome>`.
 - Push ou PR dispara o GitHub Actions, que autentica no GCP via Workload Identity Federation.
 - Cada serviço vira uma imagem no Artifact Registry. O deploy no Cloud Run acontece só para a pasta que mudou.
-- O front faz deploy no Firebase Hosting, com canal de preview por PR.
+- O front e as regras do Firestore vão para o Firebase Hosting pelo `deploy-front.yml`, no push na `main`. Canal de preview por PR ainda não: o WIF só aceita a `main`. Config em `firebase.json` e detalhes em [infra/README.md](../../infra/README.md).
 
 ## Decisões
 

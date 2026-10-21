@@ -1,0 +1,77 @@
+rules_version = '2';
+
+// Regras do Firestore do Da Tropa. Modelo de dados em infra/README.md ("Firestore: modelo de dados").
+// Testes: infra/firestore-testes (npm test, roda no emulador).
+//
+// Privilégio mínimo: só existem as duas coleções abaixo para o cliente. Todo o resto é negado,
+// inclusive o cache do stats, que o servidor acessa pelo Admin SDK (o Admin SDK não passa pelas regras).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function texto(v, max) {
+      return v is string && v.size() <= max;
+    }
+
+    function opcional(dados, campo, ok) {
+      return !(campo in dados) || ok;
+    }
+
+    // usuarios/{uid}: perfil do usuário. Cada um lê e escreve só o próprio documento.
+    match /usuarios/{uid} {
+      function perfilValido(d) {
+        return d.keys().hasOnly(['nome', 'time_favorito', 'preferencias', 'criado_em', 'atualizado_em'])
+          && opcional(d, 'nome', texto(d.get('nome', ''), 80))
+          && opcional(d, 'time_favorito', texto(d.get('time_favorito', ''), 100))
+          && opcional(d, 'preferencias', d.get('preferencias', {}) is map && d.get('preferencias', {}).size() <= 30)
+          && opcional(d, 'criado_em', d.get('criado_em', null) is timestamp)
+          && opcional(d, 'atualizado_em', d.get('atualizado_em', null) is timestamp);
+      }
+
+      allow get: if logado() && request.auth.uid == uid;
+      allow create, update: if logado() && request.auth.uid == uid && perfilValido(request.resource.data);
+      allow delete: if logado() && request.auth.uid == uid;
+    }
+
+    // estrategias/{codigo}: estratégias da prancheta. O id do documento é o código curto do link /p/<codigo>.
+    // Leitura de uma estratégia pelo código: qualquer usuário logado (o app inteiro exige login).
+    // Listagem: só as próprias (consulta com where('dono', '==', uid)).
+    // Criar, editar e apagar: só o dono.
+    match /estrategias/{codigo} {
+      function estrategiaValida(d) {
+        return d.keys().hasAll(['dono', 'mapa', 'dados'])
+          && d.keys().hasOnly(['dono', 'titulo', 'mapa', 'lado', 'dados', 'partida_id', 'round', 'criado_em', 'atualizado_em'])
+          && d.dono == request.auth.uid
+          && texto(d.mapa, 40)
+          // A prancheta inteira (peças, desenhos, etapas) vai serializada em JSON neste campo.
+          // É o único jeito de a regra limitar o tamanho de verdade: 300 mil caracteres.
+          && d.dados is string && d.dados.size() > 0 && d.dados.size() <= 300000
+          && opcional(d, 'titulo', texto(d.get('titulo', ''), 100))
+          && opcional(d, 'lado', d.get('lado', '') in ['ataque', 'defesa'])
+          && opcional(d, 'partida_id', texto(d.get('partida_id', ''), 100))
+          && opcional(d, 'round', d.get('round', 0) is int && d.get('round', 0) >= 1 && d.get('round', 0) <= 60)
+          && opcional(d, 'criado_em', d.get('criado_em', null) is timestamp)
+          && opcional(d, 'atualizado_em', d.get('atualizado_em', null) is timestamp);
+      }
+
+      allow get: if logado();
+      allow list: if logado() && resource.data.dono == request.auth.uid;
+      allow create: if logado()
+        && codigo.matches('^[A-Za-z0-9_-]{6,24}$')
+        && estrategiaValida(request.resource.data);
+      allow update: if logado()
+        && resource.data.dono == request.auth.uid
+        && estrategiaValida(request.resource.data)
+        && request.resource.data.get('criado_em', null) == resource.data.get('criado_em', null);
+      allow delete: if logado() && resource.data.dono == request.auth.uid;
+    }
+
+    // cache/** e qualquer outra coleção: negado para o cliente.
+    match /{documento=**} {
+      allow read, write: if false;
+    }
+  }
+}

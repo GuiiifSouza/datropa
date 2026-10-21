@@ -1,0 +1,25 @@
+{
+  "hosting": {
+    "public": "front/dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      { "source": "/api/coach/**", "run": { "serviceId": "coach", "region": "southamerica-east1" } },
+      { "source": "/api/stats/**", "run": { "serviceId": "stats", "region": "southamerica-east1" } },
+      { "source": "/p/**", "destination": "/index.html" },
+      { "source": "**", "destination": "/index.html" }
+    ],
+    "headers": [
+      { "source": "/index.html", "headers": [{ "key": "Cache-Control", "value": "no-cache" }] },
+      { "source": "/assets/**", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
+    ]
+  },
+  "firestore": {
+    "database": "(default)",
+    "rules": "infra/firestore.rules"
+  },
+  "emulators": {
+    "firestore": { "port": 8181 },
+    "ui": { "enabled": false },
+    "singleProjectMode": true
+  }
+}
