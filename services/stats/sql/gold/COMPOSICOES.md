@@ -1,7 +1,7 @@
 # Composicoes por time e partida
 
-Fonte: chico_teste_stats_jogador_partida e chico_teste_stats_time_partida.
-Destino: chico_teste_composicao_time_partida.
+Fonte: stats_jogador_partida e stats_time_partida.
+Destino: composicao_time_partida.
 Uma linha por time/partida, incluindo registros invalidos com alerta.
 Valida exatamente cinco jogadores unicos e cinco UUIDs de agentes distintos presentes.
 A lista de agentes e ordenada sem remover slots com DISTINCT.
@@ -23,6 +23,9 @@ Nao confundir aparicao (time por mapa jogado) com cinco aparicoes de jogadores.
 Conferencia independente dos JSONs: 672 aparicoes, 336 vitorias e derrotas,
 3360 slots e 198 pares de mapa/lista de agentes. Todos os elencos completos.
 
-Primeiro dry run de composicao_time_partida.sql; depois materializar apenas
-chico_teste_composicao_time_partida e executar validacoes/composicao_time_partida_teste.sql.
-Dry run e execucao BigQuery pendentes; nenhuma publicacao final.
+
+## Estado oficial
+
+Publicado e validado; zero alertas nas verificacoes individuais.
+SQL em oficial/; evidencias em PUBLICACAO_GOLD_336_V1.md.
+Regras de consumo em OFICIALIZACAO_E_API.md.

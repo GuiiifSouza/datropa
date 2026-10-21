@@ -1,7 +1,7 @@
 """Publicacao inicial da Gold. Nao substitui tabelas existentes.
 
 Uso: python3 services/stats/sql/gold/oficial/publicar_gold.py verificar|publicar|validar
-verificar: dry run das fontes de teste; nao cria tabelas.
+verificar: dry run dos SQLs oficiais; requer dependencias publicadas; nao cria tabelas.
 publicar: preflight, dry run e criacao sequencial dos destinos oficiais, validacao.
 validar: somente consultas de validacao nos destinos oficiais.
 """
@@ -66,9 +66,9 @@ def main():
     print('Log:', LOG)
     if modo == 'verificar':
         for nome in ORDEM:
-            print('DRY RUN TESTE:', nome)
-            consulta(RAIZ.parent / f'{nome}.sql', ['--dry_run'])
-        print('Dry runs de teste concluidos; nao validam ainda referencias oficiais inexistentes.')
+            print('DRY RUN OFICIAL:', nome)
+            consulta(RAIZ / f'{nome}.sql', ['--dry_run'])
+        print('Dry runs oficiais concluidos; nenhuma tabela alterada.')
         return
     if modo == 'publicar':
         # Usa INFORMATION_SCHEMA para evitar confundir falha de permissao com tabela ausente.

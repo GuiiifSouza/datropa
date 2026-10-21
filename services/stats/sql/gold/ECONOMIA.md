@@ -1,7 +1,7 @@
-# Economia por time e round — regra proposta para teste
+# Economia por time e round — regra oficial
 
-Arquivo economia_time_round.sql; destino chico_teste_economia_time_round.
-Fontes bronze_partidas, chico_teste_stats_jogador_partida e chico_teste_rounds.
+Arquivo economia_time_round.sql; destino economia_time_round.
+Fontes bronze_partidas, stats_jogador_partida e rounds.
 A API le somente a gold; nenhum acesso bronze em rota.
 
 ## Definicao e limites
@@ -14,7 +14,7 @@ E uma classificacao por equipamento, nao prova da intencao de compra.
 Compras mistas entram pela soma; nao inferir que os cinco tinham compra igual.
 Pistols ficam nessas mesmas tres faixas; nao criar quarta categoria no contrato atual.
 Nao filtrar rounds atipicos nesta versao.
-Os limites sao proposta versionada para revisar com o time antes da publicacao final.
+Limites oficializados em gold_336_v1 conforme autorizacao relatada por Chico.
 
 Exige cinco jogadores distintos com cinco valores nao nulos e nao negativos.
 Economia incompleta fica com categoria/equipamento_total NULL, sem tratar como eco.
@@ -34,7 +34,9 @@ Distinguir nenhuma partida no recorte de dados ainda nao publicados.
 Eco=2837 (923 vitorias); force=2888 (1413); full=7511 (4282).
 Total 6618 vitorias. Nenhum equipamento incompleto nem time/partida todo zero.
 
-## Validacao
-Primeiro dry run de economia_time_round.sql. Depois de conferir, criar exclusivamente
-chico_teste_economia_time_round e executar validacoes/economia_time_round_teste.sql.
-Dry run e resultados no BigQuery ainda pendentes. Sem merge ou tabela final.
+
+## Estado oficial
+
+Publicado e validado; zero alertas nas verificacoes individuais.
+SQL em oficial/; evidencias em PUBLICACAO_GOLD_336_V1.md.
+Regras de consumo em OFICIALIZACAO_E_API.md.

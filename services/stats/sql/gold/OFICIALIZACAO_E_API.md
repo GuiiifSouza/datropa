@@ -7,7 +7,8 @@ registradas aqui para implementacao da API. Nao representam API implementada.
 PUBLICACAO CONFIRMADA pelos logs enviados por Chico: 13 tabelas oficiais criadas,
 13 dry runs oficiais aprovados, 24 verificacoes conjuntas passou=true e validacoes
 individuais revisadas com zero alertas. Evidencias em PUBLICACAO_GOLD_336_V1.md.
-Merge e integracao API/front/coach continuam pendentes.
+Entrega via PR #7 para main; Chico relatou autorizacao de Guilherme tambem
+para executar o merge. Integracao API/front/coach continua pendente.
 
 ## Fontes oficiais e destinos
 Projeto datropa, dataset valorant, regiao southamerica-east1.
@@ -18,7 +19,8 @@ Ordem: partidas; stats_jogador_partida; stats_time_partida; rounds;
 ranking_jogador; stats_time; stats_mapa; stats_agente; mapas; eventos_round;
 pos_plant_retake_partida; composicao_time_partida; economia_time_round.
 As consultas oficiais substituem TODAS as referencias internas chico_teste_.
-SQLs anteriores e tabelas de teste ficam preservados para comparacao.
+SQLs antigos de teste foram retirados desta versao; recuperaveis pelo historico Git.
+Tabelas de teste no BigQuery permanecem preservadas.
 Somente oficial/*.sql e oficial/validacoes/*.sql sao roteiro de publicacao.
 Comentarios historicos copiados das fontes de teste nao mudam os destinos oficiais.
 
@@ -113,7 +115,8 @@ Os totais permanecem vinculados a carga de 336: carga nova exige nova validacao.
 
 ## Passo a passo de publicacao
 1. Atualizar branch; verificar arquivos do PR e autorizacao ja registrada.
-2. Executar verificar: dry runs das fontes de teste atuais, guardando bytes.
+2. Em instalacao ja publicada, verificar faz dry runs dos SQLs oficiais.
+   Em primeira instalacao, publicar valida cada dependencia antes de cria-la.
 3. Executar publicar: verificar inexistencia de TODOS os destinos oficiais;
    dry run oficial por dependencia, criar tabela e repetir validacoes.
    As consultas oficiais com dependencias inexistentes so podem ser validadas
@@ -122,7 +125,8 @@ Os totais permanecem vinculados a carga de 336: carga nova exige nova validacao.
 4. Guardar evidencias_gold_oficial/*.jsonl; enviar saida/resumo para registrar
    bytes, jobs e resultado. Nao versionar JSONs de partidas nem logs com dados.
 5. Conferir as validacoes individuais e as 24 linhas passou=true.
-6. Revisao e merge do PR por Guilherme. Merge nao cria tabelas.
+6. Integracao via PR, com autorizacao de Guilherme relatada por Chico.
+   Merge nao cria tabelas.
 7. Gugu implementar contrato/consumo/cache; front/coach integrar; Chico comparar
    respostas, filtros, pontos e contagens. Publicacao sozinha nao valida produto.
 
