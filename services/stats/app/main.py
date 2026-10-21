@@ -9,6 +9,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from google.cloud import bigquery
 
+from app.cache import obter_cache, salvar_cache
+
 app = FastAPI(
     title="DA TROPA — API de estatísticas",
     docs_url=None,
@@ -180,6 +182,28 @@ def ranking(
             "data_inicio",
         )
 
+    chave_cache = (
+        "gold_336_v1",
+        "ranking_publico_v1",
+        page,
+        page_size,
+        ordem,
+        mapa_id,
+        agente_id,
+        time_id,
+        torneio_id,
+        inicio,
+        fim,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info("Ranking: cache HIT")
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info("Ranking: cache MISS")
+
     tem_filtros = any(
         valor is not None
         for valor in [*filtros_ids.values(), inicio, fim]
@@ -263,7 +287,7 @@ def ranking(
 
                 total = next(iter(total_rows)).total
 
-        return {
+        resposta = {
             "data": data,
             "pagination": {
                 "page": page,
@@ -272,6 +296,9 @@ def ranking(
             },
             "meta": {"atualizado_em": None},
         }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
 
     except Exception:
         logging.exception("Falha ao consultar ranking")
