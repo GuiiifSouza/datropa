@@ -1,5 +1,38 @@
 # API de estatísticas — DA TROPA
 
+## Organização do código
+
+- `app/main.py`: cria a aplicação e registra os erros e as rotas.
+- `app/routes/status.py`: status do serviço.
+- `app/routes/ranking.py`: ranking, filtros e paginação.
+- `app/routes/jogadores.py`: detalhe de jogador.
+- `app/routes/times.py`: listagem de times.
+- `app/validacoes.py`: validação de parâmetros, identificadores e datas.
+- `app/erros.py`: exceção da API e respostas de erro.
+- `app/database.py`: leitura dos arquivos SQL, cliente BigQuery e limite de
+  quatro chamadas simultâneas por processo. A vaga é liberada ao encerrar
+  o bloco de consulta, inclusive em caso de falha ou jogador inexistente.
+- `app/serializacao.py`: conversão dos resultados aninhados para JSON.
+- `app/cache.py`: cache em memória e coordenação de chamadas iguais.
+- `queries/`: SQL usado pelas rotas.
+
+O comando de inicialização continua usando `app.main:app`. A separação não
+altera URLs, parâmetros, envelopes de resposta ou os arquivos SQL. Cache e
+controle de concorrência continuam locais a cada processo.
+
+### Testes da API sem consultar o BigQuery
+
+Na raiz do repositório, com as dependências de `requirements.txt` instaladas:
+
+```bash
+PYTHONPATH=services/stats services/stats/.venv/bin/python -m unittest discover -s services/stats/tests -v
+```
+
+Os testes substituem o cliente BigQuery por resultados controlados e não
+precisam de credenciais. Cobrem HTTP, filtros, paginação, serialização,
+cache, chamadas iguais simultâneas e liberação das vagas após sucesso,
+404 e falhas. Não verificam a Gold publicada nem o ambiente Cloud Run.
+
 Responsáveis: Gugu pela API e Chico por `sql/gold/`.
 
 Backend em Python 3.12 com FastAPI, preparado para execução em
@@ -203,3 +236,4 @@ BigQuery dentro do container continua pendente de validação.
 
 Esta atualização substitui as referências anteriores que indicavam
 a rota de jogador como pendente. Demais rotas continuam pendentes.
+

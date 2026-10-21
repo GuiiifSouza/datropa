@@ -1,11 +1,9 @@
 from collections import OrderedDict
 from copy import deepcopy
-from threading import Lock
-from time import monotonic
 from functools import wraps
 from inspect import signature
-
-
+from threading import Lock
+from time import monotonic
 
 TTL_SECONDS = 300
 MAX_ENTRIES = 128
@@ -53,8 +51,6 @@ def salvar_cache(chave, resposta):
 
         while len(_cache) > MAX_ENTRIES:
             _cache.popitem(last=False)
-
-    _locks_consultas = [Lock() for _ in range(128)]
 
 
 def coordenar_consultas(funcao):
