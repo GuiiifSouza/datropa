@@ -10,6 +10,7 @@ from __future__ import annotations
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, resolver_mapa, taxa, tool
+from .ids import resolver_time
 
 _TIPOS = {"time_a_id": "STRING", "time_b_id": "STRING", "mapa_id": "STRING"}
 _EXEMPLO = {"time_a_id": "exemplo_a", "time_b_id": "exemplo_b", "mapa_id": None}
@@ -150,6 +151,9 @@ def comparar_times(time_a_id: str, time_b_id: str, mapa: str | None = None) -> d
     if time_a_id == time_b_id:
         raise ErroTool("os dois times são o mesmo; passe dois time_id diferentes")
     m = resolver_mapa(mapa)
+    time_a_id, time_b_id = resolver_time(time_a_id), resolver_time(time_b_id)
+    if time_a_id == time_b_id:
+        raise ErroTool("os dois times são o mesmo; passe dois time_id diferentes")
     valores = {"time_a_id": time_a_id, "time_b_id": time_b_id, "mapa_id": m}
 
     linhas = {l["time_id"]: l for l in INDICADORES.rodar(**valores)}

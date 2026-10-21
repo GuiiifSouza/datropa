@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from .. import catalogos
 from . import ErroTool, resolver_mapa, taxa, tool
+from .ids import resolver_time
 from .composicoes import AGREGADO as COMPOSICOES
 from .composicoes import formatar as formatar_composicao
 from .economia_time import POR_CATEGORIA as ECONOMIA
@@ -66,6 +67,7 @@ def _site_preferido(lados: dict, lado: str) -> dict | None:
 )
 def scouting_time(time_id: str, mapa: str | None = None) -> dict:
     m = resolver_mapa(mapa)
+    time_id = resolver_time(time_id)
     v = {"time_id": time_id, "mapa_id": m}
     with ThreadPoolExecutor(max_workers=6) as ex:
         f_resumo = ex.submit(RESUMO.rodar, **v)

@@ -11,6 +11,7 @@ from __future__ import annotations
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, resolver_mapa, tool
+from .ids import resolver_time
 
 PARTIDA = Consulta(
     nome="resumo_partida.partida",
@@ -121,6 +122,8 @@ def resumo_partida(partida_id: str | None = None, time_id: str | None = None,
         if not time_id:
             raise ErroTool("passe partida_id ou time_id")
         m = resolver_mapa(mapa)
+        time_id = resolver_time(time_id)
+        adversario_id = resolver_time(adversario_id) if adversario_id else None
         candidatas = BUSCAR.rodar(time_id=time_id, adversario_id=adversario_id, mapa_id=m)
         if not candidatas:
             raise ErroTool("nenhuma partida desse time nesse recorte (confira os ids com buscar_entidade)")

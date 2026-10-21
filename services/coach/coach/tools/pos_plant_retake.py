@@ -12,6 +12,7 @@ from __future__ import annotations
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, resolver_mapa, taxa, tool
+from .ids import resolver_time
 
 _TIPOS = {"time_id": "STRING", "mapa_id": "STRING"}
 _EXEMPLO = {"time_id": "exemplo", "mapa_id": None}
@@ -107,6 +108,7 @@ def sites_por_mapa(linhas: list[dict]) -> dict[str, dict]:
 )
 def pos_plant_retake(time_id: str, mapa: str | None = None) -> dict:
     m = resolver_mapa(mapa)
+    time_id = resolver_time(time_id)
     linhas = TOTAIS.rodar(time_id=time_id, mapa_id=m)
     geral = next((l for l in linhas if l["geral"]), None)
     if geral is None or not geral["partidas"]:
