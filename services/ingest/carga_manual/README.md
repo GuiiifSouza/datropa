@@ -1,8 +1,8 @@
 # Carga manual do bronze
 
-Carrega a base inteira de uma vez na tabela `valorant.bronze_partidas`. Serve até o serviço de ingestão ficar pronto.
+Carrega a base inteira de uma vez na tabela `valorant.bronze_partidas`, apagando o que havia. Arquivo novo no dia a dia entra sozinho pelo serviço (veja o [README do ingest](../README.md)); a carga manual é para recarregar tudo.
 
-O bronze guarda o dado como veio. Uma linha por arquivo (um mapa), com o JSON intacto e dois campos a mais:
+O bronze guarda o dado como veio. Uma linha por arquivo (um mapa), com o JSON intacto e dois campos a mais (montados por `ingest/partida.py`, o mesmo código do serviço):
 
 - `_arquivo`: nome do arquivo. É onde estão os times e o placar.
 - `_pasta`: subpasta do torneio, ex. `Univavá/Classificatória 1`.

@@ -4,18 +4,19 @@ Uma linha por arquivo (um mapa). O JSON vai intacto, com dois campos a mais:
   _arquivo  nome do arquivo
   _pasta    subpasta relativa à entrada, ex. "Univavá/Classificatória 1"
 
+A linha é montada por `ingest/partida.py`, o mesmo código do serviço do Eventarc.
+
 Uso: python3 gerar_ndjson.py <pasta_dos_jsons> <saida.ndjson>
 """
 
 import json
 import os
 import sys
-import unicodedata
 
+# services/ingest no path, para importar o módulo do serviço com python3 puro.
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def nfc(texto):
-    # O macOS pode devolver nome com acento decomposto. NFC deixa a busca por texto previsível.
-    return unicodedata.normalize("NFC", texto)
+from ingest.partida import PartidaInvalida, arquivo_e_pasta, linha_ndjson, montar_linha  # noqa: E402
 
 
 def main():
@@ -38,12 +39,13 @@ def main():
         for caminho in arquivos:
             with open(caminho, encoding="utf-8") as f:
                 partida = json.load(f)
-            if not isinstance(partida, dict):
-                sys.exit(f"{caminho}: esperava um objeto JSON")
-            pasta = os.path.relpath(os.path.dirname(caminho), entrada)
-            partida["_arquivo"] = nfc(os.path.basename(caminho))
-            partida["_pasta"] = "" if pasta == "." else nfc(pasta.replace(os.sep, "/"))
-            out.write(json.dumps(partida, ensure_ascii=False, separators=(",", ":")))
+            relativo = os.path.relpath(caminho, entrada).replace(os.sep, "/")
+            arquivo, pasta = arquivo_e_pasta(relativo)
+            try:
+                linha = montar_linha(partida, arquivo, pasta)
+            except PartidaInvalida as e:
+                sys.exit(f"{caminho}: {e}")
+            out.write(linha_ndjson(linha))
             out.write("\n")
 
     print(f"{len(arquivos)} arquivos -> {saida}")
