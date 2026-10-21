@@ -64,5 +64,5 @@ python3 services/ingest/carga_manual/gerar_schema.py data/bronze/partidas.ndjson
 ```sql
 SELECT COUNT(*), COUNT(DISTINCT matchInfo.matchId), COUNT(DISTINCT _arquivo)
 FROM valorant.bronze_partidas;
--- 330, 330, 330 (carga de 19/10/2026)
+-- 336, 336, 336 (carga de 20/10/2026)
 ```

@@ -53,7 +53,7 @@ Exemplo de `data`:
 ```json
 {
   "torneios": [{"id":"torneio-demo","nome":"Torneio Exemplo"}],
-  "mapas": [{"id":"mapa-demo","nome":"Mapa Exemplo","minimapa_url":null,"transformacao":null}],
+  "mapas": [{"id":"mapa-demo","nome":"Mapa Exemplo","minimapa_url":null,"transformacao":{"u_x":0.0,"u_y":0.00007,"u_offset":0.81,"v_x":-0.00007,"v_y":0.0,"v_offset":0.57}}],
   "agentes": [{"id":"agente-demo","uuid":"uuid-demo","nome":"Agente Exemplo","icone_url":null}],
   "armas": [{"id":"arma-demo","uuid":"uuid-arma-demo","nome":"Arma Exemplo","icone_url":null}],
   "armaduras": [{"id":"armadura-demo","uuid":"uuid-armadura-demo","nome":"Armadura Exemplo"}]
@@ -167,9 +167,9 @@ Todas as rotas de time abaixo aceitam filtros gerais; retornam objeto em data.
 ### GET /times/{time_id}/economia
 
 ```json
-{"time_id":"time-demo","categorias":[{"tipo":"eco","rounds":10,"vitorias":2,"taxa_vitoria_pct":20.0},{"tipo":"force","rounds":20,"vitorias":8,"taxa_vitoria_pct":40.0},{"tipo":"full","rounds":70,"vitorias":45,"taxa_vitoria_pct":64.2857}],"classificacao_versao":null,"rounds_sem_classificacao":0}
+{"time_id":"time-demo","categorias":[{"tipo":"pistol","rounds":4,"vitorias":2,"taxa_vitoria_pct":50.0},{"tipo":"eco","rounds":10,"vitorias":2,"taxa_vitoria_pct":20.0},{"tipo":"force","rounds":20,"vitorias":8,"taxa_vitoria_pct":40.0},{"tipo":"full","rounds":70,"vitorias":45,"taxa_vitoria_pct":64.2857}],"classificacao_versao":"equipamento_time_10000_20000_pistol_v2","rounds_sem_classificacao":0}
 ```
-Limiares eco/force/full e tratamento de compra mista precisam ser definidos pelo chico; não classificar antes disso. Rounds com economia incompleta não entram nas taxas e devem ser contabilizados em `rounds_sem_classificacao` (inteiro, obrigatório, 0 no exemplo).
+Regra da gold (`economia_time_round`, ver `services/stats/sql/gold/ECONOMIA.md`): rounds 1 e 13 são `pistol`; nos demais, soma do equipamento dos cinco: eco < 10000, force < 20000, full ≥ 20000. Rounds com economia incompleta não entram nas taxas e devem ser contabilizados em `rounds_sem_classificacao` (inteiro, obrigatório, 0 no exemplo).
 
 ### GET /times/{time_id}/pos-plant-retake
 
@@ -196,7 +196,7 @@ Estatísticas gerais usam o mesmo recorte; confrontos diretos são calculados se
 
 ### GET /partidas/{partida_id}/rounds/{round}/eventos
 
-`round` público começa em 1; o backend converte o roundNum de origem, que começa em 0.
+`round` público começa em 1. A gold já guarda `round` em base 1 (roundNum de origem + 1); não somar 1 de novo.
 Sem paginação: retorna todos os eventos do round, ordenados por tempo_ms e ordem.
 ```json
 {
@@ -215,7 +215,7 @@ Sem paginação: retorna todos os eventos do round, ordenados por tempo_ms e ord
 ```
 Tipos: abate, plant, defuse. Campos não aplicáveis ficam null; listas desconhecidas ficam vazias. `posicao` é a vítima no abate, a bomba no plant/defuse. Snapshot contém somente posições disponíveis naquele evento; não supor os dez jogadores nem interpolar movimento. Coordenadas são originais do jogo; transformação vem de /catalogos. Sem evento disponível em round existente: eventos vazio.
 
-Transformação proposta de mapa: `{"x_multiplier":0.001,"x_offset":0.5,"y_multiplier":-0.001,"y_offset":0.5}`; `u=x*x_multiplier+x_offset`, `v=y*y_multiplier+y_offset`. u/v são coordenadas normalizadas, origem superior esquerda. Números apenas ilustrativos, não calibração real. Chico e Lhobregat validam e convertem o esquema real para esta convenção; transformação desconhecida é null.
+Transformação de mapa (gold `mapas.transformacao`): `{"u_x":0.0,"u_y":0.00007,"u_offset":0.81,"v_x":-0.00007,"v_y":0.0,"v_offset":0.57}`; `u=x*u_x+y*u_y+u_offset`, `v=x*v_x+y*v_y+v_offset`. u/v são coordenadas normalizadas na imagem inteira do minimapa, origem superior esquerda. Seis campos porque nos mapas do VALORANT os eixos se trocam (u depende de y e v de x); o esquema antigo de quatro campos não representa isso. Números ilustrativos; os reais estão na gold. u/v fora de [0,1] ou não finitos: não desenhar no minimapa, manter o evento na timeline. Transformação desconhecida é null.
 
 ### GET /mapas/{mapa_id}/calor
 
@@ -255,7 +255,7 @@ Busca ambígua exige desambiguação antes das tools por ID.
 - Observadores excluídos; lado real por round, inclusive overtime, sem inferir ataque/defesa por Red/Blue.
 - Não disponibilizar elo: competitiveTier é zero na base.
 - Não prometer posições contínuas nem habilidades por round: a base fornece snapshots e contagens de habilidade por partida.
-- MVP, rounds decisivos, classificação econômica e conversões de mapa continuam pendentes.
+- MVP e rounds decisivos continuam pendentes. Classificação econômica e transformação de mapa estão definidas na gold (seções 4 e 5).
 
 ## 8. Implementação e cache
 

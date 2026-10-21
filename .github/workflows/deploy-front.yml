@@ -1,0 +1,38 @@
+# Deploy do front no Firebase Hosting. DESLIGADO: o front/ ainda não existe.
+#
+# Para ligar, quando o front tiver esqueleto:
+#   1. dar roles/firebasehosting.admin à sa-deploy (ou criar uma sa-deploy-front);
+#   2. trocar o gatilho para push na main com paths front/** e criar a variável DEPLOY_FRONT=true no repo;
+#   3. descomentar os passos e ajustar o build ao framework escolhido.
+# Canal de preview por PR precisa de outro provider no WIF, porque o atual só aceita a main.
+name: deploy-front
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: vars.DEPLOY_FRONT == 'true' # variável do repo; não existe, então o job fica desligado
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - run: echo "Deploy do front desligado até existir front/."
+      # - uses: actions/checkout@v4
+      # - uses: google-github-actions/auth@v2
+      #   with:
+      #     workload_identity_provider: projects/19667506828/locations/global/workloadIdentityPools/github/providers/github-actions
+      #     service_account: sa-deploy@datropa.iam.gserviceaccount.com
+      # - uses: actions/setup-node@v4
+      #   with:
+      #     node-version: 22
+      #     cache: npm
+      #     cache-dependency-path: front/package-lock.json
+      # - run: npm ci && npm run build
+      #   working-directory: front
+      # - run: npx firebase-tools@latest deploy --only hosting --project datropa --non-interactive
+      #   working-directory: front

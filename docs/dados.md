@@ -10,7 +10,15 @@ Pasta no Drive: [Dados .Json](https://drive.google.com/drive/folders/1IuptLxv1Fp
 uvx gdown --folder "https://drive.google.com/drive/folders/1IuptLxv1FpcvrfB6a7z9bEqPNYSsQ-hW" -O data/raw
 ```
 
-São 330 arquivos, cerca de 190 MB. O download leva uns 15 minutos.
+São 336 arquivos, cerca de 195 MB. O download leva uns 15 minutos.
+
+O `gdown` pode pular arquivo sem avisar. Confira o total depois de baixar:
+
+```bash
+find data/raw -name '*.json' | wc -l   # tem que dar 336
+```
+
+Se faltar, liste o Drive sem baixar com `uvx gdown --json "<link da pasta>"` e compare os nomes.
 
 ## Organização
 
@@ -41,15 +49,15 @@ RUSHE_030b_07-06-26_azure_bears_golden_13_x_4_ceub_octopus_vulgaris_ascent.json
 
 ## Números da base
 
-Contagem feita em 19/10/2026 sobre a base completa.
+Contagem feita em 20/10/2026 sobre a base completa.
 
 | Item | Quantidade |
 |---|---|
-| Partidas (mapas) | 330 |
-| Times | 67 |
-| Jogadores únicos (`puuid`) | 406 |
-| Rounds | 6.510 |
-| Abates | 45.993 |
+| Partidas (mapas) | 336 |
+| Times | 68 |
+| Jogadores únicos (`puuid`) | 411 |
+| Rounds | 6.618 |
+| Abates | 46.753 |
 | Período | 06/06/2026 a 27/09/2026 |
 | Versões do jogo | 12.10 a 13.06 |
 

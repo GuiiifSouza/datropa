@@ -1,0 +1,27 @@
+name: deploy-stats
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - services/stats/**
+      - .github/workflows/deploy-stats.yml
+      - .github/workflows/deploy-servico.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-stats
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-servico.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      servico: stats
+      publico: true

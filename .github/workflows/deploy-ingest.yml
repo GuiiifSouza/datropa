@@ -1,0 +1,27 @@
+name: deploy-ingest
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - services/ingest/**
+      - .github/workflows/deploy-ingest.yml
+      - .github/workflows/deploy-servico.yml
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-ingest
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/deploy-servico.yml
+    permissions:
+      contents: read
+      id-token: write
+    with:
+      servico: ingest
+      eventarc: true
