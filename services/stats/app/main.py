@@ -9,7 +9,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from google.cloud import bigquery
 
-from app.cache import obter_cache, salvar_cache
+from app.cache import (
+    coordenar_consultas,
+    obter_cache,
+    salvar_cache,
+)
 
 app = FastAPI(
     title="DA TROPA — API de estatísticas",
@@ -124,6 +128,7 @@ def status():
 
 
 @app.get("/api/stats/ranking")
+@coordenar_consultas
 def ranking(
     request: Request,
     page: int = Query(default=1, ge=1),
