@@ -2,8 +2,8 @@ import logging
 import re
 from datetime import date
 from pathlib import Path
-from typing import Literal
 from threading import BoundedSemaphore
+from typing import Literal
 
 from fastapi import FastAPI, Query, Request
 from fastapi.exceptions import RequestValidationError
@@ -30,11 +30,17 @@ QUERIES_DIR = Path(__file__).resolve().parent.parent / "queries"
 RANKING_SQL = (QUERIES_DIR / "ranking.sql").read_text(
     encoding="utf-8"
 )
+
 RANKING_TOTAL_SQL = (QUERIES_DIR / "ranking_total.sql").read_text(
     encoding="utf-8"
 )
+
 RANKING_FILTRADO_SQL = (
     QUERIES_DIR / "ranking_filtrado.sql"
+).read_text(encoding="utf-8")
+
+JOGADOR_DETALHE_SQL = (
+    QUERIES_DIR / "jogador_detalhe.sql"
 ).read_text(encoding="utf-8")
 
 
@@ -98,6 +104,21 @@ def validar_parametros(request, permitidos):
             )
 
 
+def validar_identificadores(identificadores):
+    for campo, valor in identificadores.items():
+        if valor is not None and (
+            not valor.strip()
+            or valor != valor.strip()
+            or len(valor) > 256
+        ):
+            raise ApiError(
+                400,
+                "INVALID_ARGUMENT",
+                f"Identificador inválido para {campo}.",
+                campo,
+            )
+
+
 def validar_data(valor, campo):
     if valor is None:
         return None
@@ -119,6 +140,34 @@ def validar_data(valor, campo):
             f"Data inválida para {campo}.",
             campo,
         )
+
+
+def validar_periodo(data_inicio, data_fim):
+    inicio = validar_data(data_inicio, "data_inicio")
+    fim = validar_data(data_fim, "data_fim")
+
+    if inicio is not None and fim is not None and inicio > fim:
+        raise ApiError(
+            400,
+            "INVALID_ARGUMENT",
+            "data_inicio não pode ser posterior a data_fim.",
+            "data_inicio",
+        )
+
+    return inicio, fim
+
+
+def converter_resultado(valor):
+    if hasattr(valor, "items"):
+        return {
+            chave: converter_resultado(conteudo)
+            for chave, conteudo in valor.items()
+        }
+
+    if isinstance(valor, (list, tuple)):
+        return [converter_resultado(item) for item in valor]
+
+    return valor
 
 
 @app.get("/api/stats/status")
@@ -165,29 +214,8 @@ def ranking(
         "torneio_id": torneio_id,
     }
 
-    for campo, valor in filtros_ids.items():
-        if valor is not None and (
-            not valor.strip()
-            or valor != valor.strip()
-            or len(valor) > 256
-        ):
-            raise ApiError(
-                400,
-                "INVALID_ARGUMENT",
-                f"Identificador inválido para {campo}.",
-                campo,
-            )
-
-    inicio = validar_data(data_inicio, "data_inicio")
-    fim = validar_data(data_fim, "data_fim")
-
-    if inicio is not None and fim is not None and inicio > fim:
-        raise ApiError(
-            400,
-            "INVALID_ARGUMENT",
-            "data_inicio não pode ser posterior a data_fim.",
-            "data_inicio",
-        )
+    validar_identificadores(filtros_ids)
+    inicio, fim = validar_periodo(data_inicio, data_fim)
 
     chave_cache = (
         "gold_336_v1",
@@ -206,10 +234,14 @@ def ranking(
     resposta_cache = obter_cache(chave_cache)
 
     if resposta_cache is not None:
-        logging.getLogger("uvicorn.error").info("Ranking: cache HIT")
+        logging.getLogger("uvicorn.error").info(
+            "Ranking: cache HIT"
+        )
         return resposta_cache
 
-    logging.getLogger("uvicorn.error").info("Ranking: cache MISS")
+    logging.getLogger("uvicorn.error").info(
+        "Ranking: cache MISS"
+    )
 
     tem_filtros = any(
         valor is not None
@@ -247,7 +279,9 @@ def ranking(
         "adr_desc": "adr DESC NULLS LAST, jogador_id",
     }
 
-    sql_base = RANKING_FILTRADO_SQL if tem_filtros else RANKING_SQL
+    sql_base = (
+        RANKING_FILTRADO_SQL if tem_filtros else RANKING_SQL
+    )
 
     sql = sql_base.replace(
         "ORDER BY kills DESC NULLS LAST, jogador_id",
@@ -260,7 +294,6 @@ def ranking(
             "DATA_UNAVAILABLE",
             "Servidor ocupado. Tente novamente em alguns instantes.",
         )
-
 
     try:
         config = bigquery.QueryJobConfig(
@@ -279,10 +312,7 @@ def ranking(
                 ).result(timeout=30)
 
                 resultado = next(iter(rows))
-                data = [
-                    dict(jogador.items())
-                    for jogador in resultado.jogadores
-                ]
+                data = converter_resultado(resultado.jogadores)
                 total = resultado.total
 
             else:
@@ -291,7 +321,10 @@ def ranking(
                     job_config=config,
                 ).result(timeout=30)
 
-                data = [dict(row.items()) for row in rows]
+                data = [
+                    converter_resultado(row)
+                    for row in rows
+                ]
 
                 total_rows = client.query(
                     RANKING_TOTAL_SQL,
@@ -322,5 +355,127 @@ def ranking(
             "DATA_UNAVAILABLE",
             "Ranking temporariamente indisponível.",
         )
+
+    finally:
+        CONSULTAS_SIMULTANEAS.release()
+
+
+@app.get("/api/stats/jogadores/{jogador_id}")
+@coordenar_consultas
+def detalhe_jogador(
+    request: Request,
+    jogador_id: str,
+    torneio_id: str | None = None,
+    mapa_id: str | None = None,
+    agente_id: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+):
+    validar_parametros(
+        request,
+        {
+            "torneio_id",
+            "mapa_id",
+            "agente_id",
+            "data_inicio",
+            "data_fim",
+        },
+    )
+
+    identificadores = {
+        "jogador_id": jogador_id,
+        "torneio_id": torneio_id,
+        "mapa_id": mapa_id,
+        "agente_id": agente_id,
+    }
+
+    validar_identificadores(identificadores)
+    inicio, fim = validar_periodo(data_inicio, data_fim)
+
+    chave_cache = (
+        "gold_336_v1",
+        "jogador_detalhe_publico_v1",
+        jogador_id,
+        torneio_id,
+        mapa_id,
+        agente_id,
+        inicio,
+        fim,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info(
+            "Detalhe jogador: cache HIT"
+        )
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info(
+        "Detalhe jogador: cache MISS"
+    )
+
+    # O SQL do Chico recebe todos os parâmetros como STRING.
+    valores = {
+        **identificadores,
+        "data_inicio": inicio.isoformat() if inicio else None,
+        "data_fim": fim.isoformat() if fim else None,
+    }
+
+    config = bigquery.QueryJobConfig(
+        maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
+        query_parameters=[
+            bigquery.ScalarQueryParameter(campo, "STRING", valor)
+            for campo, valor in valores.items()
+        ],
+    )
+
+    if not CONSULTAS_SIMULTANEAS.acquire(blocking=False):
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Servidor ocupado. Tente novamente em alguns instantes.",
+        )
+
+    try:
+        with bigquery.Client(
+            project="datropa",
+            location="southamerica-east1",
+        ) as client:
+            rows = client.query(
+                JOGADOR_DETALHE_SQL,
+                job_config=config,
+            ).result(timeout=30)
+
+            jogador = next(iter(rows), None)
+
+            if jogador is None:
+                raise ApiError(
+                    404,
+                    "NOT_FOUND",
+                    "Jogador não encontrado.",
+                )
+
+            resposta = {
+                "data": converter_resultado(jogador),
+                "meta": {"atualizado_em": None},
+            }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
+
+    except ApiError:
+        raise
+
+    except Exception:
+        logging.exception(
+            "Falha ao consultar detalhe do jogador"
+        )
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Dados do jogador temporariamente indisponíveis.",
+        )
+
     finally:
         CONSULTAS_SIMULTANEAS.release()
