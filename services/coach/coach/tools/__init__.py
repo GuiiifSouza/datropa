@@ -57,5 +57,33 @@ def tool(nome: str, descricao: str, parametros: dict[str, Any]):
     return registrar
 
 
+def resolver_mapa(mapa: str | None) -> str | None:
+    """Nome do mapa (público ou codinome) -> mapa_id da gold. Mapa desconhecido vira ErroTool."""
+    from .. import catalogos
+
+    m = catalogos.mapa_id(mapa)
+    if mapa and not m:
+        raise ErroTool(f"mapa desconhecido: {mapa}. Mapas: {', '.join(catalogos.MAPAS.values())}")
+    return m
+
+
+def taxa(vitorias: int | None, total: int | None) -> float | None:
+    """100 * vitorias / total, arredondado; None se não houver base."""
+    if not total or vitorias is None:
+        return None
+    return round(100.0 * vitorias / total, 2)
+
+
 # Tools ligadas. Ordem não importa.
-from . import buscar_entidade, stats_jogador, stats_time  # noqa: E402,F401
+from . import (  # noqa: E402,F401
+    abrir_na_prancheta,
+    buscar_entidade,
+    comparar_times,
+    composicoes,
+    economia_time,
+    pos_plant_retake,
+    resumo_partida,
+    scouting_time,
+    stats_jogador,
+    stats_time,
+)
