@@ -60,6 +60,7 @@ class ApiTests(unittest.TestCase):
                 "/api/stats/jogadores/{jogador_id}",
                 "/api/stats/times",
                 "/api/stats/times/{time_id}",
+                "/api/stats/times/{time_id}/economia",
                 "/api/stats/partidas",
                 "/api/stats/partidas/{partida_id}",
             },
