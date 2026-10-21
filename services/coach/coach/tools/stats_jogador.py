@@ -10,6 +10,7 @@ from __future__ import annotations
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, tool
+from .ids import resolver_jogador
 
 _FILTRO = """jogador_id = @jogador_id
     AND (@mapa_id IS NULL OR mapa_id = @mapa_id)
@@ -96,6 +97,7 @@ def stats_jogador(jogador_id: str, mapa: str | None = None, agente: str | None =
     a = catalogos.agente_id(agente)
     if agente and not a:
         raise ErroTool(f"agente desconhecido: {agente}")
+    jogador_id = resolver_jogador(jogador_id)
 
     valores = {"jogador_id": jogador_id, "mapa_id": m, "agente_id": a}
     resumo = RESUMO.rodar(**valores)[0]

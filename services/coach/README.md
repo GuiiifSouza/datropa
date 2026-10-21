@@ -29,6 +29,7 @@ pergunta → Gemini (function calling)
 
 - O Gemini não escreve SQL. Cada tool roda `Consulta`s prontas (`coach/bq.py`), com query parameters e `maximum_bytes_billed` (padrão 200 MB por consulta).
 - Toda consulta passa por uma checagem de que começa com `SELECT`/`WITH`. Parâmetro que a tool não declarou é recusado antes de chegar no BigQuery.
+- `time_id` e `jogador_id` passam por `coach/tools/ids.py` antes de consultar. O Gemini às vezes troca um caractere ao copiar o id longo (aconteceu 2 vezes em 11 perguntas no teste real de 21/10). Id com até 2 caracteres de diferença, ou prefixo de 12+ caracteres, vira o id real se só um bater; senão volta erro e o agente refaz `buscar_entidade`. A lista de ids (`ids.times` 0,02 MiB, `ids.jogadores` 0,03 MiB) fica em cache por 10 minutos.
 - `consulta_livre` não existe no registro: fica desligada.
 - O prompt de sistema (`coach/prompt.py`) obriga a citar só números vindos das tools, avisar amostra pequena e tratar `null` como indisponível.
 

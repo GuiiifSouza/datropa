@@ -12,6 +12,7 @@ from collections import Counter
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, resolver_mapa, tool
+from .ids import resolver_time
 
 LIMITE = 10
 
@@ -76,6 +77,8 @@ def formatar(linha: dict) -> dict:
 )
 def composicoes(time_id: str | None = None, mapa: str | None = None) -> dict:
     m = resolver_mapa(mapa)
+    if time_id:
+        time_id = resolver_time(time_id)
     linhas = AGREGADO.rodar(time_id=time_id, mapa_id=m)
     if not linhas:
         raise ErroTool("nenhuma composição nesse recorte" + (" (confira o id com buscar_entidade)" if time_id else ""))

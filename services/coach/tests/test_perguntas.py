@@ -17,7 +17,8 @@ pytestmark = pytest.mark.skipif(
 )
 
 PERGUNTAS = [
-    ("Como joga o time Turuna?", {"buscar_entidade", "stats_time"}),
+    # "Como joga" serve com o resumo (stats_time) ou com o estilo (scouting_time, que traz o resumo também).
+    ("Como joga o time Turuna?", [{"buscar_entidade", "stats_time"}, {"buscar_entidade", "scouting_time"}]),
     ("Quem é o melhor jogador da Azure Bears Golden?", {"buscar_entidade", "stats_time"}),
     ("Em qual mapa a CEUB Octopus Vulgaris vai melhor e em qual sofre mais?", {"buscar_entidade", "stats_time"}),
     ("Qual o melhor jogador da UFMT Turuna? Me mostra os números dele de Jett.", {"buscar_entidade", "stats_jogador"}),
@@ -62,7 +63,10 @@ def numeros_sem_fonte(texto: str, resultados: list[dict]) -> list[str]:
         if n <= 5 and n.is_integer():  # "top 3", "5 últimas": contagem trivial
             continue
         casas = len(bruto.replace(",", ".").split(".")[1]) if "." in bruto or "," in bruto else 0
-        if not any(round(f, casas) == n or round(f) == n for f in fonte):
+        # A tool já arredonda para 2 casas (61,848 vira 61,85); o modelo pode arredondar o valor
+        # real para 1 casa (61,8). Aceita até meia unidade da casa citada mais esse 0,005.
+        folga = 0.5 * 10 ** -casas + 0.005 + 1e-9
+        if not any(abs(f - n) <= folga or round(f) == n for f in fonte):
             sem_fonte.append(bruto)
     return sem_fonte
 
@@ -78,7 +82,8 @@ def test_pergunta(pergunta, tools_esperadas):
     print(resp.texto)
 
     usadas = {c.nome for c in resp.chamadas}
-    assert tools_esperadas <= usadas, f"tools usadas: {usadas}"
+    alternativas = tools_esperadas if isinstance(tools_esperadas, list) else [tools_esperadas]
+    assert any(a <= usadas for a in alternativas), f"tools usadas: {usadas}"
     assert not [c for c in resp.chamadas if c.nome != "buscar_entidade" and "erro" in c.resultado]
     assert resp.texto
     assert re.search(r"\d", resp.texto), "a resposta não cita nenhum número"

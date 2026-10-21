@@ -8,6 +8,7 @@ from __future__ import annotations
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, tool
+from .ids import resolver_time
 
 _TIPOS = {"time_id": "STRING", "mapa_id": "STRING"}
 _EXEMPLO = {"time_id": "exemplo", "mapa_id": None}
@@ -87,6 +88,7 @@ def stats_time(time_id: str, mapa: str | None = None) -> dict:
     m = catalogos.mapa_id(mapa)
     if mapa and not m:
         raise ErroTool(f"mapa desconhecido: {mapa}. Mapas: {', '.join(catalogos.MAPAS.values())}")
+    time_id = resolver_time(time_id)
 
     linhas = RESUMO.rodar(time_id=time_id, mapa_id=m)
     geral = next((l for l in linhas if l["escopo"] == "geral"), None)

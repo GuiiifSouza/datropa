@@ -13,12 +13,20 @@ OMEN = catalogos.agente_id("Omen")
 SOVA = catalogos.agente_id("Sova")
 KJ = catalogos.agente_id("Killjoy")
 RAZE = catalogos.agente_id("Raze")
+TIME_LONGO = "time_c84a777ff0f4cfd6ada5ddaae66e6e5f87027bda4c2ee0fa3e34eef56307b399"
+OUTRO_LONGO = "time_cade03cb21ac5419a65483ac83d7cc244f367fbfcbf3ffcc70e9bf681dd819d6"
 
 
 @pytest.fixture
 def bq(monkeypatch):
     """Troca Consulta.rodar por um dict nome_da_consulta -> linhas. Guarda as chamadas."""
-    respostas: dict[str, list[dict]] = {}
+    from coach.tools import ids
+
+    ids.limpar_cache()
+    respostas: dict[str, list[dict]] = {
+        "ids.times": [{"id": i} for i in ("t", "a", "b", TIME_LONGO, OUTRO_LONGO)],
+        "ids.jogadores": [{"id": "j1"}, {"id": "j2"}],
+    }
     chamadas: list[tuple[str, dict]] = []
 
     def rodar(self, **valores):
@@ -90,7 +98,7 @@ def test_economia_time(bq):
     r = executar("economia_time", time_id="t", mapa="Lotus")
     assert "erro" not in r
     assert r["filtros"]["mapa"] == "Lotus"
-    assert bq.chamadas[0][1] == {"time_id": "t", "mapa_id": "jam"}
+    assert bq.chamadas[1][1] == {"time_id": "t", "mapa_id": "jam"}
     assert [c["categoria"] for c in r["por_categoria"]] == ["pistol", "eco", "full"]
     full = r["por_categoria"][2]
     assert full["taxa_vitoria_pct"] == 62.5 and full["pct_dos_rounds"] == round(100 * 40 / 62, 2)
@@ -241,7 +249,7 @@ def test_resumo_partida_por_time(bq):
         _round(13, "a", "b", "pistol", "pistol"),
     ]
     r = executar("resumo_partida", time_id="a", adversario_id="b", mapa="Lotus")
-    assert bq.chamadas[0] == ("resumo_partida.buscar", {"time_id": "a", "adversario_id": "b", "mapa_id": "jam"})
+    assert bq.chamadas[1] == ("resumo_partida.buscar", {"time_id": "a", "adversario_id": "b", "mapa_id": "jam"})
     assert r["partida_id"] == "p1" and r["mapa"] == "Lotus" and r["vencedor"] == "Time A"
     assert r["placar"] == {"Time A": 3, "Time B": 1}
     assert r["placar_no_intervalo"] == {"Time A": 2, "Time B": 1}
@@ -356,9 +364,70 @@ def test_scouting_time(bq):
     assert r["jogadores"][0]["jogador"] == "Ana#BR1" and r["jogadores"][0]["agente_principal"] == "Jett"
     assert r["amostra_pequena"] is False
     usadas = {n for n, _ in bq.chamadas}
-    assert usadas == {"stats_time.resumo", "stats_time.elenco", "composicoes.agregado",
+    assert usadas == {"ids.times", "stats_time.resumo", "stats_time.elenco", "composicoes.agregado",
                       "economia_time.por_categoria", "pos_plant_retake.totais", "pos_plant_retake.por_site"}
 
 
 def test_scouting_time_inexistente(bq):
     assert "não encontrado" in executar("scouting_time", time_id="x")["erro"]
+
+
+# --- ids tolerantes a erro de cópia (teste real de 21/10: "ada5" virou "ada4") ---
+
+def test_id_com_caractere_trocado_e_corrigido(bq):
+    bq.respostas["economia_time.por_categoria"] = ECONOMIA
+    r = executar("economia_time", time_id=TIME_LONGO.replace("ada5", "ada4"))
+    assert "erro" not in r
+    assert ("economia_time.por_categoria", {"time_id": TIME_LONGO, "mapa_id": None}) in bq.chamadas
+
+
+def test_id_por_prefixo_ou_com_caractere_a_menos(bq):
+    from coach.tools.ids import resolver_time
+    assert resolver_time(TIME_LONGO[:20]) == TIME_LONGO
+    assert resolver_time(TIME_LONGO[:30] + TIME_LONGO[31:]) == TIME_LONGO
+    assert resolver_time(OUTRO_LONGO.replace("70e9b", "70e8b")) == OUTRO_LONGO
+
+
+def test_id_curto_nao_tem_correcao_aproximada(bq):
+    r = executar("economia_time", time_id="x")  # "x" está a 1 troca de "t", "a" e "b"
+    assert "não encontrado" in r["erro"]
+    assert [n for n, _ in bq.chamadas] == ["ids.times"]
+
+
+def test_id_longe_demais_vira_erro(bq):
+    assert "não encontrado" in executar("pos_plant_retake", time_id=TIME_LONGO[:-4] + "ffff")["erro"]
+
+
+def test_id_ambiguo_vira_erro(bq):
+    from coach.tools import ErroTool
+    from coach.tools.ids import resolver_time
+    bq.respostas["ids.times"] = [{"id": TIME_LONGO}, {"id": TIME_LONGO[:-1] + "a"}]
+    with pytest.raises(ErroTool, match="ambíguo"):
+        resolver_time(TIME_LONGO[:-1] + "b")
+
+
+def test_lista_de_ids_fica_em_cache(bq):
+    bq.respostas["economia_time.por_categoria"] = ECONOMIA
+    executar("economia_time", time_id="t")
+    executar("economia_time", time_id="t")
+    assert [n for n, _ in bq.chamadas].count("ids.times") == 1
+
+
+def test_comparar_mesmo_time_depois_da_correcao(bq):
+    r = executar("comparar_times", time_a_id=TIME_LONGO, time_b_id=TIME_LONGO.replace("ada5", "ada4"))
+    assert "mesmo" in r["erro"]
+
+
+def test_resumo_partida_corrige_os_dois_ids(bq):
+    r = executar("resumo_partida", time_id=TIME_LONGO.replace("ada5", "ada4"),
+                 adversario_id=OUTRO_LONGO.replace("70e9b", "70e8b"))
+    assert "erro" in r  # o mock não tem partidas; o que importa é o id que chegou na busca
+    assert ("resumo_partida.buscar",
+            {"time_id": TIME_LONGO, "adversario_id": OUTRO_LONGO, "mapa_id": None}) in bq.chamadas
+
+
+def test_jogador_id_corrigido(bq):
+    from coach.tools.ids import resolver_jogador
+    puuid = "f8hEkQ9pP_KxFUebzJa_Z4o18k0SKRQu7Embzd91LoCU4VnpDdYd0TEcEK3zC4N18eQ8xmNTFHLruQ"
+    bq.respostas["ids.jogadores"] = [{"id": puuid}]
+    assert resolver_jogador(puuid.replace("Ebz", "Ebx")) == puuid
