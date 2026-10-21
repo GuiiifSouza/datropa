@@ -23,6 +23,38 @@ jobs:
       - name: shellcheck
         run: find infra -name '*.sh' -print0 | xargs -0 -r shellcheck
 
+  regras:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2 # o checkout do PR é um merge; HEAD^1 é a base
+      - id: mudou
+        run: |
+          if git diff --quiet HEAD^1 HEAD -- infra/firestore.rules infra/firestore-testes firebase.json; then
+            echo "Regras do Firestore não mudaram neste PR. Teste pulado."
+            echo "rodar=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "rodar=true" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.mudou.outputs.rodar == 'true'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - if: steps.mudou.outputs.rodar == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: infra/firestore-testes/package-lock.json
+      - name: Teste das regras no emulador
+        if: steps.mudou.outputs.rodar == 'true'
+        working-directory: infra/firestore-testes
+        run: |
+          npm ci
+          npm test
+
   build:
     runs-on: ubuntu-latest
     strategy:

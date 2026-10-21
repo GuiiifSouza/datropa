@@ -43,7 +43,8 @@ dataset_acesso() { # email role
 log "APIs"
 gcloud services enable --project "$PROJETO" \
   run.googleapis.com artifactregistry.googleapis.com eventarc.googleapis.com aiplatform.googleapis.com \
-  iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com
+  iam.googleapis.com iamcredentials.googleapis.com sts.googleapis.com \
+  firebasehosting.googleapis.com firebaserules.googleapis.com firestore.googleapis.com
 
 log "Service accounts"
 criar_sa() { # nome descrição
@@ -119,6 +120,14 @@ fi
 projeto_role "serviceAccount:$(sa sa-deploy)" "projects/$PROJETO/roles/$PAPEL_IAM_RUN"
 # Cria o gatilho do Eventarc do ingest no CD.
 projeto_role "serviceAccount:$(sa sa-deploy)" roles/eventarc.developer
+
+log "sa-deploy: deploy do Firebase Hosting e das regras do Firestore (deploy-front.yml)"
+# Hosting: publica versão e release. O rewrite para o Cloud Run usa run.services.get, que já vem do run.developer.
+projeto_role "serviceAccount:$(sa sa-deploy)" roles/firebasehosting.admin
+# Regras do Firestore: compila, cria o ruleset e troca o release. Não dá acesso aos dados.
+projeto_role "serviceAccount:$(sa sa-deploy)" roles/firebaserules.admin
+# O firebase-tools confere se a API do Firestore está ligada antes do deploy das regras.
+projeto_role "serviceAccount:$(sa sa-deploy)" roles/serviceusage.serviceUsageConsumer
 
 log "Eventarc: o agente do Cloud Storage publica os eventos do bucket"
 # `storage service-agent` só informa o e-mail; quem cria a conta é o `services identity create`.

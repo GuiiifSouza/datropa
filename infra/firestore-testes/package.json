@@ -1,0 +1,14 @@
+{
+  "name": "datropa-firestore-testes",
+  "private": true,
+  "type": "module",
+  "description": "Testes das regras do Firestore (infra/firestore.rules) no emulador",
+  "scripts": {
+    "test": "firebase emulators:exec --only firestore --project demo-datropa 'node --test regras.test.js'"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "6.0.0",
+    "firebase": "13.0.0",
+    "firebase-tools": "15.33.0"
+  }
+}

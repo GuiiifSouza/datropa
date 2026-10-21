@@ -4,7 +4,7 @@ Configuração do GCP e do Firebase: projeto, APIs, service accounts, IAM, WIF, 
 
 Dono: Guilherme. Escopo e regras em [AGENTS.md](AGENTS.md).
 
-## Estado em 20/10/2026
+## Estado em 21/10/2026
 
 Projeto `datropa`, tudo em `southamerica-east1`.
 
@@ -12,9 +12,10 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 |---|---|---|
 | Bucket | `gs://datropa-raw-matches` | JSONs originais em `partidas/`, NDJSON do bronze em `bronze/`. Acesso uniforme, sem acesso público |
 | BigQuery | dataset `valorant` | `bronze_partidas` com 336 linhas. A gold é do chico |
-| Firestore | `(default)`, modo Native | Regras ainda fechadas (padrão) |
+| Firestore | `(default)`, modo Native | Regras em [`firestore.rules`](firestore.rules), publicadas pelo `deploy-front.yml`. Modelo de dados abaixo |
 | Vertex AI | `gemini-2.5-flash` | É o único Gemini disponível na região. Os modelos Gemini 3 não estão em `southamerica-east1` |
-| Firebase | web app `datropa-front` | Login por e-mail e senha. Hosting em `datropa.web.app` |
+| Firebase | web app `datropa-front` | Login por e-mail e senha |
+| Firebase Hosting | site `datropa` | `datropa.web.app`, config em [`/firebase.json`](../firebase.json). Rewrites: `/api/coach/**` → Cloud Run `coach`, `/api/stats/**` → Cloud Run `stats` (só entra quando o `stats` estiver no ar), `/p/**` e o resto → `/index.html` (SPA). Deploy pelo `deploy-front.yml` |
 | Artifact Registry | `servicos` (Docker) | Imagens em `southamerica-east1-docker.pkg.dev/datropa/servicos/<serviço>`. Guarda as 5 mais novas de cada serviço e apaga o resto com mais de 7 dias |
 | WIF | pool `github`, provider `github-actions` | Só aceita token do repo `GuiiifSouza/datropa` (pelo id `1426256768`) na branch `main`. O GitHub Actions entra como `sa-deploy` |
 | Cloud Run | `coach` | `https://coach-amnaanrzga-rj.a.run.app`, com a `sa-coach`. Invoker público (`allUsers`), que o próprio CD garante a cada deploy; o serviço valida o JWT do Firebase. Deploy pelo `deploy-coach.yml` |
@@ -54,6 +55,54 @@ Billing desligado para tudo: Cloud Run, BigQuery, Vertex AI. Para religar, vincu
 
 Ao subir serviço no Cloud Run, use `--max-instances` baixo (2 ou 3).
 
+## Firebase Hosting
+
+- **Pasta publicada:** `front/dist`. Assumimos Vite (`npm run build` gera `front/dist`). **Confirmar com o front** (Lhobregat e RhuanK); se o framework gerar outra pasta, mude `hosting.public` no `firebase.json`.
+- **Sem `front/package.json`**, o CI publica a página provisória de [`hosting-placeholder/`](hosting-placeholder/), para os rewrites já valerem.
+- **Rota completa vai para o serviço:** `/api/coach/perguntar` chega no coach como `/api/coach/perguntar`. Cada serviço declara as rotas com o prefixo `/api/<serviço>`.
+- **Rewrite para serviço que não existe:** o Hosting recusa o deploy ("Cloud Run service `stats` does not exist in region", conferido em 21/10). Por isso o `deploy-front.yml` tira do deploy os rewrites de serviço que ainda não estão no ar e roda de novo depois de cada `deploy-stats` com sucesso. Enquanto o `stats` não sobe, `/api/stats/**` cai no fallback da SPA e devolve o `index.html`.
+- `index.html` sai com `Cache-Control: no-cache`; `/assets/**` (arquivos com hash do Vite), com cache de um ano.
+
+## Firestore: modelo de dados
+
+Regras em [`firestore.rules`](firestore.rules). O cliente só enxerga as duas coleções abaixo; todo o resto é negado. Mudou o modelo? Peça ao Guilherme: regra e teste mudam juntos.
+
+**`usuarios/{uid}`**: perfil. O id é o `uid` do Firebase Auth. Cada um lê, cria, edita e apaga só o próprio documento; ninguém lista a coleção.
+
+| Campo | Tipo | Obrigatório | Limite |
+|---|---|---|---|
+| `nome` | string | não | 80 caracteres |
+| `time_favorito` | string (id do time) | não | 100 caracteres |
+| `preferencias` | map | não | 30 chaves |
+| `criado_em`, `atualizado_em` | timestamp (`serverTimestamp()`) | não | |
+
+**`estrategias/{codigo}`**: estratégias da prancheta. O id do documento é o código curto do link `/p/<codigo>`: 6 a 24 caracteres `A-Z a-z 0-9 _ -`. Gere um código aleatório de uns 10 caracteres no front.
+
+| Campo | Tipo | Obrigatório | Limite |
+|---|---|---|---|
+| `dono` | string | sim | igual ao `uid` de quem grava; não muda depois |
+| `mapa` | string | sim | 40 caracteres |
+| `dados` | string | sim | JSON da prancheta inteira (peças, desenhos, etapas) com `JSON.stringify`, até 300 mil caracteres |
+| `titulo` | string | não | 100 caracteres |
+| `lado` | string | não | `ataque` ou `defesa` |
+| `partida_id`, `round` | string, inteiro | não | round real aberto na prancheta; `round` de 1 a 60 |
+| `criado_em`, `atualizado_em` | timestamp (`serverTimestamp()`) | não | `criado_em` não muda na edição |
+
+- **Criar, editar e apagar:** só o dono. Campo fora da tabela é recusado.
+- **Abrir pelo link `/p/<codigo>`:** **exige login**, de qualquer usuário. O app inteiro já pede login (as APIs exigem o JWT), o código é aleatório e isso evita leitura anônima em massa. Se o pitch precisar de link aberto sem login, é uma linha na regra (`allow get: if true;`).
+- **Listar:** só as próprias, com `where('dono', '==', uid)`. Consulta sem esse filtro é recusada.
+- **Por que `dados` é string:** a regra do Firestore não mede o tamanho de map nem de lista aninhada, só de string. Serializar a prancheta é o jeito de ter limite de tamanho de verdade.
+
+**`cache/**`**: do `stats`, pelo Admin SDK (que não passa pelas regras). Cliente não lê nem escreve.
+
+**Testar as regras** (precisa de Java 21+ e Node 24+; o CI roda no job `regras` quando as regras mudam):
+
+```bash
+cd infra/firestore-testes
+npm ci
+npm test   # sobe o emulador do Firestore na porta 8181 e roda regras.test.js
+```
+
 ## Service accounts
 
 Criadas por [`cicd.sh`](cicd.sh), menos `sa-build` e `sa-limite-custo`. O script é idempotente: mudou papel, edite e rode de novo (`bash infra/cicd.sh`, logado como owner).
@@ -63,7 +112,7 @@ Criadas por [`cicd.sh`](cicd.sh), menos `sa-build` e `sa-limite-custo`. O script
 | `sa-stats` | Cloud Run `stats` | `READER` no dataset `valorant`; `bigquery.jobUser` e `datastore.user` no projeto |
 | `sa-coach` | Cloud Run `coach` | `READER` no dataset `valorant`; `bigquery.jobUser` e `aiplatform.user` no projeto |
 | `sa-ingest` | Cloud Run `ingest` | `storage.objectViewer` no bucket `datropa-raw-matches`; `WRITER` no dataset `valorant`; `bigquery.jobUser` e `eventarc.eventReceiver` no projeto |
-| `sa-deploy` | GitHub Actions, via WIF | `run.developer` e `eventarc.developer` no projeto; `deployRunIam` no projeto (papel próprio: só ler e gravar IAM de serviço do Cloud Run, para o `allUsers` e o invoker do Eventarc); `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
+| `sa-deploy` | GitHub Actions, via WIF | `run.developer`, `eventarc.developer`, `firebasehosting.admin`, `firebaserules.admin` e `serviceusage.serviceUsageConsumer` (o `firebase-tools` confere se a API do Firestore está ligada) no projeto; `deployRunIam` no projeto (papel próprio: só ler e gravar IAM de serviço do Cloud Run, para o `allUsers` e o invoker do Eventarc); `artifactregistry.writer` só no repositório `servicos`; `iam.serviceAccountUser` só em `sa-stats`, `sa-coach` e `sa-ingest` |
 | `sa-build` | Build das funções e containers. Substitui a conta padrão do Compute | |
 | `sa-limite-custo` | Roda a função de corte | `billing.projectManager` no projeto |
 | Agente do Cloud Storage (`service-19667506828@gs-project-accounts…`) | Publica os eventos do bucket para o Eventarc | `pubsub.publisher` no projeto |
@@ -76,9 +125,9 @@ Workflows em [`.github/workflows/`](../.github/workflows/):
 
 | Workflow | Quando roda | O que faz |
 |---|---|---|
-| `ci.yml` | Todo PR | `actionlint`, `shellcheck` em `infra/` e `docker build` (sem push) dos serviços que mudaram e têm `Dockerfile`. Não autentica no GCP |
+| `ci.yml` | Todo PR | `actionlint`, `shellcheck` em `infra/`, teste das regras do Firestore no emulador (job `regras`, só quando as regras mudam) e `docker build` (sem push) dos serviços que mudaram e têm `Dockerfile`. Não autentica no GCP |
 | `deploy-stats.yml`, `deploy-coach.yml`, `deploy-ingest.yml` | Push na `main` que mexe em `services/<serviço>/`, ou manual | Chama `deploy-servico.yml`: build, push no Artifact Registry e `gcloud run deploy` com a SA do serviço, `--max-instances 2`, em `southamerica-east1`. Sem `Dockerfile`, o deploy é pulado. Depois do deploy: `stats` e `coach` ficam com `allUsers` como invoker (o Hosting precisa; o serviço valida o JWT). `ingest` fica privado, e o CD garante o invoker da `sa-ingest` e o gatilho `ingest-partidas` do Eventarc |
-| `deploy-front.yml` | Desligado | Esqueleto do deploy no Firebase Hosting. Liga quando existir `front/` |
+| `deploy-front.yml` | Push na `main` que mexe em `front/**`, `firebase.json`, `.firebaserc`, `infra/firestore.rules` ou `infra/hosting-placeholder/`; depois de cada `deploy-stats` com sucesso; ou manual | Build do front (`npm ci && npm run build` em `front/`) ou a página provisória, tira os rewrites de serviço que ainda não existe e roda `firebase deploy --only hosting,firestore:rules` com o `firebase-tools` fixo na versão do workflow. Sem preview por PR: o WIF só aceita a `main` |
 
 O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do commit como tag. O deploy é automático: o primeiro sai sozinho no push que trouxer o `Dockerfile` do serviço para a `main`.
 
@@ -89,10 +138,10 @@ O build roda no runner do GitHub, não no Cloud Build. A imagem leva o SHA do co
 ## Pendências
 
 - **Dockerfile** em `services/stats` e `services/ingest`. Sem ele o deploy não roda. O `coach` já tem.
-- **Deploy do front:** `roles/firebasehosting.admin` para a `sa-deploy` e ligar `deploy-front.yml` quando o `front/` tiver esqueleto. Preview por PR precisa de outro provider no WIF.
+- ~~**Deploy do front:** papéis da `sa-deploy` e `deploy-front.yml` ligado.~~ Feito em 21/10. Falta: preview por PR (precisa de outro provider no WIF) e confirmar com o front a pasta do build (`front/dist`).
 - **Variáveis e segredos dos serviços**: entram como `--set-env-vars` no deploy quando os serviços disserem do que precisam. O `coach` não precisa: os padrões dele (projeto Firebase `datropa`, `gemini-2.5-flash`) já são os de produção.
 - Login com Google no Firebase (Authentication > Sign-in method > Google, pelo console).
-- Regras do Firestore.
+- ~~Regras do Firestore.~~ Feito em 21/10 (modelo acima).
 
 ## Dívida técnica
 

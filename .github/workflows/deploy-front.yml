@@ -1,38 +1,99 @@
-# Deploy do front no Firebase Hosting. DESLIGADO: o front/ ainda não existe.
+# Deploy do front no Firebase Hosting e das regras do Firestore (firebase.json na raiz).
 #
-# Para ligar, quando o front tiver esqueleto:
-#   1. dar roles/firebasehosting.admin à sa-deploy (ou criar uma sa-deploy-front);
-#   2. trocar o gatilho para push na main com paths front/** e criar a variável DEPLOY_FRONT=true no repo;
-#   3. descomentar os passos e ajustar o build ao framework escolhido.
+# Sem front/package.json, publica a página provisória de infra/hosting-placeholder/, para os
+# rewrites de /api/** já valerem. Com ele, roda npm ci && npm run build em front/ e publica front/dist.
+#
+# O Hosting recusa rewrite para serviço do Cloud Run que não existe. Por isso o deploy tira do
+# firebase.json os rewrites de serviço que ainda não estão no ar, e roda de novo depois de cada
+# deploy-stats com sucesso (o rewrite de /api/stats entra sozinho quando o stats subir).
+#
 # Canal de preview por PR precisa de outro provider no WIF, porque o atual só aceita a main.
 name: deploy-front
 
 on:
+  push:
+    branches: [main]
+    paths:
+      - front/**
+      - firebase.json
+      - .firebaserc
+      - infra/firestore.rules
+      - infra/hosting-placeholder/**
+      - .github/workflows/deploy-front.yml
+  workflow_run:
+    workflows: [deploy-stats]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: deploy-front
+  cancel-in-progress: false
 
 permissions:
   contents: read
 
+env:
+  PROJETO: datropa
+  FIREBASE_TOOLS: firebase-tools@15.33.0
+  # Não é segredo: o provider só aceita token do repo GuiiifSouza/datropa na branch main (infra/cicd.sh).
+  WIF_PROVIDER: projects/19667506828/locations/global/workloadIdentityPools/github/providers/github-actions
+  SA_DEPLOY: sa-deploy@datropa.iam.gserviceaccount.com
+
 jobs:
   deploy:
-    if: vars.DEPLOY_FRONT == 'true' # variável do repo; não existe, então o job fica desligado
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
     steps:
-      - run: echo "Deploy do front desligado até existir front/."
-      # - uses: actions/checkout@v4
-      # - uses: google-github-actions/auth@v2
-      #   with:
-      #     workload_identity_provider: projects/19667506828/locations/global/workloadIdentityPools/github/providers/github-actions
-      #     service_account: sa-deploy@datropa.iam.gserviceaccount.com
-      # - uses: actions/setup-node@v4
-      #   with:
-      #     node-version: 22
-      #     cache: npm
-      #     cache-dependency-path: front/package-lock.json
-      # - run: npm ci && npm run build
-      #   working-directory: front
-      # - run: npx firebase-tools@latest deploy --only hosting --project datropa --non-interactive
-      #   working-directory: front
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.SA_DEPLOY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Build do front (ou página provisória)
+        run: |
+          if [ -f front/package.json ]; then
+            cd front
+            npm ci
+            npm run build
+          else
+            echo "::notice::front/package.json não existe. Publicando infra/hosting-placeholder."
+            mkdir -p front/dist
+            cp -R infra/hosting-placeholder/. front/dist/
+          fi
+          test -f front/dist/index.html || { echo "::error::front/dist/index.html não existe depois do build."; exit 1; }
+
+      - name: Rewrites só para serviços no ar
+        run: |
+          for alvo in $(jq -r '.hosting.rewrites[] | select(.run) | "\(.run.serviceId)@\(.run.region)"' firebase.json); do
+            servico=${alvo%@*}
+            regiao=${alvo#*@}
+            if saida=$(gcloud run services describe "$servico" --project "$PROJETO" --region "$regiao" --format='value(metadata.name)' 2>&1); then
+              echo "$servico está no ar: rewrite mantido."
+            elif grep -qi -e 'Cannot find service' -e 'could not be found' -e 'NOT_FOUND' <<<"$saida"; then
+              echo "::warning::Cloud Run $servico não existe em $regiao. Rewrite de /api/$servico tirado deste deploy."
+              jq --arg s "$servico" 'del(.hosting.rewrites[] | select(.run.serviceId? == $s))' firebase.json >firebase.tmp.json
+              mv firebase.tmp.json firebase.json
+            else
+              echo "$saida"
+              echo "::error::Não deu para conferir o Cloud Run $servico."
+              exit 1
+            fi
+          done
+          jq '.hosting.rewrites' firebase.json
+
+      - name: Deploy no Hosting e regras do Firestore
+        run: npx --yes "$FIREBASE_TOOLS" deploy --only hosting,firestore:rules --project "$PROJETO" --non-interactive
