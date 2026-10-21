@@ -20,7 +20,18 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 
 A config do web app do Firebase é pública, mas não entra no repo. Peça no canal.
 
-## Acessos
+## Antes de rodar `gcloud` ou `bq`
+
+A conta owner (`guilherme@souzasec.com`) pede reautenticação de tempos em tempos. Quando o token vence, todo comando falha com `Reauthentication failed. cannot prompt during non-interactive execution`. Agente e script não conseguem refazer o login sozinhos, porque o login abre o navegador.
+
+Antes de qualquer script desta pasta, confira e, se precisar, faça o login no seu terminal:
+
+```bash
+gcloud auth print-access-token >/dev/null && echo ok || gcloud auth login guilherme@souzasec.com
+```
+
+O `bq` usa a mesma credencial do `gcloud`. Confira também a conta e o projeto ativos (`gcloud config list`): a máquina tem as contas da Nublify e a do Gmail logadas.
+
 
 - chico e gugu: `bigquery.jobUser` no projeto e escrita (`WRITER`) no dataset `valorant`.
 - O front não precisa de acesso ao GCP para rodar local.
