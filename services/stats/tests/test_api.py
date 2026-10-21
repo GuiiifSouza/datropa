@@ -1,4 +1,4 @@
-"""Testes HTTP sem credenciais e sem executar consultas no BigQuery."""
+'/api/stats/times/{time_id}' """Testes HTTP sem credenciais e sem executar consultas no BigQuery."""
 import unittest
 from concurrent.futures import ThreadPoolExecutor
 from threading import BoundedSemaphore, Event
@@ -52,8 +52,16 @@ class ApiTests(unittest.TestCase):
             'data': {'status': 'ok'}, 'meta': {'atualizado_em': None},
         })
         paths = set(app.openapi()['paths'])
-        self.assertEqual(paths, {'/api/stats/status', '/api/stats/ranking',
-                                 '/api/stats/jogadores/{jogador_id}', '/api/stats/times'})
+        self.assertEqual(
+            paths,
+            {
+                "/api/stats/status",
+                "/api/stats/ranking",
+                "/api/stats/jogadores/{jogador_id}",
+                "/api/stats/times",
+                "/api/stats/times/{time_id}",
+            },
+        )
         self.client_factory.assert_not_called()
 
     def test_invalid_arguments_do_not_query(self):
