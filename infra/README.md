@@ -14,7 +14,7 @@ Projeto `datropa`, tudo em `southamerica-east1`.
 | BigQuery | dataset `valorant` | `bronze_partidas` com 336 linhas. A gold é do chico |
 | Firestore | `(default)`, modo Native | Regras em [`firestore.rules`](firestore.rules), publicadas pelo `deploy-front.yml`. Modelo de dados abaixo |
 | Vertex AI | `gemini-2.5-flash` | É o único Gemini disponível na região. Os modelos Gemini 3 não estão em `southamerica-east1` |
-| Firebase | web app `datropa-front` | Login por e-mail e senha |
+| Firebase | web app `datropa-front` | Login anônimo (Tropa AI) e por e-mail e senha |
 | Firebase Hosting | site `datropa` | `datropa.web.app`, config em [`/firebase.json`](../firebase.json). Rewrites: `/api/coach/**` → Cloud Run `coach`, `/api/stats/**` → Cloud Run `stats` (só entra quando o `stats` estiver no ar), `/p/**` e o resto → `/index.html` (SPA). Deploy pelo `deploy-front.yml` |
 | Artifact Registry | `servicos` (Docker) | Imagens em `southamerica-east1-docker.pkg.dev/datropa/servicos/<serviço>`. Guarda as 5 mais novas de cada serviço e apaga o resto com mais de 7 dias |
 | WIF | pool `github`, provider `github-actions` | Só aceita token do repo `GuiiifSouza/datropa` (pelo id `1426256768`) na branch `main`. O GitHub Actions entra como `sa-deploy` |
@@ -45,10 +45,10 @@ gcloud org-policies delete iam.allowedPolicyMemberDomains --project datropa
 
 ## Limite de custo
 
-O cartão aguenta R$ 500. São três travas:
+Limite de R$ 100 até a entrega (baixado de R$ 500 em 22/10). São três travas:
 
-1. **Orçamento** `datropa` de R$ 500/mês, com aviso por e-mail em 50%, 80%, 90% e 100%.
-2. **Corte automático.** O orçamento avisa o tópico Pub/Sub `billing-cap`. A função [`limite-custo`](limite-custo/) desliga o billing do projeto quando o gasto do mês chega a **R$ 400**. A margem existe porque o custo chega ao orçamento com horas de atraso.
+1. **Orçamento** `datropa` de R$ 100/mês, com aviso por e-mail em 50%, 80%, 90% e 100%.
+2. **Corte automático.** O orçamento avisa o tópico Pub/Sub `billing-cap`. A função [`limite-custo`](limite-custo/) desliga o billing do projeto quando o gasto do mês chega a **R$ 80**. A margem existe porque o custo chega ao orçamento com horas de atraso.
 3. **Cota do BigQuery:** no máximo 100 GiB de consulta por dia no projeto. Passou disso, a consulta falha até o dia seguinte.
 
 Billing desligado para tudo: Cloud Run, BigQuery, Vertex AI. Para religar, vincule a conta de billing ao projeto no console (Faturamento > Gerenciar projetos).
