@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import APIRouter, Query, Request
+from fastapi import APIRouter, Path, Query, Request
 
 from app.cache import coordenar_consultas, obter_cache, salvar_cache
 from app.database import (
@@ -21,6 +21,7 @@ router = APIRouter()
 
 PARTIDAS_LISTA_SQL = carregar_sql("partidas_lista.sql")
 PARTIDA_DETALHE_SQL = carregar_sql("partida_detalhe.sql")
+ROUND_EVENTOS_SQL = carregar_sql("round_eventos.sql")
 
 
 @router.get("/api/stats/partidas")
@@ -216,4 +217,82 @@ def detalhe_partida(
             503,
             "DATA_UNAVAILABLE",
             "Dados da partida temporariamente indisponíveis.",
+        )
+
+@router.get(
+    "/api/stats/partidas/{partida_id}/rounds/{round}/eventos"
+)
+@coordenar_consultas
+def eventos_round(
+    request: Request,
+    partida_id: str,
+    round: int = Path(ge=1),
+):
+    validar_parametros(request, set())
+    validar_identificadores({"partida_id": partida_id})
+
+    chave_cache = (
+        "gold_336_v1",
+        "round_eventos_publico_v1",
+        partida_id,
+        round,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info(
+            "Eventos round: cache HIT"
+        )
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info(
+        "Eventos round: cache MISS"
+    )
+
+    config = bigquery.QueryJobConfig(
+        maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
+        query_parameters=[
+            bigquery.ScalarQueryParameter(
+                "partida_id", "STRING", partida_id
+            ),
+            bigquery.ScalarQueryParameter(
+                "round", "INT64", round
+            ),
+        ],
+    )
+
+    try:
+        with conexao_bigquery() as client:
+            rows = client.query(
+                ROUND_EVENTOS_SQL,
+                job_config=config,
+            ).result(timeout=30)
+
+            resultado = next(iter(rows), None)
+
+            if resultado is None:
+                raise ApiError(
+                    404,
+                    "NOT_FOUND",
+                    "Partida ou round não encontrado.",
+                )
+
+            resposta = {
+                "data": converter_resultado(resultado),
+                "meta": {"atualizado_em": None},
+            }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
+
+    except ApiError:
+        raise
+
+    except Exception:
+        logging.exception("Falha ao consultar eventos do round")
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Eventos do round temporariamente indisponíveis.",
         )
