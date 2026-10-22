@@ -9,6 +9,7 @@ import { Agente, Carregando, ErroDados, FonteDados, LinkTime } from '../componen
 import { Colunas } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach, useContextoCoach } from '../coach/Coach';
+import { Contador } from '../componentes/Vida';
 import { Link, useParametro } from '../rotas';
 import { dec, diaBrasilia, diaNumerico, nomeTime, pct } from '../util/formato';
 
@@ -101,7 +102,7 @@ export function Jogador({ id }: { id: string }) {
           return (
             <div key={m.chave} className="metrica" title={m.ajuda}>
               <span className="rotulo">{m.rotulo}</span>
-              <b className="num">{m.formato(v ?? null)}</b>
+              <b className="num"><Contador valor={v ?? null} formato={m.formato} /></b>
               {p ? <span className="metrica__pos"><b>{p.pos}º</b> de {p.de}</span> : <span className="metrica__pos apagado">{r.partidas < MIN_MAPAS ? `menos de ${MIN_MAPAS} mapas` : agenteSel ? 'no agente' : ''}</span>}
               <span className="metrica__barra" aria-hidden="true"><span style={{ width: `${p?.pctil ?? 0}%` }} />{media !== undefined && <i />}</span>
               {media !== undefined && <span className="apagado" style={{ fontSize: 11 }}>média {m.formato(media)}</span>}

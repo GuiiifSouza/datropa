@@ -2,6 +2,7 @@ import { AuthProvider } from './auth/Auth';
 import { CoachProvider, PainelCoach } from './coach/Coach';
 import { CatalogoProvider } from './componentes/Catalogo';
 import { Header, Rodape } from './componentes/Moldura';
+import { MotorDeVida } from './componentes/Vida';
 import { Roteador, type Rota } from './rotas';
 import { Panorama } from './paginas/Panorama';
 import { Partidas } from './paginas/Partidas';
@@ -35,10 +36,11 @@ export function App() {
       <CatalogoProvider>
         <CoachProvider>
           <div className="app">
-            <a href="#conteudo" className="pular">Pular para o conteúdo</a>
+            <a href="#conteudo" className="pular" onClick={(e) => { e.preventDefault(); document.getElementById('conteudo')?.focus(); }}>Pular para o conteúdo</a>
+            <MotorDeVida />
             <Header />
             <PainelCoach />
-            <div id="conteudo" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <div id="conteudo" tabIndex={-1} style={{ flex: 1, display: 'flex', flexDirection: 'column', outline: 'none' }}>
               <Roteador rotas={ROTAS} naoEncontrada={<NaoEncontrada />} />
             </div>
             <Rodape />

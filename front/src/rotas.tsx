@@ -5,22 +5,36 @@
 import { useSyncExternalStore, type AnchorHTMLAttributes, type MouseEvent, type ReactNode } from 'react';
 
 const EVENTO = 'dt:navegou';
+// VITE_ROTEAMENTO=hash guarda a rota no hash (#/partidas). Serve para pré-visualizações em hospedagem estática
+// sem rewrite para o index.html. No Firebase Hosting o padrão (caminho normal) continua valendo.
+const HASH = import.meta.env.VITE_ROTEAMENTO === 'hash';
 
 function assinar(cb: () => void) {
   window.addEventListener('popstate', cb);
+  window.addEventListener('hashchange', cb);
   window.addEventListener(EVENTO, cb);
   return () => {
     window.removeEventListener('popstate', cb);
+    window.removeEventListener('hashchange', cb);
     window.removeEventListener(EVENTO, cb);
   };
 }
-const retrato = () => window.location.pathname + window.location.search;
+let ultimaRota = '/';
+function retrato() {
+  if (!HASH) return window.location.pathname + window.location.search;
+  // Âncoras comuns (#conteudo) não são rota: mantém a última rota válida.
+  const h = window.location.hash.slice(1);
+  if (h.startsWith('/')) ultimaRota = h;
+  else if (!h) ultimaRota = '/';
+  return ultimaRota;
+}
+const href = (para: string) => (HASH ? `#${para}` : para);
 
 export function navegar(para: string, opcoes: { substituir?: boolean; manterRolagem?: boolean } = {}) {
   if (para === retrato()) return;
-  const caminhoAntes = window.location.pathname;
-  if (opcoes.substituir) window.history.replaceState(null, '', para);
-  else window.history.pushState(null, '', para);
+  const caminhoAntes = new URL(retrato(), window.location.origin).pathname;
+  if (opcoes.substituir) window.history.replaceState(null, '', href(para));
+  else window.history.pushState(null, '', href(para));
   window.dispatchEvent(new Event(EVENTO));
   if (!opcoes.manterRolagem && new URL(para, window.location.origin).pathname !== caminhoAntes) window.scrollTo({ top: 0 });
 }
@@ -35,7 +49,7 @@ export function useLocal() {
 export function useParametro(nome: string): [string | null, (v: string | null) => void] {
   const { busca } = useLocal();
   const definir = (v: string | null) => {
-    const u = new URL(window.location.href);
+    const u = new URL(retrato(), window.location.origin);
     if (v === null || v === '') u.searchParams.delete(nome);
     else u.searchParams.set(nome, v);
     navegar(u.pathname + u.search, { substituir: true, manterRolagem: true });
@@ -53,7 +67,7 @@ export function Link({ para, onClick, ...resto }: LinkProps) {
     e.preventDefault();
     navegar(para);
   };
-  return <a href={para} onClick={aoClicar} {...resto} />;
+  return <a href={href(para)} onClick={aoClicar} {...resto} />;
 }
 
 export type Params = Record<string, string>;

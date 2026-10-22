@@ -35,9 +35,23 @@ Pílulas (`999px`) para botões e filtros; cartões com raio 22 a 40. Bordas de 
 - **Figura**: moldura de gráfico com título, legenda, Gráfico/Tabela e fonte.
 - **Estados**: esqueleto ao carregar, erro com "tentar de novo", vazio com dica do que mudar.
 
+## Movimento
+
+Tudo em `src/estilos/animacoes.css` e `src/componentes/Vida.tsx`, desligado para quem pede menos movimento no sistema.
+
+- Botões sobem um pouco no hover, afundam no clique e o principal tem um brilho que atravessa.
+- Pílula ou item de menu escolhido dá um "estalo".
+- Cartões têm um holofote que segue o ponteiro e sobem no hover.
+- As páginas entram em cascata; blocos abaixo da dobra aparecem ao rolar. O que já está na tela ao carregar nunca começa escondido.
+- Os gráficos se desenham: barras crescem, a linha do momentum é traçada, os anéis enchem e as células do livro de rounds estalam em sequência.
+- Números grandes contam até o valor (`<Contador>`).
+- O fundo tem três manchas de luz que derivam devagar, e o ticker de resultados corre sozinho (para no hover).
+- Menus suspensos são nossos (`<Seletor>`), nunca o `<select>` do navegador: abrem com animação e funcionam no teclado.
+
 ## Não fazer
 
 - Texto na cor da série nos gráficos (o número fica em `--giz`; a cor fica na marca).
 - Vermelho para algo que não seja IA, ativo ou ação.
 - Arte da Riot antes do OK da organização.
 - Zero no lugar de valor desconhecido.
+- `<select>` nativo: use `<Seletor>`.

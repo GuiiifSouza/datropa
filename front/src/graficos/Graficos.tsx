@@ -4,7 +4,7 @@
  * Regras: marcas finas, cantos de 4px, texto sempre em tinta de texto (nunca na cor da série),
  * dica no hover e foco por teclado, e a Figura oferece a tabela com os mesmos números.
  */
-import type { PointerEvent, ReactNode } from 'react';
+import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import { useDica } from './Figura';
 import { COMPRAS, RESULTADOS, pct } from '../util/formato';
 
@@ -90,9 +90,9 @@ export function Momentum({ pontos, nomeA, nomeB, altura = 220, destaque }: { pon
         {[12, 24].filter((r) => r < n).map((r) => (
           <line key={r} x1={5 + r * 10} y1="4" x2={5 + r * 10} y2={H - 4} stroke="#263442" strokeDasharray="2 3" vectorEffect="non-scaling-stroke" />
         ))}
-        <path d={area(1)} fill="rgba(249,162,59,.26)" />
-        <path d={area(-1)} fill="rgba(50,224,196,.26)" />
-        <path d={linha} fill="none" stroke="#ECE8E1" strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+        <path className="momentum__area" d={area(1)} fill="rgba(249,162,59,.26)" />
+        <path className="momentum__area" d={area(-1)} fill="rgba(50,224,196,.26)" />
+        <path className="momentum__linha" pathLength={1} d={linha} fill="none" stroke="#ECE8E1" strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {destaque && destaque <= n && <circle cx={5 + destaque * 10} cy={xy[destaque][1]} r="3" fill="#FF4655" stroke="#16212C" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
         {pontos.map((p, i) => (
           <rect key={p.round} x={5 + i * 10 + 5} y="0" width="10" height={H} fill="transparent"
@@ -126,7 +126,7 @@ export function LivroRounds({ rounds, nomeA, nomeB, linkRound, renderLink }: {
           <div key={lado} className="livro__linha">
             <span className={`livro__nome ${lado === 'a' ? 'cor-a' : 'cor-b'}`}>{lado === 'a' ? nomeA : nomeB}</span>
             <div className="livro__celulas">
-              {rounds.map((r) => {
+              {rounds.map((r, idx) => {
                 const ganhou = r.vencedor === lado;
                 const texto = `Round ${r.round}: ${r.vencedor === 'a' ? nomeA : r.vencedor === 'b' ? nomeB : '?'} venceu${r.lado_vencedor ? ` no ${r.lado_vencedor}` : ''} · ${RESULTADOS[r.resultado ?? ''] ?? '—'}${r.plant_site ? ` · plant no ${r.plant_site}` : ''}`;
                 const cls = `livro__celula${ganhou ? ` livro__celula--${lado}` : ''}${r.round === 13 || r.round === 25 ? ' livro__celula--corte' : ''}`;
@@ -134,8 +134,9 @@ export function LivroRounds({ rounds, nomeA, nomeB, linkRound, renderLink }: {
                   <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONE[r.resultado ?? ''] ?? ICONE.eliminacao}</svg>
                 ) : null;
                 const props = { onPointerMove: (e: PointerEvent) => mostrar(e, texto), onPointerLeave: esconder };
-                if (ganhou && linkRound && renderLink) return <span key={r.round} {...props} className="livro__slot">{renderLink(linkRound(r.round), conteudo, `${texto}. Abrir na prancheta`, cls)}</span>;
-                return <span key={r.round} {...props} className={cls} aria-label={ganhou ? texto : undefined} role={ganhou ? 'img' : undefined}>{conteudo}</span>;
+                const atraso = { '--i': idx } as CSSProperties;
+                if (ganhou && linkRound && renderLink) return <span key={r.round} {...props} className="livro__slot" style={atraso}>{renderLink(linkRound(r.round), conteudo, `${texto}. Abrir na prancheta`, cls)}</span>;
+                return <span key={r.round} {...props} style={atraso} className={cls} aria-label={ganhou ? texto : undefined} role={ganhou ? 'img' : undefined}>{conteudo}</span>;
               })}
             </div>
           </div>
@@ -164,7 +165,7 @@ export function Anel({ valor, rotulo, cor = AMBAR, tamanho = 96, centro }: { val
     <div className="anel" style={{ width: tamanho }}>
       <svg viewBox="0 0 100 100" width={tamanho} height={tamanho} role="img" aria-label={`${rotulo}: ${pct(valor)}`}>
         <circle cx="50" cy="50" r={r} fill="none" stroke="var(--trilho)" strokeWidth="9" />
-        {valor !== null && <circle cx="50" cy="50" r={r} fill="none" stroke={cor} strokeWidth="9" strokeLinecap="round" strokeDasharray={`${(v / 100) * c} ${c}`} transform="rotate(-90 50 50)" />}
+        {valor !== null && <circle cx="50" cy="50" r={r} fill="none" stroke={cor} strokeWidth="9" className="anel__arco" strokeLinecap="round" strokeDasharray={`${(v / 100) * c} ${c}`} transform="rotate(-90 50 50)" />}
         <text x="50" y="57" textAnchor="middle" className="anel__texto">{centro ?? pct(valor, 0)}</text>
       </svg>
       <span className="anel__rotulo">{rotulo}</span>

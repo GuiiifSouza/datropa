@@ -7,6 +7,7 @@ import './estilos/hubs.css';
 import './estilos/graficos.css';
 import './estilos/coach.css';
 import './estilos/paginas.css';
+import './estilos/animacoes.css';
 
 createRoot(document.getElementById('raiz')!).render(
   <StrictMode>

@@ -6,6 +6,7 @@ import type { RankingItem, TimeItem } from '../api/tipos';
 import { useCatalogo } from '../componentes/Catalogo';
 import { Agente, Carregando, ErroDados, FonteDados, LinkTime, Vazio } from '../componentes/Visuais';
 import { Link, useParametro } from '../rotas';
+import { Seletor } from '../componentes/Seletor';
 import { dec, nomeTime, pct } from '../util/formato';
 
 type Col = { k: keyof RankingItem | 'time'; t: string; f: (r: RankingItem) => string; v: (r: RankingItem) => number | string | null; titulo?: string };
@@ -63,15 +64,12 @@ export function Estatisticas() {
       </div>
 
       <div className="barra-ferramentas">
-        <select className="select" aria-label="Torneio" value={torneio ?? ''} onChange={(e) => setTorneio(e.target.value || null)}>
-          <option value="">Todos os torneios</option>{cat?.torneios.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
-        </select>
-        <select className="select" aria-label="Mapa" value={mapa ?? ''} onChange={(e) => setMapa(e.target.value || null)}>
-          <option value="">Todos os mapas</option>{cat?.mapas.map((m) => <option key={m.id} value={m.id}>{m.nome}</option>)}
-        </select>
-        <select className="select" aria-label="Agente" value={agente ?? ''} onChange={(e) => setAgente(e.target.value || null)}>
-          <option value="">Todos os agentes</option>{[...(cat?.agentes ?? [])].sort((a, b) => (a.nome ?? '').localeCompare(b.nome ?? '')).map((a) => <option key={a.id} value={a.id}>{a.nome}</option>)}
-        </select>
+        <Seletor rotulo="Torneio" valor={torneio ?? ''} aoMudar={(v) => setTorneio(v || null)}
+          opcoes={[{ valor: '', rotulo: 'Todos os torneios' }, ...(cat?.torneios ?? []).map((t) => ({ valor: t.id, rotulo: t.nome }))]} larguraMin={240} />
+        <Seletor rotulo="Mapa" valor={mapa ?? ''} aoMudar={(v) => setMapa(v || null)}
+          opcoes={[{ valor: '', rotulo: 'Todos os mapas' }, ...(cat?.mapas ?? []).map((m) => ({ valor: m.id, rotulo: m.nome }))]} larguraMin={180} />
+        <Seletor rotulo="Agente" valor={agente ?? ''} aoMudar={(v) => setAgente(v || null)} larguraMin={180}
+          opcoes={[{ valor: '', rotulo: 'Todos os agentes' }, ...[...(cat?.agentes ?? [])].sort((a, b) => (a.nome ?? '').localeCompare(b.nome ?? '')).map((a) => ({ valor: a.id, rotulo: a.nome ?? a.id, extra: <Agente id={a.id} tamanho="p" /> }))]} />
         <span className="segmentado" role="group" aria-label="Mínimo de mapas">
           {[1, 5, 8, 15].map((n) => <button key={n} type="button" aria-pressed={minimo === n} onClick={() => setMinimo(n)}>{n === 1 ? 'Todos' : `${n}+ mapas`}</button>)}
         </span>

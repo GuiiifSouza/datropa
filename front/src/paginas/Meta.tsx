@@ -7,6 +7,7 @@ import { BarrasMedia } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach } from '../coach/Coach';
 import { useParametro } from '../rotas';
+import { Seletor } from '../componentes/Seletor';
 import { COMPRAS, dec, num, pct } from '../util/formato';
 
 const CLASSES = ['Duelista', 'Iniciador', 'Controlador', 'Sentinela'];
@@ -28,9 +29,8 @@ export function Meta() {
         <h1 className="titulo-xl">Meta</h1>
       </div>
       <div className="barra-ferramentas">
-        <select className="select" aria-label="Torneio" value={torneio ?? ''} onChange={(e) => setTorneio(e.target.value || null)}>
-          <option value="">Todos os torneios</option>{cat?.torneios.map((t) => <option key={t.id} value={t.id}>{t.nome}</option>)}
-        </select>
+        <Seletor rotulo="Torneio" valor={torneio ?? ''} aoMudar={(v) => setTorneio(v || null)} larguraMin={240}
+          opcoes={[{ valor: '', rotulo: 'Todos os torneios' }, ...(cat?.torneios ?? []).map((t) => ({ valor: t.id, rotulo: t.nome }))]} />
         <div className="pills" role="toolbar" aria-label="Filtrar por mapa" style={{ flex: 1 }}>
           <button type="button" className="pill" aria-pressed={!mapaSel} onClick={() => setMapa(null)}>Todos os mapas</button>
           {cat?.mapas.map((x) => <button key={x.id} type="button" className="pill" aria-pressed={mapaSel === x.id} onClick={() => setMapa(x.id)}>{x.nome}</button>)}
