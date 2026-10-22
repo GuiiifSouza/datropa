@@ -18,7 +18,7 @@ Lhobregat e RhuanK trocaram de frente:
 - Rota que ainda não existe na API cai no snapshot (`public/snapshot`). Quando o gugu publicar a rota, a tela troca sozinha. Função que só existe no snapshot fica marcada em `stats.ts`.
 - O coach exige o ID token do Firebase. As rotas de stats são públicas, mas o cliente manda o token quando há login.
 - Link da prancheta: `/prancheta?partida_id=<id>&round=<n>`, round começando em 1. Use `linkPrancheta()` de `src/componentes/Prancheta.tsx`.
-- A prancheta grava estratégias direto no Firestore pelo SDK. As regras do Firestore são do Guilherme: precisou mudar, peça.
+- A prancheta guarda as jogadas no navegador (`localStorage`), sem Firestore. Se um dia for para o Firestore, as regras são do Guilherme: peça.
 - Minimapa e ícone/arte de agente são da Riot. Ficam desligados (`VITE_ARTE_RIOT=0`) e fora do git até o OK da organização.
 - Config do Firebase Hosting (`firebase.json`, rewrites) e deploy são do Guilherme.
 

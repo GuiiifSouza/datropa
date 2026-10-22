@@ -92,7 +92,8 @@ python3 scripts/exportar_prancheta.py   # regera src/prancheta/gerado/ (molde, C
 
 - `src/prancheta/Motor.tsx` monta a tela no React a partir do molde (`{{buracos}}`, `sc-for`, `sc-if`) e da lógica.
 - `src/prancheta/reais.ts` busca partidas e eventos de round pela API e converte as posições para o desenho do mapa.
-- Arte (mapas, splash, ícones de agente e habilidade) fica em `public/arte/prancheta/`, fora do git como manda o AGENTS.md. Sem ela a prancheta abre sem mapa e sem rostos. No deploy, o `deploy-front.yml` baixa a pasta do bucket privado `gs://datropa-arte` (ver `infra/README.md`); para atualizar a arte do site, suba de novo com `gcloud storage cp -r arte gs://datropa-arte/` a partir de `front/public`.
+- Arte (mapas, splash, ícones de agente e habilidade) fica em `public/arte/prancheta/`, fora do git como manda o AGENTS.md. Sem ela a prancheta abre sem mapa e sem rostos. No deploy, o `deploy-front.yml` baixa a pasta do bucket privado `gs://datropa-arte` (ver `infra/README.md`); se o bucket estiver vazio, o deploy segue com um aviso e a prancheta sobe sem arte; para atualizar a arte do site, suba de novo com `gcloud storage cp -r arte gs://datropa-arte/` a partir de `front/public`.
 - Mapas com desenho: Lotus, Haven, Ascent, Breeze e Fracture. Os outros abrem no Planejar.
 - Mapa de calor: a aba está no ar, mas fica vazia até a API trazer os eventos do mapa inteiro (`AMB.calorVazio` em `paginas/Prancheta.tsx`).
 - Jogadas salvas ficam no navegador (localStorage). Firestore fica para depois.
+- Link de compartilhar (`?j=`): código `DT2.` (JSON comprimido com `CompressionStream('deflate-raw')`, em base64url); links antigos `DT1.` (base64 sem compressão) continuam abrindo. Acima de 8.000 caracteres a tela de compartilhar avisa, porque o Hosting devolve 414. Link estragado abre a prancheta vazia com aviso.
