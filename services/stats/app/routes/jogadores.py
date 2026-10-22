@@ -10,6 +10,7 @@ from app.database import (
     conexao_bigquery,
 )
 from app.erros import ApiError
+from app.routes.agentes import CATALOGO_JSON as AGENTES_JSON
 from app.serializacao import converter_resultado
 from app.validacoes import (
     validar_identificadores,
@@ -56,7 +57,7 @@ def detalhe_jogador(
 
     chave_cache = (
         "gold_336_v1",
-        "jogador_detalhe_publico_v1",
+        "jogador_detalhe_publico_v2",
         jogador_id,
         torneio_id,
         mapa_id,
@@ -82,6 +83,7 @@ def detalhe_jogador(
         **identificadores,
         "data_inicio": inicio.isoformat() if inicio else None,
         "data_fim": fim.isoformat() if fim else None,
+        "agentes_json": AGENTES_JSON,
     }
 
     config = bigquery.QueryJobConfig(

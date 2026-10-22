@@ -1,10 +1,18 @@
-WITH jogadores AS (
+WITH identidades AS (
+  -- ranking_jogador traz o nick da partida mais recente do jogador.
+  SELECT jogador_id, nome
+  FROM `datropa.valorant.ranking_jogador`
+),
+jogadores AS (
   SELECT
-    partida_id,
+    s.partida_id,
     ARRAY_AGG(
       STRUCT(
-        jogador_id,
-        nome,
+        s.jogador_id,
+        -- nome: nick mais recente, igual ao ranking e ao detalhe
+        -- do jogador. nome_partida: nick usado nesta partida.
+        COALESCE(i.nome, s.nome) AS nome,
+        s.nome AS nome_partida,
         time_id,
         agente_id,
         kills,
@@ -18,11 +26,13 @@ WITH jogadores AS (
         kills DESC NULLS LAST,
         (deaths IS NULL) ASC,
         deaths ASC,
-        jogador_id
+        s.jogador_id
     ) AS itens
-  FROM `datropa.valorant.stats_jogador_partida`
-  WHERE partida_id = @partida_id
-  GROUP BY partida_id
+  FROM `datropa.valorant.stats_jogador_partida` s
+  LEFT JOIN identidades i
+    ON i.jogador_id = s.jogador_id
+  WHERE s.partida_id = @partida_id
+  GROUP BY s.partida_id
 ),
 rounds_agrupados AS (
   SELECT

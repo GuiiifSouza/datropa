@@ -29,7 +29,7 @@ CATALOGOS_JSON = {
         ),
         ensure_ascii=False,
     )
-    for nome in ("agentes", "armas", "armaduras")
+    for nome in ("torneios", "agentes", "armas", "armaduras")
 }
 
 
@@ -40,7 +40,7 @@ def listar_catalogos(request: Request):
 
     chave_cache = (
         "gold_336_v1",
-        "catalogos_publico_v1",
+        "catalogos_publico_v2",
         *sorted(CATALOGOS_JSON.items()),
     )
 

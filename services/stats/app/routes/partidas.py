@@ -159,7 +159,7 @@ def detalhe_partida(
 
     chave_cache = (
         "gold_336_v1",
-        "partida_detalhe_publico_v1",
+        "partida_detalhe_publico_v2",
         partida_id,
     )
 

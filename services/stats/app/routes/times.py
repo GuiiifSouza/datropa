@@ -169,7 +169,7 @@ def detalhe_time(
 
     chave_cache = (
         "gold_336_v1",
-        "time_detalhe_publico_v1",
+        "time_detalhe_publico_v2",
         time_id,
         mapa_id,
         torneio_id,

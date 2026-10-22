@@ -3,6 +3,12 @@ WITH torneios AS (
   FROM `datropa.valorant.partidas`
   WHERE torneio_id IS NOT NULL
 ),
+torneios_catalogo AS (
+  SELECT
+    JSON_VALUE(item, '$.id') AS id,
+    JSON_VALUE(item, '$.nome') AS nome
+  FROM UNNEST(JSON_QUERY_ARRAY(@torneios_json)) AS item
+),
 agentes_presentes AS (
   SELECT DISTINCT agente_id AS id
   FROM `datropa.valorant.stats_jogador_partida`
@@ -41,9 +47,11 @@ armaduras_catalogo AS (
 )
 SELECT
   ARRAY(
-    SELECT AS STRUCT id, id AS nome
-    FROM torneios
-    ORDER BY id
+    -- Torneio fora do catálogo local mantém o ID como nome.
+    SELECT AS STRUCT t.id, COALESCE(c.nome, t.id) AS nome
+    FROM torneios t
+    LEFT JOIN torneios_catalogo c ON c.id = t.id
+    ORDER BY t.id
   ) AS torneios,
   ARRAY(
     SELECT AS STRUCT

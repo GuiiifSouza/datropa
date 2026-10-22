@@ -66,7 +66,7 @@ def ranking(
 
     chave_cache = (
         "gold_336_v1",
-        "ranking_publico_v1",
+        "ranking_publico_v2",
         page,
         page_size,
         ordem,

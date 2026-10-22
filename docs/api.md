@@ -25,6 +25,10 @@ Os exemplos JSON abaixo são fictícios, não resultados da base.
 - Datas e filtros em UTC.
 - IDs são strings opacas; não confundir identificadores com nomes.
 - Jogador deriva do puuid; partida representa um mapa jogado.
+- `nome` de jogador é sempre o nick da partida mais recente do jogador
+  no histórico inteiro, com ou sem filtro (ranking, busca, detalhe do
+  jogador e detalhe da partida). O nick usado numa partida específica
+  aparece só em `jogadores[].nome_partida` do detalhe da partida.
 - Times usam IDs da Gold, não Red/Blue; não juntar por prefixo do nome.
 - Filtros gerais: `torneio_id`, `mapa_id`, `data_inicio` e `data_fim`.
 - Datas de filtro usam YYYY-MM-DD, inclusivas.
@@ -173,6 +177,9 @@ de agregar e recalculando razões pelos totais.
 `time_id` só é preenchido quando há um único time no recorte do jogador.
 Não atribuir todo o histórico ao último time.
 
+`nome` é o nick mais recente do jogador no histórico inteiro, mesmo
+com filtros. Filtrar por torneio antigo não traz o nick antigo.
+
 ADR e HS% ficam null quando houver alertas de qualidade, conforme
 o SQL oficial da Gold.
 
@@ -233,6 +240,12 @@ Exemplo de `data`:
 }
 ```
 
+`torneios[].nome` vem do catálogo local `app/catalogos/torneios.json`
+(ex.: `UNIVAVA_G` → "Univavá · Fase de grupos"). Torneio presente
+na Gold e ausente do catálogo usa o próprio ID como nome.
+`mapas[].nome` vem da Gold (`mapas`) e `agentes[].nome` do catálogo
+local de agentes.
+
 IDs desconhecidos preservam o identificador original e usam nome,
 classe ou ícone null quando indisponíveis.
 
@@ -283,7 +296,8 @@ Objeto em `data`:
       "agente_id": "agente-demo",
       "partidas": 5,
       "vitorias": 3,
-      "taxa_vitoria_pct": 60.0
+      "taxa_vitoria_pct": 60.0,
+      "nome": "Agente Exemplo"
     }
   ],
   "mapas": [
@@ -291,13 +305,19 @@ Objeto em `data`:
       "mapa_id": "mapa-demo",
       "partidas": 5,
       "vitorias": 3,
-      "taxa_vitoria_pct": 60.0
+      "taxa_vitoria_pct": 60.0,
+      "nome": "Mapa Exemplo"
     }
   ]
 }
 ```
 
 Times representam o recorte filtrado.
+
+`agentes` e `mapas` vêm ordenados por `partidas` decrescente, depois
+`vitorias` decrescente, `nome` crescente (null no fim) e ID.
+`nome` é o nome amigável do agente (catálogo local) ou do mapa (Gold);
+null quando o ID não está no catálogo.
 
 Jogador inexistente: 404.
 
@@ -360,11 +380,16 @@ Objeto em `data`:
       "mapa_id": "mapa-demo",
       "partidas": 5,
       "vitorias": 3,
-      "taxa_vitoria_pct": 60.0
+      "taxa_vitoria_pct": 60.0,
+      "nome": "Mapa Exemplo"
     }
   ]
 }
 ```
+
+`mapas` segue a mesma ordem do detalhe de jogador: `partidas`
+decrescente, `vitorias` decrescente, `nome` (null no fim) e `mapa_id`.
+`nome` é o nome amigável do mapa na Gold.
 
 Não somar os escopos geral e por mapa de `stats_time`.
 Elenco histórico não significa elenco atual.
@@ -436,6 +461,7 @@ Objeto em `data`:
     {
       "jogador_id": "jogador-demo",
       "nome": "Jogador Exemplo",
+      "nome_partida": "Nick Antigo",
       "time_id": "time-demo",
       "agente_id": "agente-demo",
       "kills": 20,
@@ -458,6 +484,11 @@ Objeto em `data`:
   "rounds_decisivos": []
 }
 ```
+
+Em `jogadores`, `nome` é o nick mais recente do jogador (o mesmo do
+ranking e da página do jogador) e `nome_partida` é o nick que ele usava
+nesta partida. Mostrar `nome` mantém o mesmo jogador com o mesmo nome
+em todas as telas; `nome_partida` serve para indicar o nick da época.
 
 Resultados: eliminacao, detonacao, desarme, tempo ou outro.
 Desconhecido permanece null.
@@ -914,3 +945,32 @@ Não foi necessário alterar o código da aplicação ou a imagem.
 Continuam pendentes a autenticação automática com sa-stats no
 Cloud Run, o deploy e a integração com o frontend.
 Os testes simulados não validam os cálculos SQL na Gold.
+
+## Ajustes para o front — 22/10/2026
+
+- `/catalogos`: `torneios[].nome` com nome amigável, vindo de
+  `services/stats/app/catalogos/torneios.json`.
+- Detalhe de jogador e de time: `agentes` e `mapas` ordenados por
+  partidas, vitórias, nome e ID; itens ganham `nome` (campo novo).
+- Ranking com filtro e detalhe da partida: `nome` passa a ser o nick
+  mais recente do jogador. O detalhe da partida ganha `nome_partida`.
+- Formato preservado: só valores corrigidos e campos acrescentados.
+- `queries/jogador_detalhe.sql` agora difere da origem em
+  `sql/gold/consultas_api/` (ordem e nomes). A Gold não mudou.
+
+Dry run com a carga `gold_336_v1`:
+
+| Consulta | Bytes estimados |
+|---|---:|
+| catalogos.sql | 1.840.232 |
+| jogador_detalhe.sql | 1.197.614 |
+| time_detalhe.sql | 131.029 |
+| ranking_filtrado.sql (torneio) | 964.682 |
+| partida_detalhe.sql | 2.003.605 |
+
+Diferenças de 1 entre a API e o antigo snapshot do front (ADR,
+porcentagens e posição no ranking) vêm do snapshot, não da API:
+o snapshot arredondava para uma casa antes de exibir sem casas
+(205,46 → 205,5 → 206) e desempatava o ranking com `localeCompare`
+em vez da ordem binária do `jogador_id`. Os totais por jogador
+(rounds, kills, dano, tiros, first bloods) batem nos 411 jogadores.

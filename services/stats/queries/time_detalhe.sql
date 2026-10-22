@@ -91,10 +91,17 @@ SELECT
       ) AS taxa_vitoria_pct
     )
   ] AS lados,
+  -- Mais partidas primeiro, depois vitorias, nome e ID.
   ARRAY(
-    SELECT AS STRUCT *
-    FROM mapas
-    ORDER BY mapa_id
+    SELECT AS STRUCT m.*, c.nome
+    FROM mapas m
+    LEFT JOIN `datropa.valorant.mapas` c
+      ON c.id = m.mapa_id
+    ORDER BY
+      m.partidas DESC,
+      m.vitorias DESC,
+      c.nome ASC NULLS LAST,
+      m.mapa_id
   ) AS mapas
 FROM identidade i
 CROSS JOIN totais t

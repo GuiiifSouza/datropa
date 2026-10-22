@@ -64,14 +64,27 @@ WITH filtros AS (
     COUNTIF(venceu IS TRUE) AS vitorias,
     100.0 * SAFE_DIVIDE(COUNTIF(venceu IS TRUE), COUNT(venceu)) AS taxa_vitoria_pct
   FROM recorte GROUP BY mapa_id
+), agentes_catalogo AS (
+  -- Catalogo estatico local (app/catalogos/agentes.json), enviado pela API.
+  SELECT JSON_VALUE(item, '$.id') AS id, JSON_VALUE(item, '$.nome') AS nome
+  FROM UNNEST(JSON_QUERY_ARRAY(@agentes_json)) AS item
+), mapas_catalogo AS (
+  SELECT id, nome FROM `datropa.valorant.mapas`
 )
+-- Agentes e mapas: mais partidas primeiro, depois vitorias, nome e ID.
 SELECT i.id, i.nome,
   ARRAY(SELECT AS STRUCT t.id, t.nome FROM times_recorte t ORDER BY t.id) AS times,
   STRUCT(r.partidas AS partidas, r.rounds AS rounds, r.kills AS kills,
     r.deaths AS deaths, r.assists AS assists, r.kd AS kd, r.adr AS adr,
     r.hs_pct AS hs_pct, r.first_bloods AS first_bloods) AS resumo,
-  ARRAY(SELECT AS STRUCT a.agente_id, a.partidas, a.vitorias, a.taxa_vitoria_pct
-    FROM agentes a ORDER BY a.agente_id) AS agentes,
-  ARRAY(SELECT AS STRUCT m.mapa_id, m.partidas, m.vitorias, m.taxa_vitoria_pct
-    FROM mapas m ORDER BY m.mapa_id) AS mapas
+  ARRAY(SELECT AS STRUCT a.agente_id, a.partidas, a.vitorias, a.taxa_vitoria_pct,
+      c.nome
+    FROM agentes a LEFT JOIN agentes_catalogo c ON c.id = a.agente_id
+    ORDER BY a.partidas DESC, a.vitorias DESC, c.nome ASC NULLS LAST,
+      a.agente_id) AS agentes,
+  ARRAY(SELECT AS STRUCT m.mapa_id, m.partidas, m.vitorias, m.taxa_vitoria_pct,
+      c.nome
+    FROM mapas m LEFT JOIN mapas_catalogo c ON c.id = m.mapa_id
+    ORDER BY m.partidas DESC, m.vitorias DESC, c.nome ASC NULLS LAST,
+      m.mapa_id) AS mapas
 FROM identidade i CROSS JOIN resumo r;
