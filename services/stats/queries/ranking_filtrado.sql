@@ -11,11 +11,6 @@ WITH base AS (
 totais AS (
   SELECT
     jogador_id,
-    (ARRAY_AGG(
-      STRUCT(nome, tag)
-      ORDER BY inicio DESC, partida_id DESC
-      LIMIT 1
-    ))[OFFSET(0)] AS identidade,
     IF(COUNT(DISTINCT time_id) = 1, MAX(time_id), NULL) AS time_id,
     COUNT(DISTINCT partida_id) AS partidas,
     SUM(rounds) AS rounds,
@@ -33,10 +28,16 @@ totais AS (
   FROM base
   GROUP BY jogador_id
 ),
+identidades AS (
+  -- ranking_jogador traz o nick da partida mais recente do jogador.
+  SELECT jogador_id, nome
+  FROM `datropa.valorant.ranking_jogador`
+),
 ranking AS (
   SELECT
-    jogador_id,
-    identidade.nome AS nome,
+    t.jogador_id,
+    -- Nick mais recente do histórico inteiro, não só do recorte.
+    i.nome,
     time_id,
     partidas,
     rounds,
@@ -57,7 +58,9 @@ ranking AS (
       NULL
     ) AS hs_pct,
     first_bloods
-  FROM totais
+  FROM totais t
+  LEFT JOIN identidades i
+    ON i.jogador_id = t.jogador_id
 )
 SELECT
   ARRAY(
