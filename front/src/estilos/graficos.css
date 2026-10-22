@@ -1,0 +1,80 @@
+/* Gráficos próprios. Grade e eixos recessivos, marcas finas, texto em tinta de texto. */
+.figura { margin: 0; background: var(--superficie); border: 1px solid var(--linha); border-radius: 24px; padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.figura--compacta { padding: 16px 18px; border-radius: 20px; }
+.figura__topo { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+.figura__titulo { font-size: 15px; }
+.figura__rodape { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; border-top: 1px solid rgba(236,232,225,.07); padding-top: 12px; }
+.figura__fonte { font-size: 11px; color: var(--apagado); }
+.figura__acoes { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.legenda { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--giz-2); }
+.legenda__item { display: inline-flex; align-items: center; gap: 6px; }
+.legenda__marca { display: inline-block; width: 12px; height: 12px; border-radius: 3px; }
+.legenda__marca--linha { width: 14px; height: 2px; border-radius: 2px; }
+.legenda__marca--traco { width: 3px; height: 14px; border-radius: 2px; }
+[data-grafico] { position: relative; }
+.dica { position: absolute; z-index: 5; transform: translate(-50%, calc(-100% - 12px)); pointer-events: none; background: var(--fundo); color: var(--giz);
+  border: 1px solid var(--linha-forte); border-radius: 10px; padding: 7px 10px; font-size: 12px; line-height: 1.35; box-shadow: 0 10px 24px rgba(0,0,0,.45); max-width: 280px; white-space: normal; }
+
+/* barras contra a média */
+.barras-media { display: flex; flex-direction: column; gap: 12px; }
+.barras-media__linha { display: grid; grid-template-columns: minmax(56px, 120px) minmax(0, 1fr) 70px; gap: 12px; align-items: center; outline-offset: 4px; border-radius: 8px; }
+.barras-media__rotulo { font-size: 14px; color: var(--giz-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.barras-media__trilho { position: relative; display: block; height: 20px; }
+.barras-media__fundo { position: absolute; inset: 7px 0; background: var(--trilho); border-radius: var(--r-pill); }
+.barras-media__barra { position: absolute; left: 0; top: 4px; height: 12px; border-radius: 4px; box-shadow: 0 0 0 2px var(--superficie); transition: width .6s var(--suave); }
+.barras-media__media { position: absolute; top: 0; width: 3px; height: 20px; background: var(--giz); border-radius: 2px; }
+.barras-media__valor { font-size: 22px; text-align: right; }
+
+/* espelho */
+.espelho { display: flex; flex-direction: column; gap: 10px; }
+.espelho__linha { display: grid; grid-template-columns: 64px minmax(0, 1fr) minmax(90px, 140px) minmax(0, 1fr) 64px; gap: 10px; align-items: center; border-radius: 8px; }
+.espelho__lado { display: flex; height: 12px; }
+.espelho__lado span { display: block; height: 100%; border-radius: 4px; transition: width .6s var(--suave); }
+.espelho__lado--a { justify-content: flex-end; }
+.espelho__rotulo { text-align: center; font-size: 13px; color: var(--giz-2); }
+.espelho__v { font-size: 20px; text-align: right; }
+.espelho__v--b { text-align: left; }
+
+/* momentum */
+.momentum svg { display: block; width: 100%; }
+.momentum__eixo { display: flex; justify-content: space-between; font-size: 10px; color: var(--apagado); margin-top: 6px; }
+
+/* livro de rounds */
+.livro { display: flex; flex-direction: column; gap: 12px; overflow-x: auto; }
+.livro__linhas { display: flex; flex-direction: column; gap: 6px; min-width: max-content; }
+.livro__linha { display: grid; grid-template-columns: 150px auto; gap: 12px; align-items: center; }
+.livro__nome { font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.livro__celulas { display: flex; gap: 4px; }
+.livro__slot { display: inline-flex; }
+.livro__celula, .livro__n { width: 26px; height: 26px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; flex: none; background: var(--superficie-2); color: var(--fundo); }
+.livro__celula--a { background: var(--ambar); }
+.livro__celula--b { background: var(--menta); }
+a.livro__celula:hover { outline: 2px solid var(--giz); outline-offset: 1px; color: var(--fundo); }
+.livro__celula--corte { margin-left: 10px; }
+.livro__n { background: transparent; color: var(--apagado); font-size: 10px; height: 16px; }
+.livro__legenda { display: flex; gap: 16px; flex-wrap: wrap; font-size: 10px; color: var(--apagado); }
+.livro__legenda span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* anel */
+.anel { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.anel__texto { font: 900 26px var(--f-display); fill: var(--giz); }
+.anel__rotulo { font-size: 12px; color: var(--giz-2); line-height: 1.3; }
+
+/* colunas */
+.colunas { position: relative; display: flex; align-items: flex-end; gap: 10px; }
+.colunas__item { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; border-radius: 8px; }
+.colunas__v { font-size: 18px; }
+.colunas__trilho { width: 100%; max-width: 46px; display: flex; align-items: flex-end; background: rgba(38,52,66,.55); border-radius: 6px; overflow: hidden; }
+.colunas__trilho span { display: block; width: 100%; border-radius: 4px 4px 0 0; transition: height .6s var(--suave); }
+.colunas__rotulo { font-size: 12px; color: var(--giz-2); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.colunas__ref { position: absolute; left: 0; right: 0; height: 0; border-top: 1px dashed rgba(236,232,225,.35); pointer-events: none; }
+.colunas__ref span { position: absolute; right: 0; top: -16px; font-size: 10px; color: var(--apagado); }
+
+/* economia round a round */
+.eco-rounds { display: flex; gap: 3px; height: 150px; align-items: stretch; overflow-x: auto; }
+.eco-rounds__col { flex: 1 0 12px; display: flex; flex-direction: column; border-radius: 4px; }
+.eco-rounds__col--corte { margin-left: 8px; }
+.eco-rounds__meia { flex: 1; display: flex; }
+.eco-rounds__meia span { display: block; width: 100%; border-radius: 3px; }
+.eco-rounds__meia--a { align-items: flex-end; border-bottom: 1px solid #3A4856; padding-bottom: 1px; }
+.eco-rounds__meia--b { align-items: flex-start; padding-top: 1px; }

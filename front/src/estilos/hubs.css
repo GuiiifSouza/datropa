@@ -1,0 +1,80 @@
+/* Orbes do header: Tropa AI e Prancheta. Mesmo desenho do artboard 01 · Panorama. */
+@keyframes orbSpin{to{transform:rotate(360deg)}}
+.dt-hubs{display:flex;align-items:center;gap:36px;position:relative;z-index:6}
+.dt-hub{position:relative;width:64px;height:64px;margin:-4px 0 -12px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex:none;text-decoration:none;perspective:320px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.34,1.56,.64,1)}
+.dt-hub.ai{--aro:#FF4655;--aro-s:rgba(255,70,85,.45)}.dt-hub.pr{--aro:#32E0C4;--aro-s:rgba(50,224,196,.45)}
+.dt-link:hover .dt-hub,.dt-link:focus-visible .dt-hub{z-index:3;transform:translateY(5px) scale(1.1)}
+.dt-link:hover .dt-hub.pr,.dt-link:focus-visible .dt-hub.pr{transform:translateY(5px) scale(1.1) rotate(-4deg)}
+.dt-hub span,.dt-hub i,.dt-hub svg{pointer-events:none}
+.hub-base{position:absolute;inset:0;border-radius:50%;background:#16212C;box-shadow:0 0 0 4px #0F1923,0 0 0 5px var(--aro-s),0 10px 22px rgba(0,0,0,.4);transition:box-shadow .4s}
+.dt-link:hover .dt-hub .hub-base{box-shadow:0 0 0 4px #0F1923,0 0 0 5.5px var(--aro),0 0 26px 2px var(--aro),0 22px 34px rgba(0,0,0,.6)}
+
+/* ---------- Tropa AI ---------- */
+.ai-aura{position:absolute;inset:6px;border-radius:50%;background:radial-gradient(circle,rgba(255,70,85,.32),rgba(255,70,85,0) 66%);animation:aiPulso 4.8s ease-in-out infinite}
+.dt-link:hover .dt-hub.ai .ai-giz{position:absolute;inset:0;width:100%;height:100%;animation:orbSpin 40s linear infinite;opacity:.28;transition:opacity .3s}
+.dt-link:hover .dt-hub.ai .ai-giz{animation-duration:5s;opacity:.9}
+.ai-orbita{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(62deg) rotateY(-8deg)}
+.ai-ic{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;transform-style:preserve-3d;animation:aiOrbita 8s linear infinite;animation-delay:var(--d)}
+.ai-ic b{display:flex;align-items:center;justify-content:center;width:26px;height:26px;box-sizing:border-box;border-radius:50%;background:#16212C;border:1.5px solid var(--c);color:var(--c);box-shadow:0 0 10px -2px var(--c);transform:rotateY(8deg) rotateX(-62deg) scale(0);opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1) var(--t),opacity .25s var(--t)}
+.dt-link:hover .dt-hub.ai .ai-ic b,.dt-link:focus-visible .dt-hub.ai .ai-ic b,.dt-hub.ai.aberto .ai-ic b{transform:rotateY(8deg) rotateX(-62deg) scale(1);opacity:1}
+.dt-link:hover .dt-hub.ai .ai-ic{animation-duration:5s}
+.ai-x{position:absolute;z-index:2;filter:drop-shadow(0 0 4px #0F1923);opacity:0;transform:scale(.4) rotate(-90deg);transition:opacity .3s,transform .4s cubic-bezier(.34,1.56,.64,1)}
+.dt-hub.aberto .ai-x{opacity:1;transform:none}
+.dt-hub.aberto .ai-aura{animation-duration:1.3s}
+@keyframes aiOrbita{from{transform:rotateZ(0) translateX(54px) rotateZ(0)}to{transform:rotateZ(360deg) translateX(54px) rotateZ(-360deg)}}
+@keyframes aiPulso{0%,100%{transform:scale(.9);opacity:.5}50%{transform:scale(1.08);opacity:.9}}
+@keyframes aiRespira{0%,100%{transform:scale(.96)}50%{transform:scale(1.02)}}
+@keyframes aiBoing{0%{transform:scale(1)}30%{transform:scale(1.22,.9)}55%{transform:scale(.92,1.12)}80%{transform:scale(1.08)}100%{transform:scale(1.04)}}
+@keyframes aiBrilho{0%,100%{transform:scale(.4) rotate(0);opacity:.2}50%{transform:scale(1) rotate(45deg);opacity:1}}
+
+/* ---------- Prancheta ---------- */
+.pr-mesa{position:absolute;inset:11px;border-radius:50%;overflow:hidden;background-color:#0F1923;background-image:linear-gradient(rgba(50,224,196,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(50,224,196,.2) 1px,transparent 1px);background-size:7px 7px;box-shadow:0 0 0 1.5px rgba(50,224,196,.5);animation:prMesa 30s linear infinite}
+.pr-radar{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,rgba(50,224,196,0) 0 74%,rgba(50,224,196,.55));animation:orbSpin 2.6s linear infinite;opacity:0;transition:opacity .3s}
+.dt-link:hover .dt-hub.pr .pr-radar{opacity:1}
+.pr-pt{position:absolute;width:6px;height:6px;border-radius:50%;animation-duration:5s !important}
+.dt-link:hover .dt-hub.pr .pr-pt{animation-duration:1.6s !important;box-shadow:0 0 6px currentColor}
+.pr-pt.a1{color:#F9A23B;background:#F9A23B;left:6px;top:20px;animation:prA1 2.6s ease-in-out infinite alternate}
+.pr-pt.a2{color:#F9A23B;background:#F9A23B;left:12px;top:31px;animation:prA2 3.1s ease-in-out infinite alternate}
+.pr-pt.b1{color:#32E0C4;background:#32E0C4;left:33px;top:10px;animation:prB1 2.9s ease-in-out infinite alternate}
+.pr-pt.b2{color:#32E0C4;background:#32E0C4;left:30px;top:31px;animation:prB2 3.4s ease-in-out infinite alternate}
+.pr-traco{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.pr-traco path{stroke-dasharray:64;animation:prTraco 5s ease-in-out infinite}
+.dt-link:hover .dt-hub.pr .pr-traco path{animation-duration:1.1s}
+.pr-lapis{position:absolute;left:33px;top:-9px;width:14px;height:60px;transform-origin:7px 60px;transform:rotate(36deg);filter:drop-shadow(-3px 5px 3px rgba(0,0,0,.5));animation:prLapis 4s ease-in-out infinite;transition:top .4s cubic-bezier(.34,1.56,.64,1)}
+.dt-link:hover .dt-hub.pr .pr-lapis{animation:prRabisco .32s ease-in-out infinite}
+.pr-dica{position:absolute;top:var(--y);left:var(--x);white-space:nowrap;font:700 18px/1 'Caveat',cursive;color:#0F1923;background:var(--c);padding:6px 11px 7px;border-radius:14px 14px 14px 4px;box-shadow:0 10px 22px rgba(0,0,0,.45);transform:rotate(var(--r)) scale(0);transform-origin:var(--o);opacity:0;transition:transform .5s cubic-bezier(.34,1.56,.64,1) var(--t),opacity .2s var(--t)}
+.pr-dica::before{content:"";position:absolute;top:-5px;left:var(--cauda);width:10px;height:10px;background:var(--c);transform:rotate(45deg);border-radius:2px}
+.dt-link:hover .dt-hub.pr .pr-dica,.dt-link:focus-visible .dt-hub.pr .pr-dica{transform:rotate(var(--r)) scale(1);opacity:1;animation:prBoia 2.4s ease-in-out calc(var(--t) + .5s) infinite}
+@keyframes prMesa{0%{transform:rotateX(54deg) rotateZ(0)}50%{transform:rotateX(62deg) rotateZ(180deg)}100%{transform:rotateX(54deg) rotateZ(360deg)}}
+@keyframes prA1{to{transform:translate(11px,-7px)}}
+@keyframes prA2{to{transform:translate(9px,-5px)}}
+@keyframes prB1{to{transform:translate(-9px,7px)}}
+@keyframes prB2{to{transform:translate(-7px,-6px)}}
+@keyframes prTraco{0%{stroke-dashoffset:64;opacity:1}60%{stroke-dashoffset:0;opacity:1}100%{stroke-dashoffset:0;opacity:0}}
+@keyframes prLapis{0%,100%{transform:rotate(36deg) translate(0,0)}50%{transform:rotate(33deg) translate(-1px,1px)}}
+@keyframes prRabisco{0%,100%{transform:rotate(28deg) translate(-3px,-4px)}50%{transform:rotate(40deg) translate(2px,-2px)}}
+@keyframes prBoia{0%,100%{translate:0 0}50%{translate:0 -4px}}
+.dt-link{display:flex;align-items:center;gap:16px;text-decoration:none;color:inherit;border-radius:999px}
+.dt-link:focus-visible{outline:2px solid #ECE8E1;outline-offset:6px}
+.hub-nome{font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.18em;color:#9AA6B2;transition:color .3s,letter-spacing .4s cubic-bezier(.34,1.56,.64,1),transform .5s cubic-bezier(.34,1.56,.64,1)}
+.dt-link.ai:hover .hub-nome,.dt-link.ai:focus-visible .hub-nome,.dt-link.ai.is-open .hub-nome{transform:translateX(-30px)}
+.dt-link.ai.is-open .hub-nome{color:#FF4655}
+.dt-link:hover .hub-nome,.dt-link:focus-visible .hub-nome{color:var(--c);letter-spacing:.24em}
+.ai-globo{position:absolute;inset:9px;width:46px;height:46px;overflow:visible;animation:aiRespira 4.8s ease-in-out infinite;--T:7s}
+.ai-globo .mer{transform-box:fill-box;transform-origin:center;animation:aiMer var(--T) infinite;animation-delay:calc(var(--k) * var(--T) / -4)}
+.ai-nucleo{transform-box:fill-box;transform-origin:center;animation:aiNucleo 4s ease-in-out infinite}
+.dt-link:hover .ai-globo{--T:2.4s;animation:aiBoing .8s cubic-bezier(.34,1.56,.64,1) both}
+.dt-link:hover .ai-nucleo{animation:aiNucleoGira 1.2s cubic-bezier(.34,1.56,.64,1) infinite}
+.dt-hub.aberto .ai-nucleo{opacity:0}
+.dt-hub.aberto .ai-globo{--T:3s}
+@keyframes aiMer{0%{transform:scaleX(1);animation-timing-function:cubic-bezier(.12,0,.39,0)}50%{transform:scaleX(.02);animation-timing-function:cubic-bezier(.61,1,.88,1)}100%{transform:scaleX(1)}}
+@keyframes aiNucleo{0%,100%{transform:scale(.8) rotate(0);opacity:.75}50%{transform:scale(1.1) rotate(45deg);opacity:1}}
+@keyframes aiNucleoGira{0%{transform:scale(1) rotate(0)}50%{transform:scale(1.35) rotate(90deg)}100%{transform:scale(1) rotate(180deg)}}
+
+/* No app, o orbe da IA é um botão (abre o painel) e o da prancheta é link. */
+button.dt-link { background: none; border: 0; padding: 0; color: inherit; font: inherit; cursor: pointer; }
+.dt-link:hover { color: inherit; }
+
+/* No app o rótulo da IA some quando o painel abre: os ícones em órbita ocupam esse espaço. */
+.dt-link.ai:hover .hub-nome, .dt-link.ai:focus-visible .hub-nome { transform: translateX(-18px); }
+.dt-link.ai.is-open .hub-nome { opacity: 0; transform: translateX(-18px); }

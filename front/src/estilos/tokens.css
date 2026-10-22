@@ -1,0 +1,44 @@
+/* Identidade Da Tropa 2.0, "Sinal Aberto + Strafe". Fonte única das cores, tipos e formas. */
+:root {
+  /* superfícies */
+  --fundo: #0F1923;
+  --superficie: #16212C;
+  --superficie-2: #1C2A36;
+  --superficie-ia: #1F1219;
+  --trilho: #263442;
+  --linha: rgba(236, 232, 225, 0.09);
+  --linha-forte: rgba(236, 232, 225, 0.16);
+
+  /* texto */
+  --giz: #ECE8E1;
+  --giz-2: #C5CBD3;
+  --apagado: #9AA6B2;
+  --apagado-2: #5D6B78;
+
+  /* sinais */
+  --vermelho: #FF4655;   /* Tropa AI, ativo, ação */
+  --ambar: #F9A23B;      /* time A / ataque */
+  --menta: #32E0C4;      /* time B / defesa / prancheta */
+  --alerta: #F5E36B;     /* prorrogação, aviso */
+
+  /* tipos */
+  --f-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
+  --f-texto: 'Inter Tight', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --f-giz: 'Caveat', cursive;
+
+  /* formas */
+  --r-pill: 999px;
+  --r-1: 18px;
+  --r-2: 22px;
+  --r-3: 28px;
+  --r-4: 40px;
+  --sombra: 0 18px 50px rgba(0, 0, 0, 0.38);
+  --largura: 1360px;
+  --gutter: 24px;
+  --mola: cubic-bezier(.34, 1.56, .64, 1);
+  --suave: cubic-bezier(.16, 1, .3, 1);
+}
+@media (max-width: 720px) {
+  :root { --gutter: 16px; }
+}
