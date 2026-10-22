@@ -75,7 +75,7 @@ As métricas seguem a gold do chico (`services/stats/sql/gold/oficial/`, PR #7):
 
 ## Prancheta: contrato do link
 
-Segue `docs/api.md`, seção 6, e é a rota que o front usa (`front/src/App.tsx`, rota `/prancheta`, branch `front/site-completo`).
+Segue `docs/api.md`, seção 6, e é a rota que o front usa (`front/src/App.tsx`, rota `/prancheta`).
 
 ```
 /prancheta?partida_id=<partida_id>&round=<n>
@@ -192,7 +192,7 @@ O serviço sobe privado. Para o Hosting conseguir chamar, o Guilherme libera o i
 
 ## Falta
 
-- **Teste ponta a ponta com token real do Firebase**, pelo front. Em 22/10 o `datropa.web.app` ainda servia a página provisória: o front está na branch `front/site-completo`, fora da `main`. Até lá a validação do JWT foi testada com chave própria nos testes e com o serviço no ar respondendo 401 sem token. Conferir: login no front, pergunta na tela do coach, resposta 200 com números, e 401 depois do logout.
+- **Teste ponta a ponta com token real do Firebase**, pelo front. Não feito em 22/10: o front entrou na `main` nesse dia (PR #15) e o teste exige login com conta real. Até lá a validação do JWT foi testada com chave própria nos testes e com o serviço no ar respondendo 401 sem token. Conferir: login no front, pergunta na tela do coach, resposta 200 com números, e 401 depois do logout.
 - **Perguntas da demo:** testadas em 22/10 contra o Vertex e a gold, 13 de 13 em duas rodadas seguidas. Lista e respostas em [PERGUNTAS_DEMO.md](PERGUNTAS_DEMO.md). As do gugu não foram achadas no repo; as 10 saíram das sugestões da tela do coach no front.
 - MVP e rounds decisivos seguem sem critério oficial: `resumo_partida` devolve `mvp: null` e destaques com critério explícito.
 

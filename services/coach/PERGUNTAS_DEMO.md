@@ -1,6 +1,6 @@
 # Perguntas da demo do coach
 
-Testadas em 22/10/2026 contra o Vertex AI (`gemini-2.5-flash`) e a gold `gold_336_v1`, com o código desta pasta. As 10 perguntas saíram das sugestões que a tela do coach mostra no front (`Coach.tsx`, `Panorama.tsx`, `Time.tsx`, `Jogador.tsx` e `Partida.tsx`, branch `front/site-completo`). As 10 perguntas do gugu citadas no plano não estavam no repo.
+Testadas em 22/10/2026 contra o Vertex AI (`gemini-2.5-flash`) e a gold `gold_336_v1`, com o código desta pasta. As 10 perguntas saíram das sugestões que a tela do coach mostra no front (`Coach.tsx`, `Panorama.tsx`, `Time.tsx`, `Jogador.tsx` e `Partida.tsx`, em `front/src`). As 10 perguntas do gugu citadas no plano não estavam no repo.
 
 Quando a tela tem contexto, o front manda a pergunta com o prefixo `[Contexto da tela: <tipo> <id> (<rótulo>)]`. As perguntas 3, 4 e 10 foram testadas assim.
 
@@ -37,4 +37,4 @@ Nicks de jogador ficam fora deste arquivo porque o repo é público. Na demo ele
 
 - Round decisivo e MVP não têm critério oficial. O coach diz o critério que usou (o round que fechou o mapa, o maior ACS).
 - Com temperatura 0,2, o texto muda entre rodadas. Os números e a tool escolhida ficaram iguais nas duas rodadas, salvo na pergunta 7, que às vezes usa `comparar_times` em vez de `pos_plant_retake`, com os mesmos números.
-- O teste com login real do Firebase em produção não foi feito: o front no ar ainda é a página provisória.
+- O teste em produção com login real do Firebase não foi feito, porque exige conta. Pela tela do front, no ar, ele fica com o Guilherme.
