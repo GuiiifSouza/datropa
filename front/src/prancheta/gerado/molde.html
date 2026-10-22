@@ -276,6 +276,7 @@
               <div style="height: 12px; border-radius: 6px; background: linear-gradient(90deg, #3B0F70, #8C2981, #DE4968, #FE9F6D, #FCFDBF);"></div>
               <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9AA6B2;"><span>pouco</span><span>onde mais acontece</span></div>
               <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9AA6B2;">Só aparecem as áreas com concentração relevante. Lugares com um ou outro evento ficam sem cor.</p>
+              <sc-if value="{{calorAviso}}" hint-placeholder-val="{{ false }}"><p style="margin: 0; font-size: 12px; line-height: 1.5; color: #F9A23B;">{{calorAvisoTxt}}</p></sc-if>
             </div>
           </sc-if>
           <sc-if value="{{calorPontos}}" hint-placeholder-val="{{ false }}">

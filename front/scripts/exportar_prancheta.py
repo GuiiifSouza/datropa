@@ -149,6 +149,11 @@ fim = molde.index('</header>', ini) + len('</header>')
 molde = molde[:ini] + molde[fim:]
 molde = trocar(molde, 'style="height: 100vh; min-height: 760px;', 'style="height: calc(100vh - var(--altura-topo-site, 64px)); min-height: 640px;')
 molde = trocar_blobs(molde)
+# o "carregando X de Y" do calor só existia no visual Pontos; no Mancha (o padrão) o mapa incompleto ficava sem aviso
+molde = trocar(molde, 'Lugares com um ou outro evento ficam sem cor.</p>',
+               'Lugares com um ou outro evento ficam sem cor.</p>\n'
+               '              <sc-if value="{{calorAviso}}" hint-placeholder-val="{{ false }}">'
+               '<p style="margin: 0; font-size: 12px; line-height: 1.5; color: #F9A23B;">{{calorAvisoTxt}}</p></sc-if>')
 for q in quadros:
     molde = re.sub(r'(animation(?:-name)?\s*:\s*)' + re.escape(q) + r'\b', r'\1dcp-' + q, molde)
 
@@ -213,6 +218,7 @@ js = trocar(js, '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>', """if (A
         });
       } else (AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>""")
 js = trocar(js, "pontosNota: AMB.calorVazio ?", "pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ?")
+js = trocar(js, "      pontosNota: AMB.calor &&", "      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),\n      pontosNota: AMB.calor &&")
 js = trocar(js, "    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(", "    if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());\n    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(")
 # entrada pelo link: ?j= (jogada compartilhada) ou ?partida_id=&round= (round real)
 js = trocar(js, '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n',

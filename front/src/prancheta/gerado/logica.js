@@ -1415,6 +1415,7 @@ class Component extends DCLogic {
       visManchaCls: 'seg' + (visual === 'mancha' ? ' on' : ''), visPontosCls: 'seg' + (visual === 'pontos' ? ' on' : ''),
       pickMancha: () => this.setState({ calorVisual: 'mancha' }), pickPontos: () => this.setState({ calorVisual: 'pontos' }),
       legPontoA: s.tipoCalor === 'plants' ? 'Plant' : (s.tipoCalor === 'mortes' ? 'Morreu atacando' : 'Matou atacando'), legPontoB: s.tipoCalor === 'plants' ? '—' : (s.tipoCalor === 'mortes' ? 'Morreu defendendo' : 'Matou defendendo'),
+      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),
       pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ? 'Os eventos do mapa de calor entram assim que a base estiver no ar.' : calorN > 2500 ? 'Mostrando uma amostra de 2.500 dos ' + calorN + ' eventos. Filtre por time para ver todos.' : 'Todos os ' + calorN + ' eventos do recorte.',
       ecosCalor: [['todas', 'Todas'], ['pistol', 'Pistol'], ['eco', 'Eco'], ['forca', 'Força'], ['full', 'Full']].map((o) => ({ nome: o[1], cls: 'seg' + ((s.calorEco || 'todas') === o[0] ? ' on' : ''), pick: () => this.setState({ calorEco: o[0] }) })),
       temArea: !!s.calorPt, semArea: !s.calorPt,
