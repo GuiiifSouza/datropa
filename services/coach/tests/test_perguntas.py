@@ -6,6 +6,7 @@ Confere que o agente chamou as tools certas, sem erro, e que todo número da
 resposta aparece no resultado das tools (a regra de não inventar).
 """
 
+import functools
 import json
 import os
 import re
@@ -16,19 +17,31 @@ pytestmark = pytest.mark.skipif(
     os.environ.get("COACH_TESTE_REAL") != "1", reason="defina COACH_TESTE_REAL=1 para rodar"
 )
 
+# Ids reais da gold gold_336_v1, usados no prefixo que a tela do front manda (Coach.tsx).
+# O jogador sai da gold na hora ({JOGADOR_ID}, {JOGADOR}): o repo é público e não guarda nick de jogador.
+WOLF_GAMING = "time_f613d8d5755a4046b6a7c6dcb116a5e51ebc4c53fa42c9fb2bdfb73b22f46cfb"
+SPLIT_MACKLOGIC_WOLF = "a8065391-13ad-43b6-b56d-c7f637544b49"
+
+# As 10 primeiras são as perguntas da demo (sugestões da tela do coach, PERGUNTAS_DEMO.md).
 PERGUNTAS = [
-    # "Como joga" serve com o resumo (stats_time) ou com o estilo (scouting_time, que traz o resumo também).
-    ("Como joga o time Turuna?", [{"buscar_entidade", "stats_time"}, {"buscar_entidade", "scouting_time"}]),
-    ("Quem é o melhor jogador da Azure Bears Golden?", {"buscar_entidade", "stats_time"}),
-    ("Em qual mapa a CEUB Octopus Vulgaris vai melhor e em qual sofre mais?", {"buscar_entidade", "stats_time"}),
-    ("Qual o melhor jogador da UFMT Turuna? Me mostra os números dele de Jett.", {"buscar_entidade", "stats_jogador"}),
-    ("Compara a UFMT Turuna com a Unicamp Tritons Black.", {"buscar_entidade", "comparar_times"}),
-    ("Como a UFMT Turuna se sai nos rounds de eco e de force?", {"buscar_entidade", "economia_time"}),
-    ("A Unicamp Tritons Black converte bem depois de plantar? E no retake?", {"buscar_entidade", "pos_plant_retake"}),
+    ("Quem foi o melhor jogador da fase de grupos do Univavá?", {"ranking_jogadores"}),
+    ("Qual time converte melhor depois de plantar a spike?", {"ranking_times"}),
+    ("[Contexto da tela: jogador {JOGADOR_ID} ({JOGADOR})] Em qual agente o {JOGADOR} rende mais?",
+     {"stats_jogador"}),
+    (f"[Contexto da tela: time {WOLF_GAMING} (Wolf Gaming)] Faz um scouting do Wolf Gaming: mapas, lado forte, "
+     "composição e jogadores-chave.", {"scouting_time"}),
+    ("Macklogic Red ou Azure Bears Golden: quem está melhor?", {"buscar_entidade", "comparar_times"}),
+    ("Como o Wolf Gaming se sai nos rounds de force?", {"buscar_entidade", "economia_time"}),
+    ("Quem segura melhor depois de plantar a spike: Minerva Thunders ou UFMT Turuna?",
+     [{"buscar_entidade", "pos_plant_retake"}, {"buscar_entidade", "comparar_times"}]),
     ("Qual composição mais ganha em Lotus?", {"composicoes"}),
-    ("Quero estudar a Unicamp Tritons Black para o próximo jogo. Como eles jogam?",
-     {"buscar_entidade", "scouting_time"}),
-    ("Resume o último jogo da UFMT Turuna contra a Unicamp Tritons Black.", {"buscar_entidade", "resumo_partida"}),
+    ("Me conta como foi o Split entre Macklogic Red e Wolf Gaming.", {"buscar_entidade", "resumo_partida"}),
+    (f"[Contexto da tela: partida {SPLIT_MACKLOGIC_WOLF} (Split · Wolf Gaming x Macklogic Red)] Qual foi o round "
+     "que decidiu esse mapa? Abre ele na prancheta.", {"abrir_na_prancheta"}),
+    # Cobertura das tools que a demo não usa.
+    ("Em qual mapa a CEUB Octopus Vulgaris vai melhor e em qual sofre mais?", {"buscar_entidade", "stats_time"}),
+    ("Qual o melhor jogador da UFMT Turuna? Me mostra os números dele de Jett.",
+     [{"buscar_entidade", "stats_jogador", "stats_time"}, {"buscar_entidade", "stats_jogador", "ranking_jogadores"}]),
     ("Abre na prancheta o round 3 do jogo da UFMT Turuna contra a Unicamp Tritons Black.",
      {"buscar_entidade", "resumo_partida", "abrir_na_prancheta"}),
 ]
@@ -71,9 +84,22 @@ def numeros_sem_fonte(texto: str, resultados: list[dict]) -> list[str]:
     return sem_fonte
 
 
+@functools.lru_cache(maxsize=1)
+def _jogador() -> dict:
+    """1º por ACS na fase de grupos do Univavá (o mesmo da pergunta 1)."""
+    from coach.tools import REGISTRO
+
+    r = REGISTRO["ranking_jogadores"].executar({"ordenar_por": "acs", "torneio": "UNIVAVA_G", "limite": 1})
+    return r["ranking"][0]
+
+
 @pytest.mark.parametrize("pergunta,tools_esperadas", PERGUNTAS)
 def test_pergunta(pergunta, tools_esperadas):
     from coach.agente import perguntar
+
+    if "{JOGADOR" in pergunta:
+        j = _jogador()
+        pergunta = pergunta.replace("{JOGADOR_ID}", j["jogador_id"]).replace("{JOGADOR}", j["jogador"])
 
     resp = perguntar(pergunta)
     print(f"\n### {pergunta}")
