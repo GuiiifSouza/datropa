@@ -22,7 +22,7 @@ assert.equal(agentes.length, 29);
 const slug = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
 let nome = '';
 const { Agente } = compilar(ler('../../src/componentes/Visuais.tsx').replace("import.meta.env.VITE_ARTE_RIOT", "'1'"), {
-  '../api/cliente': {}, '../rotas': {},
+  '../api/cliente': {}, '../rotas': {}, '../util/logosTimes': {},
   '../util/formato': { slugAgente: slug }, '../util/arteAgentes': arte,
   './Catalogo': { useCatalogo: () => ({ agente: () => nome, classe: () => 'Controlador' }) },
 });

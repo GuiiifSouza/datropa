@@ -172,3 +172,6 @@ h1, h2, h3, h4, p { margin: 0; }
 /* ---------- rodapé ---------- */
 .rodape { border-top: 1px solid var(--linha); }
 .rodape__dentro { max-width: var(--largura); margin: 0 auto; padding: 28px var(--gutter) 40px; display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; align-items: center; font-size: 13px; color: var(--apagado); }
+
+/* A logo ocupa o selo existente sem mudar seu tamanho, forma ou posição. */
+.selo-time img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }
