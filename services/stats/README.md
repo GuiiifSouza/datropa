@@ -12,10 +12,10 @@ Escopo da pasta: [AGENTS.md](AGENTS.md).
 
 As rotas abaixo estão implementadas. Foram realizadas verificações
 HTTP manuais no Cloud Shell e a suíte automatizada existente passou
-com 12 testes.
+com 20 testes.
 
 O container atualizado iniciou e `/api/stats/status` respondeu 200.
-Isso não confirma acesso ao BigQuery dentro do container.
+O ranking consultou o BigQuery dentro do container usando token temporário: HTTP 200, um jogador e total de 411. A autenticação com sa-stats no Cloud Run permanece pendente.
 
 A revisão final de aderência ao contrato, a integração com o frontend
 e o deploy ainda estão pendentes.
@@ -166,7 +166,7 @@ PYTHONPATH=services/stats services/stats/.venv/bin/python \
   -m unittest discover -s services/stats/tests -v
 ```
 
-Último resultado informado: 12 testes aprovados.
+Último resultado informado: 20 testes aprovados.
 
 Os testes usam BigQuery simulado e não precisam de credenciais.
 Cobrem comportamentos de ranking, jogador, listagem de times,
@@ -211,7 +211,7 @@ fornece credenciais para consultar o BigQuery.
 - Ampliar testes funcionais das novas rotas.
 - Testar expiração e invalidação do cache.
 - Validar exclusões espaciais e o desenho com o frontend.
-- Validar acesso real ao BigQuery dentro do container/Cloud Run.
+- Validar autenticação automática e permissões de sa-stats no Cloud Run.
 - Tratar jobs que continuem após timeout.
 - Concluir tratamento uniforme de 404 e 500.
 - Definir limite de requisições e resposta 429.
@@ -225,3 +225,19 @@ após troca de filtros e mostrar falhas por componente. Erros não
 devem ser apresentados como estatísticas zeradas.
 
 Infraestrutura, permissões e deploy ficam com Guilherme.
+
+## Evidência atualizada — testes e container
+
+Em 22/10/2026, a suíte retornou 20 testes aprovados, usando BigQuery
+simulado. Os oito testes adicionais verificam validações, detalhes
+inexistentes, páginas vazias, cache, nulos, snapshots, contadores
+do calor, falhas e lotação nas novas rotas.
+
+Em teste separado, o ranking consultou o BigQuery dentro do container
+com token temporário fornecido ao cliente somente durante o teste.
+Resultado: HTTP 200, um jogador retornado e total de 411.
+Não foi necessário alterar o código da aplicação ou a imagem.
+
+Continuam pendentes a autenticação automática com sa-stats no
+Cloud Run, o deploy e a integração com o frontend.
+Os testes simulados não validam os cálculos SQL na Gold.

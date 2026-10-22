@@ -768,7 +768,8 @@ Aplicar as decisões da Gold registradas em
 - Consultas que continuem após timeout exigem tratamento adicional.
 - Container com um worker e porta definida pela variável PORT.
 - Build Docker e inicialização local testados.
-- BigQuery dentro do container e deploy ainda não validados.
+- Ranking no BigQuery validado dentro do container com token temporário: HTTP 200, um jogador e total de 411.
+- Autenticação com sa-stats no Cloud Run e deploy pendentes.
 - Infraestrutura, permissões e deploy alinhados com Guilherme.
 
 O frontend deve evitar requisições repetidas a cada renderização,
@@ -815,7 +816,7 @@ Estimativas e totais dependem da carga; nova carga exige validação.
 - Tratar consultas após timeout.
 - Definir limite de requisições para publicação pública.
 - Registrar o instante confiável da carga.
-- Validar BigQuery no container/Cloud Run.
+- Validar autenticação automática e permissões de sa-stats no Cloud Run.
 - Publicar e testar integração com frontend e coach.
 - Alinhar documentos antigos que ainda exigem JWT nas estatísticas.
 
@@ -881,12 +882,13 @@ Mapa inexistente retorna 404.
 O frontend deve percorrer as páginas para obter o recorte completo.
 ## Verificação da entrega — 22/10/2026
 
-- Suíte automatizada existente: 12 testes aprovados.
+- Suíte automatizada existente: 20 testes aprovados.
 - O teste de inventário de rotas não substitui testes funcionais
   específicos de cada endpoint.
 - Novas rotas verificadas principalmente por chamadas HTTP manuais.
 - Container atualizado iniciou e GET /api/stats/status respondeu 200.
-- Acesso real ao BigQuery dentro do container ainda não validado.
+- Ranking no BigQuery validado dentro do container com token temporário: HTTP 200, um jogador e total de 411.
+- Autenticação com sa-stats no Cloud Run pendente.
 - Integração com frontend, deploy e teste da página completa pendentes.
 - Revisão final dos campos e filtros em relação ao contrato pendente.
 - Nomes e classes dos agentes vêm do catálogo estático local.
@@ -895,3 +897,20 @@ O frontend deve percorrer as páginas para obter o recorte completo.
   com nome null.
 - GET /catalogos fornece as transformações reais dos mapas.
 - minimapa_url permanece null; imagens são responsabilidade do frontend.
+
+
+## Evidência atualizada — testes e container
+
+Em 22/10/2026, a suíte retornou 20 testes aprovados, usando BigQuery
+simulado. Os oito testes adicionais verificam validações, detalhes
+inexistentes, páginas vazias, cache, nulos, snapshots, contadores
+do calor, falhas e lotação nas novas rotas.
+
+Em teste separado, o ranking consultou o BigQuery dentro do container
+com token temporário fornecido ao cliente somente durante o teste.
+Resultado: HTTP 200, um jogador retornado e total de 411.
+Não foi necessário alterar o código da aplicação ou a imagem.
+
+Continuam pendentes a autenticação automática com sa-stats no
+Cloud Run, o deploy e a integração com o frontend.
+Os testes simulados não validam os cálculos SQL na Gold.
