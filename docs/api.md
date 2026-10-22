@@ -854,3 +854,27 @@ A cópia utilizada pelo runtime fica em queries/jogador_detalhe.sql.
 Mudanças na origem precisam ser sincronizadas e testadas na cópia.
 
 Demais rotas ainda não implementadas permanecem planejadas.
+
+## Complemento — resposta do mapa de calor
+
+GET /api/stats/mapas/{mapa_id}/calor implementado para
+tipo=abate e tipo=plant, com filtros e paginação.
+
+Os itens de data mantêm x/y nas coordenadas originais do jogo.
+A projeção usa a transformação da Gold; pontos não projetáveis
+são excluídos da camada espacial, sem alterar estatísticas de kills.
+
+Campos adicionais de meta:
+- eventos_elegiveis: total após filtros e regras de combate,
+  antes da validação espacial.
+- pontos_excluidos: elegíveis sem posição finita e projetável
+  dentro de [0,1] nos dois eixos.
+- transformacao_disponivel: existência da transformação na Gold.
+
+pagination.total conta somente os pontos projetáveis.
+Antes da paginação:
+eventos_elegiveis = pagination.total + pontos_excluidos.
+
+Sem transformação, nenhum ponto é considerado projetável.
+Mapa inexistente retorna 404.
+O frontend deve percorrer as páginas para obter o recorte completo.
