@@ -4,7 +4,7 @@
  *
  * Partida: { id, a, b, pa, pb, torneio, data, jog: [[nick, agente, 'A'|'B']], rounds }
  * Round:   { n, venc, atk, res, cer, eA, eB, ev }  (ev = null até os eventos chegarem)
- * Evento:  [tipo k|p|d, tempo_ms, ator, vítima, x, y, [[jogador, x, y, mira]], site]
+ * Evento:  [tipo k|p|d, tempo_ms, ator, vítima, x, y, [[jogador, x, y, mira]], site, evento_id]
  *
  * As posições vêm em coordenada do jogo. A conversão para o desenho do mapa usa a transformação
  * oficial do minimapa (u, v) e a calibração do SVG da prancheta (conferida pelos plants nos sites).
@@ -12,7 +12,7 @@
 import { dados } from '../api/stats';
 import type { EventoRound, PartidaDetalhe, PartidaItem } from '../api/tipos';
 
-type Ev = [string, number, number, number, number, number, [number, number, number, null][], string?];
+type Ev = [string, number, number, number, number, number, [number, number, number, null][], string?, string?];
 type Round = { n: number; venc: 'A' | 'B'; atk: 'A' | 'B'; res: string; cer: string; eA: number | null; eB: number | null; ev: Ev[] | null };
 type Partida = { id: string; ta: string; tb: string; a: string; b: string; pa: number; pb: number; torneio: string; data: string; jog: [string, string, 'A' | 'B'][]; rounds: Round[] };
 export type DadosMapa = { mapa: string; partidas: Partida[] };
@@ -131,7 +131,7 @@ export function criarReais(op: Opcoes) {
         if (s) { s[1] = pos[0]; s[2] = pos[1]; } else snaps.push([vitima, pos[0], pos[1], null]);
       }
       return [tipo[e.tipo], e.tempo_ms ?? 0, idx(e.ator_id), vitima,
-        pos ? pos[0] : NaN, pos ? pos[1] : NaN, snaps, e.site ?? undefined] as Ev;
+        pos ? pos[0] : NaN, pos ? pos[1] : NaN, snaps, e.site ?? undefined, e.id] as Ev;
     });
   }
 
