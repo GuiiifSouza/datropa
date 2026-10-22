@@ -156,6 +156,17 @@ Resposta (envelope de `docs/api.md`):
 - O serviço não guarda estado. O front manda o `historico` em texto (até 20 turnos). Os resultados de tool não voltam no histórico, então o agente consulta de novo quando precisa de número.
 - `tools` traz o que o agente consultou, para o front mostrar a fonte dos números.
 - Limite de 20 perguntas por usuário a cada 10 minutos, por instância: 429 `RATE_LIMITED` com `Retry-After`.
+- **Cota diária** (`coach/cota.py`), para segurar o orçamento do projeto agora que o front usa login anônimo (qualquer pessoa ganha token): **20 perguntas por usuário** (`sub` do token) e **500 no serviço inteiro**, por dia de São Paulo (UTC-3). A pergunta é contada antes de chamar o Gemini; pergunta recusada não conta. Passou de um dos dois: 429 com `Retry-After` até a meia-noite e
+
+  ```json
+  {"error": {"code": "RESOURCE_EXHAUSTED",
+             "message": "Você chegou ao limite de 20 perguntas por dia na Tropa AI. Volte amanhã.",
+             "details": {"escopo": "usuario"}}}
+  ```
+
+  `escopo` é `usuario` ou `global`; o front mostra a `message`.
+- **Onde a cota é contada:** em memória, por instância (padrão). A `sa-coach` não tem acesso ao Firestore (só `aiplatform.user`, `bigquery.jobUser` e leitura do dataset, conferido em 22/10). Com `--max-instances 2`, o pior caso é o dobro: 40 por usuário e 1000 no total por dia. O contador zera quando a instância reinicia (deploy ou escala a zero depois de ficar parada). O limite por usuário é fácil de contornar com outra conta anônima; quem segura o custo é o global.
+- **Firestore (desligado):** com `roles/datastore.user` na `sa-coach` e `COACH_LIMITE_FIRESTORE=1` no serviço, os contadores vão para `limites/{AAAA-MM-DD}` (global) e `limites/{AAAA-MM-DD}_{uid}`, campo `n`, numa transação, e valem para todas as instâncias. O cliente não enxerga a coleção (cai no `allow read, write: if false` de `infra/firestore.rules`; o Admin SDK ignora as regras). Se o Firestore falhar, o erro vai para o log e a pergunta segue contada em memória.
 - Corpo com campo desconhecido, pergunta vazia ou com mais de 1000 caracteres: 400 `INVALID_ARGUMENT`. Falha do Gemini ou do BigQuery: 503 `DATA_UNAVAILABLE`.
 
 Variáveis da rota, além das de cima:
@@ -164,7 +175,10 @@ Variáveis da rota, além das de cima:
 |---|---|---|
 | `COACH_FIREBASE_PROJETO` | igual a `COACH_PROJETO` | `aud` e `iss` esperados no token |
 | `COACH_CORS_ORIGENS` | vazio | Origens liberadas, separadas por vírgula (ex.: `http://localhost:5173`). Pelo Hosting não precisa |
-| `COACH_LIMITE_PERGUNTAS`, `COACH_JANELA_LIMITE_S` | `20`, `600` | Limite por usuário |
+| `COACH_LIMITE_PERGUNTAS`, `COACH_JANELA_LIMITE_S` | `20`, `600` | Limite por usuário em rajada |
+| `COACH_LIMITE_DIARIO_USUARIO` | `20` | Perguntas por usuário por dia |
+| `COACH_LIMITE_DIARIO_GLOBAL` | `500` | Perguntas por dia no serviço inteiro |
+| `COACH_LIMITE_FIRESTORE` | — | `1` guarda a cota no Firestore (exige `roles/datastore.user` na `sa-coach`) |
 | `COACH_AUTH_DESLIGADA` | — | `1` desliga o JWT para testar local. Ignorada no Cloud Run (`K_SERVICE` definido) |
 
 Rodar local:

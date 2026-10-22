@@ -25,14 +25,16 @@ export class ErroApi extends Error {
   }
 }
 
-let tokenProvider: (() => Promise<string | null>) | null = null;
+type ProvedorToken = (garantir?: boolean) => Promise<string | null>;
+let tokenProvider: ProvedorToken | null = null;
 /** O módulo de auth registra aqui como pegar o ID token do Firebase. */
-export function registrarToken(fn: () => Promise<string | null>) {
+export function registrarToken(fn: ProvedorToken) {
   tokenProvider = fn;
 }
-export async function tokenAtual(): Promise<string | null> {
+/** `garantir`: sem usuário, entra como anônimo antes (a Tropa AI precisa do token; as stats não). */
+export async function tokenAtual(garantir = false): Promise<string | null> {
   try {
-    return tokenProvider ? await tokenProvider() : null;
+    return tokenProvider ? await tokenProvider(garantir) : null;
   } catch {
     return null;
   }

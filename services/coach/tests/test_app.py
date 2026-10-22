@@ -57,6 +57,7 @@ def cliente(monkeypatch):
     monkeypatch.setattr(agente, "Conversa", _AgenteFalso)
     monkeypatch.setattr(config, "AUTH_DESLIGADA", False)
     monkeypatch.setattr(app_mod, "limite", app_mod._Limite())
+    monkeypatch.setattr(app_mod, "cota_diaria", app_mod.cota.Cota(usar_firestore=False))
     return TestClient(app_mod.app)
 
 
@@ -117,6 +118,33 @@ def test_limite_por_usuario(cliente, monkeypatch):
     assert r.status_code == 429
     assert int(r.headers["Retry-After"]) > 0
     assert _post(cliente, token(sub="outro-uid")).status_code == 200
+
+
+@pytest.mark.parametrize("escopo,ajuste", [
+    ("usuario", {"LIMITE_DIARIO_USUARIO": 2, "LIMITE_DIARIO_GLOBAL": 100}),
+    ("global", {"LIMITE_DIARIO_USUARIO": 100, "LIMITE_DIARIO_GLOBAL": 2}),
+])
+def test_cota_diaria_vira_429(cliente, monkeypatch, escopo, ajuste):
+    for nome, valor in ajuste.items():
+        monkeypatch.setattr(config, nome, valor)
+    chamadas = []
+
+    class Contador(_AgenteFalso):
+        def perguntar(self, pergunta):
+            chamadas.append(pergunta)
+            return super().perguntar(pergunta)
+    monkeypatch.setattr(agente, "Conversa", Contador)
+
+    assert _post(cliente, token()).status_code == 200
+    assert _post(cliente, token()).status_code == 200
+    r = _post(cliente, token())
+    assert r.status_code == 429
+    erro = r.json()["error"]
+    assert erro["code"] == "RESOURCE_EXHAUSTED"
+    assert erro["details"] == {"escopo": escopo}
+    assert "Volte amanhã" in erro["message"]
+    assert 0 < int(r.headers["Retry-After"]) <= 86400
+    assert len(chamadas) == 2  # a pergunta recusada não chega no Gemini
 
 
 def test_falha_do_agente_vira_503(cliente, monkeypatch):

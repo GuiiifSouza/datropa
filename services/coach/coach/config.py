@@ -36,6 +36,12 @@ MAX_TURNOS_HISTORICO = 10
 # Perguntas por usuário por janela, por instância. Protege a cota do Gemini e do BigQuery.
 LIMITE_PERGUNTAS = int(os.environ.get("COACH_LIMITE_PERGUNTAS", "20"))
 JANELA_LIMITE_S = int(os.environ.get("COACH_JANELA_LIMITE_S", "600"))
+# Cota diária (dia de São Paulo), antes de chamar o Gemini. Segura o orçamento do projeto.
+LIMITE_DIARIO_USUARIO = int(os.environ.get("COACH_LIMITE_DIARIO_USUARIO", "20"))
+LIMITE_DIARIO_GLOBAL = int(os.environ.get("COACH_LIMITE_DIARIO_GLOBAL", "500"))
+# 1 guarda os contadores no Firestore (vale para todas as instâncias). Exige
+# roles/datastore.user na sa-coach. Desligado: contador em memória, por instância.
+LIMITE_FIRESTORE = os.environ.get("COACH_LIMITE_FIRESTORE") == "1"
 
 _IDENT =re.compile(r"^[A-Za-z0-9_\-]+$")
 
