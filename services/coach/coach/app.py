@@ -9,6 +9,8 @@ Envelope e erros seguem docs/api.md.
 
 from __future__ import annotations
 
+import json
+import os
 import logging
 import threading
 import time
@@ -23,6 +25,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import auth, config, cota
+from .medicao import sessao
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 log = logging.getLogger("coach.app")
@@ -31,6 +34,23 @@ app = FastAPI(title="coach", docs_url=None, redoc_url=None, openapi_url=None)
 if config.CORS_ORIGENS:
     app.add_middleware(CORSMiddleware, allow_origins=config.CORS_ORIGENS,
                        allow_methods=["POST"], allow_headers=["Authorization", "Content-Type"])
+
+
+@app.middleware("http")
+async def medir_requisicao(request: Request, call_next):
+    # Opt-in local; nao altera o envelope HTTP nem registra token/pergunta/resultado.
+    if os.environ.get("COACH_MEDIR_TEMPOS") != "1" or request.url.path != "/api/coach/perguntar":
+        return await call_next(request)
+    status = 500
+    with sessao("http") as m:
+        try:
+            resposta = await call_next(request)
+            status = resposta.status_code
+            return resposta
+        finally:
+            # A sessao fecha no __exit__, depois deste finally.
+            m.total_ms = round((time.perf_counter() - m.inicio) * 1000, 3)
+            log.info("coach_tempos %s", json.dumps({**m.relatorio(), "http_status": status}))
 
 
 class ErroApi(Exception):
