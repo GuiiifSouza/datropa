@@ -2,9 +2,10 @@
 
 Responsável: Gugu.
 
-Estado: ranking e status implementados e testados no Cloud Shell.
-As demais rotas são especificações para implementação, não funcionalidades
-já disponíveis.
+Estado: as rotas descritas neste contrato foram implementadas no backend.
+As funcionalidades foram verificadas por chamadas manuais no Cloud Shell;
+a cobertura automatizada varia por rota. A revisão final de aderência ao
+contrato, integração com o frontend e deploy ainda estão pendentes.
 
 Chico prepara e valida consultas SQL; RhuanK e Lhobregat validam o
 consumo pelo frontend; Guilherme valida as tools e a política do coach.
@@ -95,7 +96,7 @@ da requisição. Permanece null enquanto esse instante não estiver disponível.
 O tratamento uniforme de 404 e 500 e o limite de requisições com
 resposta 429 ainda estão pendentes.
 
-A falta de vaga de execução do ranking retorna 503.
+A falta de vaga de execução de consultas retorna 503.
 
 Não devolver SQL, credenciais ou detalhes internos de infraestrutura.
 Falha de consulta não deve virar lista vazia nem estatística zerada.
@@ -177,7 +178,7 @@ o SQL oficial da Gold.
 
 Uma página além do fim retorna `data: []`, preservando o total do recorte.
 
-## 3. Catálogos e busca — implementação pendente
+## 3. Catálogos e busca
 
 ### GET /catalogos
 
@@ -253,7 +254,7 @@ Item:
 {"tipo": "time", "id": "time-demo", "nome": "Time Exemplo"}
 ```
 
-## 4. Demais estatísticas — implementação pendente
+## 4. Demais estatísticas
 
 ### GET /jogadores/{jogador_id}
 
@@ -464,7 +465,7 @@ Desconhecido permanece null.
 Sem critério definido, MVP permanece null e rounds decisivos,
 lista vazia.
 
-## 5. Análise coletiva — implementação pendente
+## 5. Análise coletiva
 
 Rotas de time aceitam filtros gerais e retornam objeto em `data`.
 
@@ -569,7 +570,7 @@ Aceita filtros gerais.
 
 Confrontos diretos são calculados separadamente, dentro do mesmo recorte.
 
-## 6. Prancheta e calor — implementação pendente
+## 6. Prancheta e calor
 
 ### GET /partidas/{partida_id}/rounds/{round}/eventos
 
@@ -748,7 +749,7 @@ Aplicar as decisões da Gold registradas em
 
 - Python 3.12 com FastAPI.
 - Consultas com maximum_bytes_billed de 1 GiB por consulta.
-- Cache atual aplicado ao ranking, em memória.
+- Cache em memória aplicado às rotas de dados implementadas.
 - TTL: 300 segundos.
 - Capacidade: 128 respostas por processo.
 - Chave inclui rota, filtros, ordenação, paginação, versão da resposta
@@ -757,7 +758,7 @@ Aplicar as decisões da Gold registradas em
 - Cache vencido não é servido; reiniciar apaga o cache.
 - Erros não são armazenados.
 - Chamadas iguais são coordenadas dentro do mesmo processo.
-- Até quatro execuções de ranking simultâneas por processo.
+- Até quatro blocos de consulta simultâneos por processo, compartilhados entre as rotas.
 - Sem vaga: HTTP 503.
 - Cache e coordenação não são compartilhados entre instâncias.
 - Travas têm quantidade fixa; consultas diferentes podem
@@ -827,7 +828,7 @@ Estimativas e totais dependem da carga; nova carga exige validação.
 | Guilherme | Infraestrutura, deploy e política do coach |
 
 Este documento distingue implementação de planejamento.
-Uma rota listada como pendente ainda não está disponível.
+Consulte o estado atual e os limites de validação deste documento.
 ## Atualização de implementação — detalhe de jogador
 
 GET /api/stats/jogadores/{jogador_id} está implementado.
@@ -853,7 +854,7 @@ A consulta original permanece em sql/gold/consultas_api/.
 A cópia utilizada pelo runtime fica em queries/jogador_detalhe.sql.
 Mudanças na origem precisam ser sincronizadas e testadas na cópia.
 
-Demais rotas ainda não implementadas permanecem planejadas.
+O estado atual no início deste documento substitui as indicações anteriores de implementação pendente.
 
 ## Complemento — resposta do mapa de calor
 
@@ -878,3 +879,19 @@ eventos_elegiveis = pagination.total + pontos_excluidos.
 Sem transformação, nenhum ponto é considerado projetável.
 Mapa inexistente retorna 404.
 O frontend deve percorrer as páginas para obter o recorte completo.
+## Verificação da entrega — 22/10/2026
+
+- Suíte automatizada existente: 12 testes aprovados.
+- O teste de inventário de rotas não substitui testes funcionais
+  específicos de cada endpoint.
+- Novas rotas verificadas principalmente por chamadas HTTP manuais.
+- Container atualizado iniciou e GET /api/stats/status respondeu 200.
+- Acesso real ao BigQuery dentro do container ainda não validado.
+- Integração com frontend, deploy e teste da página completa pendentes.
+- Revisão final dos campos e filtros em relação ao contrato pendente.
+- Nomes e classes dos agentes vêm do catálogo estático local.
+- Catálogos de armas e armaduras são estáticos; não indicam uso na base.
+- IDs de armas desconhecidos presentes na Gold são preservados
+  com nome null.
+- GET /catalogos fornece as transformações reais dos mapas.
+- minimapa_url permanece null; imagens são responsabilidade do frontend.

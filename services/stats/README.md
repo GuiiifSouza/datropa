@@ -1,73 +1,126 @@
 # API de estatísticas — DA TROPA
 
-## Organização do código
+Responsáveis: Gugu pela API e Chico pelas tabelas em `sql/gold/`.
 
-- `app/main.py`: cria a aplicação e registra os erros e as rotas.
-- `app/routes/status.py`: status do serviço.
-- `app/routes/ranking.py`: ranking, filtros e paginação.
-- `app/routes/jogadores.py`: detalhe de jogador.
-- `app/routes/times.py`: listagem de times.
-- `app/validacoes.py`: validação de parâmetros, identificadores e datas.
-- `app/erros.py`: exceção da API e respostas de erro.
-- `app/database.py`: leitura dos arquivos SQL, cliente BigQuery e limite de
-  quatro chamadas simultâneas por processo. A vaga é liberada ao encerrar
-  o bloco de consulta, inclusive em caso de falha ou jogador inexistente.
-- `app/serializacao.py`: conversão dos resultados aninhados para JSON.
-- `app/cache.py`: cache em memória e coordenação de chamadas iguais.
-- `queries/`: SQL usado pelas rotas.
+Backend em Python 3.12 com FastAPI, preparado para Cloud Run com
+a service account `sa-stats`.
 
-O comando de inicialização continua usando `app.main:app`. A separação não
-altera URLs, parâmetros, envelopes de resposta ou os arquivos SQL. Cache e
-controle de concorrência continuam locais a cada processo.
-
-### Testes da API sem consultar o BigQuery
-
-Na raiz do repositório, com as dependências de `requirements.txt` instaladas:
-
-```bash
-PYTHONPATH=services/stats services/stats/.venv/bin/python -m unittest discover -s services/stats/tests -v
-```
-
-Os testes substituem o cliente BigQuery por resultados controlados e não
-precisam de credenciais. Cobrem HTTP, filtros, paginação, serialização,
-cache, chamadas iguais simultâneas e liberação das vagas após sucesso,
-404 e falhas. Não verificam a Gold publicada nem o ambiente Cloud Run.
-
-Responsáveis: Gugu pela API e Chico por `sql/gold/`.
-
-Backend em Python 3.12 com FastAPI, preparado para execução em
-container no Cloud Run com a conta de serviço `sa-stats`.
+Contrato de referência: [docs/api.md](../../docs/api.md).
+Escopo da pasta: [AGENTS.md](AGENTS.md).
 
 ## Estado atual
 
-Implementado e testado no Cloud Shell:
+As rotas abaixo estão implementadas. Foram realizadas verificações
+HTTP manuais no Cloud Shell e a suíte automatizada existente passou
+com 12 testes.
 
-- Ranking com dados reais da Gold no BigQuery.
-- Paginação, filtros combinados e ordenação.
-- Validação de parâmetros e respostas de erro.
-- Cache em memória por 5 minutos, com até 128 respostas.
-- Coordenação de chamadas iguais dentro do mesmo processo.
-- Até quatro execuções de ranking simultâneas por processo.
-- Build Docker e inicialização do container.
+O container atualizado iniciou e `/api/stats/status` respondeu 200.
+Isso não confirma acesso ao BigQuery dentro do container.
 
-O deploy e o acesso ao BigQuery dentro do container ainda não
-foram validados. As demais rotas do contrato continuam pendentes.
+A revisão final de aderência ao contrato, a integração com o frontend
+e o deploy ainda estão pendentes.
 
-## Acesso público
+## Rotas
 
-Por decisão do escopo atual, as rotas de estatísticas não exigem
-login nem token Firebase. Isso não altera a política do coach,
-a hospedagem do frontend ou as regras da prancheta.
+Todas usam o prefixo `/api/stats`.
 
-As credenciais do Google Cloud ficam no backend. Não incluir
-credenciais, tokens ou arquivos `.env` no Git ou na imagem Docker.
+| Método | Caminho | Finalidade |
+|---|---|---|
+| GET | `/status` | Verificar se o servidor responde |
+| GET | `/ranking` | Ranking de jogadores |
+| GET | `/jogadores/{jogador_id}` | Detalhe de jogador |
+| GET | `/times` | Lista de times |
+| GET | `/times/{time_id}` | Detalhe de time |
+| GET | `/times/{time_id}/economia` | Economia por categoria |
+| GET | `/times/{time_id}/pos-plant-retake` | Resultados após plant |
+| GET | `/partidas` | Lista de partidas |
+| GET | `/partidas/{partida_id}` | Placar, jogadores e rounds |
+| GET | `/partidas/{partida_id}/rounds/{round}/eventos` | Eventos para a prancheta |
+| GET | `/composicoes` | Composições por mapa |
+| GET | `/comparacoes/times` | Comparação e confrontos diretos |
+| GET | `/mapas` | Estatísticas por mapa |
+| GET | `/mapas/{mapa_id}/calor` | Pontos de abates ou plants |
+| GET | `/agentes` | Nome, classe e estatísticas dos agentes |
+| GET | `/catalogos` | Torneios, mapas, agentes, armas e armaduras |
+| GET | `/busca` | Busca de times, jogadores e mapas |
 
-A exigência de JWT nos documentos anteriores precisa ser
-atualizada para refletir essa decisão.
+Parâmetros e formatos estão no contrato. A revisão final deve conferir
+o comportamento implementado em cada rota, inclusive filtros.
+
+`/status` não consulta nem verifica o BigQuery.
+
+## Organização
+
+- `app/main.py`: aplicação, registro dos erros e routers.
+- `app/routes/`: endpoints organizados por assunto.
+- `app/catalogos/`: traduções estáticas e registro das fontes.
+- `app/validacoes.py`: parâmetros, identificadores e datas.
+- `app/erros.py`: erros tratados da API.
+- `app/database.py`: cliente BigQuery, leitura de SQL e concorrência.
+- `app/serializacao.py`: conversão de resultados aninhados.
+- `app/cache.py`: cache em memória e coordenação de chamadas.
+- `queries/`: consultas de leitura usadas pelos endpoints.
+- `sql/gold/`: definições e validações da Gold, mantidas por Chico.
+- `tests/`: testes automatizados.
+
+## Acesso e dados
+
+As estatísticas são públicas e não exigem login ou token Firebase.
+Essa decisão não altera a política do coach ou as regras da prancheta.
+
+Credenciais Google Cloud ficam exclusivamente no backend.
+Credenciais, tokens e arquivos `.env` não entram no Git nem na imagem.
+
+As consultas dos endpoints leem somente a Gold:
+
+- Projeto: `datropa`.
+- Dataset: `valorant`.
+- Região: `southamerica-east1`.
+- Limite: `maximum_bytes_billed=1073741824` por consulta.
+
+Datas de filtro são inclusivas e em UTC. Razões são recalculadas
+pelos totais; denominador zero produz null. Alertas de qualidade
+seguem o tratamento de cada consulta.
+
+`meta.atualizado_em` permanece null enquanto o instante da carga
+não estiver disponível.
+
+## Catálogos e coordenadas
+
+Nomes e classes dos agentes vêm do catálogo estático local.
+Armas e armaduras também usam arquivos locais; suas fontes estão
+registradas em `app/catalogos/README.md`.
+
+Dados estáticos externos não são usados para completar partidas.
+IDs de armas desconhecidos encontrados na Gold são preservados
+com nome null.
+
+`/catalogos` fornece as transformações reais dos mapas.
+`minimapa_url` permanece null; imagens ficam com o frontend.
+
+Projeção:
+
+```text
+u = x*u_x + y*u_y + u_offset
+v = x*v_x + y*v_y + v_offset
+```
+
+Eventos de round preservam as coordenadas originais e os snapshots
+disponíveis, sem interpolação.
+
+O calor exclui pontos não projetáveis e informa:
+
+- `meta.eventos_elegiveis`;
+- `meta.pontos_excluidos`;
+- `meta.transformacao_disponivel`.
+
+`pagination.total` conta os pontos projetáveis antes da paginação.
+O frontend deve percorrer as páginas para obter o recorte completo.
+Exclusões espaciais não alteram as estatísticas de kills.
 
 ## Executar localmente
 
-Comandos na raiz do repositório:
+Na raiz do repositório:
 
 ```bash
 python3 -m venv services/stats/.venv
@@ -78,103 +131,54 @@ services/stats/.venv/bin/python -m pip install \
 services/stats/.venv/bin/python -m uvicorn app.main:app \
   --app-dir services/stats \
   --host 127.0.0.1 \
-  --port 8080
+  --port 8083
 ```
 
-O acesso ao BigQuery exige credenciais Google Cloud disponíveis
-ao processo, com permissão para executar consultas e ler a Gold.
-
-## Rotas implementadas
-
-### GET /api/stats/status
-
-Verifica se o servidor responde. Não verifica a conexão com BigQuery.
-
-### GET /api/stats/ranking
-
-Parâmetros opcionais:
-
-| Parâmetro | Regra |
-|---|---|
-| page | Inteiro positivo; padrão 1 |
-| page_size | De 1 a 100; padrão 20 |
-| ordem | kills_desc, kd_desc ou adr_desc; padrão kills_desc |
-| mapa_id | Identificador do mapa |
-| agente_id | Identificador do agente |
-| time_id | Identificador do time |
-| torneio_id | Identificador do torneio |
-| data_inicio | YYYY-MM-DD, inclusiva em UTC |
-| data_fim | YYYY-MM-DD, inclusiva em UTC |
-
-Parâmetros desconhecidos, repetidos ou inválidos retornam HTTP 400.
-Uma página sem resultados retorna lista vazia e preserva o total.
-
-Resposta:
-
-```json
-{
-  "data": [],
-  "pagination": {
-    "page": 1,
-    "page_size": 20,
-    "total": 0
-  },
-  "meta": {
-    "atualizado_em": null
-  }
-}
-```
-
-`atualizado_em` permanece null enquanto o instante da carga não
-estiver disponível. Não representa o horário da requisição.
-
-## Consultas e métricas
-
-- Projeto: `datropa`.
-- Dataset: `valorant`.
-- Região: `southamerica-east1`.
-- Sem filtros: `ranking_jogador`.
-- Com filtros: `stats_jogador_partida`, filtrada antes da agregação.
-- Toda consulta tem `maximum_bytes_billed` de 1 GiB.
-- K/D usa a divisão dos totais; denominador zero produz null.
-- ADR e HS% respeitam os alertas de qualidade da Gold.
-- Valores nulos ficam no fim da ordenação; jogador_id desempata.
-- Não há mínimo de partidas para participar do ranking.
-
-Dry runs registrados na carga `gold_336_v1`:
-
-| Consulta | Bytes estimados |
-|---|---:|
-| Ranking geral, nas três ordenações | 93.951 |
-| Ranking filtrado por Ascent, nas três ordenações | 973.913 |
-| Contagem geral | 0 |
-
-As estimativas podem mudar após alterações nos dados ou nas consultas.
-A contagem geral executada retornou 411 jogadores; o recorte Ascent,
-293 jogadores.
+O processo precisa de credenciais Google Cloud com permissão
+para executar consultas e ler as tabelas necessárias.
 
 ## Cache e concorrência
 
-A chave do cache inclui versão da Gold, versão da resposta, filtros,
-ordenação e paginação. Ao mudar a carga ou o formato, atualizar
-a versão correspondente.
-
-- TTL: 300 segundos.
-- Capacidade: 128 respostas por processo.
+- Cache em memória com TTL de 300 segundos.
+- Até 128 respostas por processo.
+- Chaves incluem versões e parâmetros relevantes da resposta.
 - Reiniciar o processo apaga o cache.
 - Erros não são armazenados.
-- Chamadas iguais são coordenadas por travas no mesmo processo.
-- As travas têm quantidade fixa; chamadas diferentes podem
-  compartilhar uma trava e aguardar.
-- Sem vaga de execução, o ranking retorna HTTP 503.
+- Chamadas iguais são coordenadas dentro do mesmo processo.
+- Travas têm quantidade fixa; chamadas diferentes podem aguardar
+  a mesma trava.
+- Até quatro blocos de consulta simultâneos por processo,
+  compartilhados entre as rotas.
+- Sem vaga, a rota retorna HTTP 503.
+- A vaga é liberada ao encerrar o bloco, inclusive após falhas.
 
-Cache e limite não são compartilhados entre instâncias.
-O limite de concorrência não equivale a limite de requisições
-por visitante nem a teto global de custo.
+Cache e concorrência não são compartilhados entre instâncias.
+Esses controles não equivalem a limite por visitante nem a teto
+global de custo. Jobs podem continuar no BigQuery após timeout;
+esse tratamento ainda precisa ser concluído.
+
+## Testes
+
+Na raiz:
+
+```bash
+PYTHONPATH=services/stats services/stats/.venv/bin/python \
+  -m unittest discover -s services/stats/tests -v
+```
+
+Último resultado informado: 12 testes aprovados.
+
+Os testes usam BigQuery simulado e não precisam de credenciais.
+Cobrem comportamentos de ranking, jogador, listagem de times,
+validação, cache e concorrência, além do inventário de rotas.
+
+O teste de inventário não valida funcionalmente cada endpoint.
+As rotas acrescentadas depois da reorganização foram verificadas
+principalmente por chamadas HTTP manuais.
 
 ## Container
 
-Build, na raiz do repositório:
+Build:
 
 ```bash
 docker build -t datropa-stats:local services/stats
@@ -183,57 +187,41 @@ docker build -t datropa-stats:local services/stats
 Executar:
 
 ```bash
-docker run --rm \
-  -p 127.0.0.1:8081:8080 \
+docker run --rm --name datropa-stats-validacao \
+  -e PORT=8080 \
+  -p 127.0.0.1:8084:8080 \
   datropa-stats:local
 ```
 
 Teste em outro terminal:
 
 ```bash
-curl -i http://127.0.0.1:8081/api/stats/status
+curl -i http://127.0.0.1:8084/api/stats/status
 ```
 
-O servidor usa a variável PORT, padrão 8080, e um único worker.
-O comando acima não fornece credenciais para consultar BigQuery.
+O container copia `app/`, incluindo os catálogos, e `queries/`.
+Usa usuário sem privilégios de root, um worker e a variável `PORT`.
 
-## Pendências
+Inicialização e status foram verificados. O comando acima não
+fornece credenciais para consultar o BigQuery.
 
-- Demais rotas de `docs/api.md` e integração dos SQLs do Chico.
-- Testes adicionais dos filtros e da expiração do cache.
-- Tratamento de consultas que continuem após timeout.
-- Política de limite de requisições para publicação pública.
-- Atualização do contrato e das instruções de autenticação.
-- Registro confiável do instante de carga.
-- Validação do BigQuery no ambiente do container/Cloud Run.
-- Deploy e teste integrado com todas as chamadas do frontend.
+## Pendências para entrega
 
-O frontend deve controlar chamadas repetidas, ignorar respostas
-antigas ao trocar filtros e mostrar falhas por componente.
-Falhas não devem ser convertidas em estatísticas zeradas.
+- Revisar campos e filtros das rotas contra o contrato.
+- Ampliar testes funcionais das novas rotas.
+- Testar expiração e invalidação do cache.
+- Validar exclusões espaciais e o desenho com o frontend.
+- Validar acesso real ao BigQuery dentro do container/Cloud Run.
+- Tratar jobs que continuem após timeout.
+- Concluir tratamento uniforme de 404 e 500.
+- Definir limite de requisições e resposta 429.
+- Disponibilizar um instante confiável da carga.
+- Concluir alinhamento dos documentos antigos de autenticação.
+- Testar a página inteira com chamadas simultâneas e troca de filtros.
+- Realizar deploy com Guilherme e teste integrado.
 
-Infraestrutura e deploy ficam alinhados com Guilherme.
-## Atualização — detalhe de jogador integrado
+O frontend deve evitar chamadas repetidas, ignorar respostas antigas
+após troca de filtros e mostrar falhas por componente. Erros não
+devem ser apresentados como estatísticas zeradas.
 
-Implementada a rota pública GET /api/stats/jogadores/{jogador_id},
-usando a consulta preparada por Chico e copiada para
-queries/jogador_detalhe.sql.
-
-Aceita torneio_id, mapa_id, agente_id, data_inicio e data_fim.
-Compartilha cache e limite de quatro execuções com o ranking.
-
-Testado pela API no Cloud Shell:
-- duduziN sem filtros: 36 partidas, 468 kills, 437 deaths, 258 assists.
-- Ascent: 12 partidas, 168 kills, 135 deaths, 78 assists.
-- Jogador inexistente: 404.
-- Período sem partidas: identidade preservada, contagens zero,
-  taxas null e listas vazias.
-- Repetição do recorte vazio: cache HIT e HTTP 200.
-- Ranking geral preservado: Kaytoh com 628 kills e total 411.
-
-Imagem Docker reconstruída e status respondeu 200.
-BigQuery dentro do container continua pendente de validação.
-
-Esta atualização substitui as referências anteriores que indicavam
-a rota de jogador como pendente. Demais rotas continuam pendentes.
-
+Infraestrutura, permissões e deploy ficam com Guilherme.
