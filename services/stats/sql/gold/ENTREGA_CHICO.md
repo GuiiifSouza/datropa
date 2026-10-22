@@ -96,3 +96,20 @@ SQLs/planos de teste removidos do checkout continuam no historico Git.
 - [ ] Revisar PR e integrar na API com Gugu; conferir JSON e erros HTTP.
 - [ ] Preparar consultas de time e partida em tarefas seguintes.
 Esta entrega contem SQL e documentacao; nao altera Dockerfile, rotas, cache ou ranking.
+
+
+## Otimização do carregamento do calor — 22/10/2026
+
+Preparada na branch existente chico/consultas-api-jogador, sem republicar Gold.
+A rota de calor aceita page_size até 1000; outras coleções continuam até 100.
+Front solicita 1000 e usa 100 se a API antiga rejeitar a primeira página com 400.
+Para 11714 pontos, reduz de 118 para 12 requisições quando a API está atualizada.
+SQL, filtros, coordenadas e os quatro downloads simultâneos foram preservados.
+37 testes offline da API aprovados; tipos e build do front aprovados; teste
+sintético do carregador confere 11714 pontos únicos e compatibilidade com API antiga.
+Comando do teste: cd front && node scripts/testes/calor-paginacao.mjs.
+Não foram feitas consultas reais, chamadas Gemini, deploy nem medição real do ganho.
+Pendente: revisar/publicar backend e frontend por PR e medir uma carga de Ascent.
+O build local sem as artes privadas avisa caminhos ausentes; não houve inspeção
+visual desta otimização. Alteração não reduz o volume total de pontos transferidos;
+reduz páginas e repetição de consultas. Não promete 90% menos tempo ou custo.
