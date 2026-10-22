@@ -46,7 +46,7 @@ Todas as telas que mostram partida ou round levam para a prancheta com o link co
 ```
 src/
   api/        tipos do contrato, cliente HTTP, fachada de dados (stats.ts), snapshot local e cache (useDados)
-  auth/       login com Google pelo Firebase Auth (só a Tropa AI exige)
+  auth/       login pelo Firebase Auth: anônimo automático na Tropa AI, Google opcional
   coach/      Tropa AI: estado, painel, tela cheia e gráficos montados a partir das tools
   componentes/ header, orbes, busca, cartões de série, selos, estados, links da prancheta
   graficos/   gráficos próprios em SVG (sem biblioteca)
@@ -76,6 +76,6 @@ Só biblioteca padrão do Python. Saída em `front/public/snapshot/`.
 
 ## Estado
 
-Pronto: todas as telas acima com dados reais, Tropa AI com login, erros (401, 429, 503) e gráficos, busca global (atalho `/`), versão mobile.
+Pronto: todas as telas acima com dados reais, Tropa AI com login anônimo automático, erros (401, 429, 503) e gráficos, busca global (atalho `/`), versão mobile.
 
 Falta, fora desta pasta: rotas da API que ainda não existem, Google habilitado no Firebase Auth e a prancheta do Rhuan. Lista completa em [docs/pedidos.md](docs/pedidos.md).

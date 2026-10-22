@@ -16,7 +16,7 @@ flowchart LR
   CC -->|POST /api/coach/perguntar| H
   H --> ST[Cloud Run stats]
   H --> CO[Cloud Run coach]
-  A -->|login Google| FA[Firebase Auth]
+  A -->|login anônimo ou Google| FA[Firebase Auth]
 ```
 
 ## Camadas
@@ -49,7 +49,7 @@ Os IDs do snapshot são os mesmos da gold (ver [dados.md](dados.md)), então as 
 - `CoachProvider` guarda a conversa (sessionStorage), abre e fecha (orbe do header, Ctrl/Cmd+K, Esc) e envia.
 - O histórico vai em texto, até 20 turnos, como o coach pede (`services/coach/README.md`).
 - A tela atual registra contexto com `useContextoCoach` (partida, time ou jogador). A pergunta vai com o prefixo `[Contexto da tela: partida <id> (...)]`, para o agente usar os IDs nas tools. O chip "VOU CONSIDERAR" desliga isso.
-- Erros: 401 pede login, 429 mostra o tempo de espera, 400 pede para reescrever, 503 e rede mostram "tente de novo".
+- Erros: 401 pede para recarregar, 429 mostra a mensagem do coach (limite de perguntas) ou o tempo de espera, 400 pede para reescrever, 503 e rede mostram "tente de novo".
 
 ### Gráficos nas respostas
 
@@ -75,4 +75,4 @@ As cores da marca (âmbar e menta) passam no teste de daltonismo (ΔE 15 entre e
 
 ## Auth
 
-`auth/Auth.tsx` carrega o SDK do Firebase sob demanda. Config: `/__/firebase/init.json` no Hosting ou `VITE_FIREBASE_*`. Login com Google em popup. O token vai para o coach e, quando há login, também para o stats.
+`auth/Auth.tsx` carrega o SDK do Firebase sob demanda. Config: `/__/firebase/init.json` no Hosting ou `VITE_FIREBASE_*`. Ao abrir a Tropa AI sem usuário, entra sozinho como anônimo (`signInAnonymously`), sem tela de login; o Google em popup fica no avatar do header. O token vai para o coach e, quando há usuário, também para o stats.
