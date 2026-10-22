@@ -16,6 +16,7 @@ import { Meta } from './paginas/Meta';
 import { TropaAI } from './paginas/TropaAI';
 import { NaoEncontrada } from './paginas/NaoEncontrada';
 import { Carregando } from './componentes/Visuais';
+import { LimiteDeErro } from './componentes/LimiteDeErro';
 
 // a prancheta é a tela mais pesada (motor, molde e estilos próprios): só baixa quando alguém abre
 const Prancheta = lazy(() => import('./paginas/Prancheta').then((m) => ({ default: m.Prancheta })));
@@ -31,7 +32,12 @@ const ROTAS: Rota[] = [
   { padrao: '/meta', render: () => <Meta /> },
   { padrao: '/tropa-ai', render: () => <TropaAI /> },
   // Prancheta tática: dono Rhuan. Contrato do link: /prancheta?partida_id=<id>&round=<n>.
-  { padrao: '/prancheta', render: () => <Suspense fallback={<main className="pagina"><Carregando altura={480} /></main>}><Prancheta /></Suspense> },
+  // o limite de erro segura link ?j= estragado ou falha ao baixar a tela, para o site não ficar em branco
+  { padrao: '/prancheta', render: () => (
+    <LimiteDeErro key={window.location.search} titulo="Não deu para abrir a prancheta" recomecar="/prancheta">
+      <Suspense fallback={<main className="pagina"><Carregando altura={480} /></main>}><Prancheta /></Suspense>
+    </LimiteDeErro>
+  ) },
 ];
 
 export function App() {
