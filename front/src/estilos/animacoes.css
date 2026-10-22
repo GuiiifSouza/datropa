@@ -204,7 +204,7 @@ a.livro__celula:hover { transform: scale(1.18); }
 .seletor__lista {
   position: absolute; z-index: 50; top: calc(100% + 8px); left: 0; min-width: 100%; max-height: 320px; overflow-y: auto; margin: 0; padding: 6px; list-style: none;
   background: var(--superficie); border: 1px solid var(--linha-forte); border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.6);
-  transform-origin: top center; animation: abreMenu .22s var(--suave) both; scrollbar-width: thin;
+  transform-origin: top center; animation: abreMenu .22s var(--suave) both;
 }
 .seletor__lista--cima { top: auto; bottom: calc(100% + 8px); transform-origin: bottom center; animation-name: abreMenuCima; }
 .seletor__opcao {
@@ -219,3 +219,45 @@ a.livro__celula:hover { transform: scale(1.18); }
 /* Barras de filtro ficam acima do conteúdo que vem depois, para o menu aberto não passar por baixo dos cartões. */
 .barra-ferramentas { position: relative; z-index: 10; }
 .seletor--aberto { z-index: 60; }
+
+/* ---------- barra de rolagem da marca ---------- */
+/* Chromium e Safari: ::-webkit-scrollbar. (Não usar scrollbar-color/width aqui: no Chrome 121+ eles desligam estes estilos.) */
+::-webkit-scrollbar { width: 12px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--fundo); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF6170, var(--vermelho) 45%, #C42E3E);
+  border-radius: 999px; border: 3px solid var(--fundo); background-clip: padding-box; min-height: 48px;
+}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #FF8A94, #FF5262 45%, #E0384A); border-width: 2px; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:active { background: var(--giz); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: var(--fundo); }
+/* Barras internas (filtros, tabelas, menus, painel da IA) mais finas, sobre a superfície do cartão. */
+.pills::-webkit-scrollbar, .tabela-rolagem::-webkit-scrollbar, .livro::-webkit-scrollbar, .eco-rounds::-webkit-scrollbar { height: 6px; }
+.seletor__lista::-webkit-scrollbar, .painel-coach__corpo::-webkit-scrollbar, .busca__lista::-webkit-scrollbar { width: 8px; }
+.pills::-webkit-scrollbar-track, .tabela-rolagem::-webkit-scrollbar-track, .livro::-webkit-scrollbar-track, .eco-rounds::-webkit-scrollbar-track,
+.seletor__lista::-webkit-scrollbar-track, .painel-coach__corpo::-webkit-scrollbar-track, .busca__lista::-webkit-scrollbar-track { background: transparent; }
+.pills::-webkit-scrollbar-thumb, .tabela-rolagem::-webkit-scrollbar-thumb, .livro::-webkit-scrollbar-thumb, .eco-rounds::-webkit-scrollbar-thumb,
+.seletor__lista::-webkit-scrollbar-thumb, .painel-coach__corpo::-webkit-scrollbar-thumb, .busca__lista::-webkit-scrollbar-thumb {
+  border: 0; background: rgba(255,70,85,.55); border-radius: 999px;
+}
+.pills::-webkit-scrollbar-thumb:hover, .tabela-rolagem::-webkit-scrollbar-thumb:hover, .seletor__lista::-webkit-scrollbar-thumb:hover,
+.painel-coach__corpo::-webkit-scrollbar-thumb:hover, .busca__lista::-webkit-scrollbar-thumb:hover { background: var(--vermelho); }
+/* Firefox (sem ::-webkit-scrollbar): cor padrão do navegador trocada pela da marca. */
+@supports not selector(::-webkit-scrollbar) {
+  html { scrollbar-color: var(--vermelho) var(--fundo); }
+  .pills, .tabela-rolagem, .livro, .eco-rounds, .seletor__lista, .painel-coach__corpo, .busca__lista { scrollbar-width: thin; scrollbar-color: rgba(255,70,85,.6) transparent; }
+}
+::selection { background: rgba(255,70,85,.35); color: var(--giz); }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Progresso de leitura: um fio vermelho no topo que acompanha a rolagem (onde o navegador suporta). */
+@supports (animation-timeline: scroll()) {
+  body::after {
+    content: ""; position: fixed; z-index: 100; top: 0; left: 0; right: 0; height: 3px; pointer-events: none;
+    background: linear-gradient(90deg, var(--vermelho), #FF8A94); box-shadow: 0 0 10px rgba(255,70,85,.7);
+    transform-origin: left center; transform: scaleX(0);
+    animation: progresso linear both; animation-timeline: scroll(root);
+  }
+  @keyframes progresso { to { transform: scaleX(1); } }
+}
