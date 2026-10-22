@@ -149,6 +149,11 @@ fim = molde.index('</header>', ini) + len('</header>')
 molde = molde[:ini] + molde[fim:]
 molde = trocar(molde, 'style="height: 100vh; min-height: 760px;', 'style="height: calc(100vh - var(--altura-topo-site, 64px)); min-height: 640px;')
 molde = trocar_blobs(molde)
+# o "carregando X de Y" do calor só existia no visual Pontos; no Mancha (o padrão) o mapa incompleto ficava sem aviso
+molde = trocar(molde, 'Lugares com um ou outro evento ficam sem cor.</p>',
+               'Lugares com um ou outro evento ficam sem cor.</p>\n'
+               '              <sc-if value="{{calorAviso}}" hint-placeholder-val="{{ false }}">'
+               '<p style="margin: 0; font-size: 12px; line-height: 1.5; color: #F9A23B;">{{calorAvisoTxt}}</p></sc-if>')
 for q in quadros:
     molde = re.sub(r'(animation(?:-name)?\s*:\s*)' + re.escape(q) + r'\b', r'\1dcp-' + q, molde)
 
@@ -180,6 +185,41 @@ js = trocar(js, 'function deCodigo(txt) {', 'AMB.decodificar = function (t) { va
 # (somar só os rounds já abertos no Round real daria um calor enganoso)
 js = trocar(js, 'partidasR.forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(', '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(')
 js = trocar(js, "pontosNota: calorN > 2500 ?", "pontosNota: AMB.calorVazio ? 'Os eventos do mapa de calor entram assim que a base estiver no ar.' : calorN > 2500 ?")
+# com a rota /mapas/{id}/calor (AMB.calor, src/prancheta/calor.ts) os pontos vêm prontos da API:
+# um por evento, já com time de referência, lado, compra e tempo. Os filtros do protótipo valem iguais.
+js = trocar(js, '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>', """if (AMB.calor) {
+        const idxP = {}; partidasR.forEach((p, i) => { idxP[p.id] = i; });
+        const rotulo = tipo === 'plants' ? 'Plant' : (tipo === 'mortes' ? 'Morte' : 'Abate');
+        AMB.calor.pontos(s.mapa, tipo).forEach((q) => {
+          const pi = idxP[q.partida_id], p = pi == null ? null : partidasR[pi];
+          const nomeTime = p ? (q.time_id === p.ta ? p.a : (q.time_id === p.tb ? p.b : '')) : '';
+          if (s.calorTime && nomeTime !== s.calorTime) return;
+          const atacando = q.lado === 'ataque';
+          if (ladoF === 'atk' && q.lado !== 'ataque') return;
+          if (ladoF === 'def' && q.lado !== 'defesa') return;
+          if (fase !== 'todo') {
+            if (q.tempo_ms == null) return;
+            const seg = q.tempo_ms / 1000;
+            if (fase === 'inicio' && seg >= 30) return;
+            if (fase === 'meio' && (seg < 30 || seg >= 60)) return;
+            if (fase === 'fim' && seg < 60) return;
+          }
+          if (ecoF !== 'todas' && (q.compra === 'force' ? 'forca' : q.compra) !== ecoF) return;
+          const cx = Math.floor(q.x / W * G), cy = Math.floor(q.y / H * G);
+          if (cx >= 0 && cy >= 0 && cx < G && cy < G) grade[cy * G + cx] += q.peso || 1;
+          pts.push([q.x, q.y, atacando ? 'a' : 'd']);
+          calorN++;
+          if (pt && p && Math.pow(q.x - pt[0], 2) + Math.pow(q.y - pt[1], 2) <= R2) {
+            const ch = pi + ':' + (q.round - 1);
+            if (vistos[ch]) { vistos[ch].n++; return; }
+            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
+            areaRounds.push(vistos[ch]);
+          }
+        });
+      } else (AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>""")
+js = trocar(js, "pontosNota: AMB.calorVazio ?", "pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ?")
+js = trocar(js, "      pontosNota: AMB.calor &&", "      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),\n      pontosNota: AMB.calor &&")
+js = trocar(js, "    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(", "    if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());\n    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(")
 # round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
 # mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
 js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
