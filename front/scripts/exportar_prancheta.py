@@ -149,6 +149,13 @@ fim = molde.index('</header>', ini) + len('</header>')
 molde = molde[:ini] + molde[fim:]
 molde = trocar(molde, 'style="height: 100vh; min-height: 760px;', 'style="height: calc(100vh - var(--altura-topo-site, 64px)); min-height: 640px;')
 molde = trocar_blobs(molde)
+# o palco (mapa, peças, linhas, spike, calor) precisa ter sempre a proporção do mapa: com height 100% e
+# max-width 100%, numa área mais estreita que o mapa (tablet) a largura era cortada e a altura não, o <img>
+# desenhava o mapa centralizado com margens e as camadas em % e as SVG (preserveAspectRatio none) esticavam
+# por cima. Agora a vista é um contêiner de tamanho e o palco cabe nela (contain) sem perder a proporção.
+molde = trocar(molde, 'justify-content: center; cursor: {{cursor}};">', 'justify-content: center; container-type: size; cursor: {{cursor}};">')
+molde = trocar(molde, 'style="position: relative; height: 100%; max-width: 100%; aspect-ratio: {{aspecto}};',
+               'style="position: relative; flex: none; width: min(100cqw, calc(100cqh * {{aspecto}})); aspect-ratio: {{aspecto}};')
 # o "carregando X de Y" do calor só existia no visual Pontos; no Mancha (o padrão) o mapa incompleto ficava sem aviso
 molde = trocar(molde, 'Lugares com um ou outro evento ficam sem cor.</p>',
                'Lugares com um ou outro evento ficam sem cor.</p>\n'
