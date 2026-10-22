@@ -1,0 +1,51 @@
+/*
+ * Só na rota /prancheta: a página (paginas/Prancheta.tsx) põe a classe na-prancheta no <html> enquanto está
+ * aberta. O rodapé do site vira uma linha fina para a prancheta caber inteira na tela, sem rolagem; a altura
+ * dele é medida e descontada da prancheta (--altura-rodape-site).
+ */
+html.na-prancheta .rodape__dentro {
+  max-width: none;
+  padding: 4px 16px;
+  gap: 0 20px;
+  font-size: 11px;
+  line-height: 1.5;
+}
+html.na-prancheta .rodape__dentro span {
+  font-size: 11px !important;
+}
+
+/* A prancheta é uma ferramenta e usa a tela toda: aqui o topo (e o rodapé, acima) acompanha essa largura, para
+   topo, barra da prancheta, cartões e créditos terem as mesmas bordas (16px, o respiro lateral do topo).
+
+   A barra cresce ao entrar e encolhe ao sair como um elástico: arranca acelerando, passa um pouco do ponto
+   (~4%) e oscila até assentar, num movimento só. Para poder passar do ponto mesmo ao crescer até a borda, a
+   largura não usa max-width: sai de --topo-p (0 = largura normal do site, 1 = tela toda), que anima com uma
+   curva de mola; acima de 1 a barra fica mais larga que o espaço e a margem negativa a mantém centralizada.
+   Com --topo-p em 0 o resultado é igual ao do base.css. A transição fica fora do na-prancheta de propósito (senão
+   sumiria com a classe e a saída não animaria). Este CSS só entra com a prancheta e fica depois da 1ª visita. */
+@property --topo-p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+.topo__barra {
+  --topo-base: min(100%, var(--largura));
+  max-width: none;
+  width: calc(var(--topo-base) + (100% - var(--topo-base)) * var(--topo-p));
+  margin-left: calc((100% - var(--topo-base)) * (1 - var(--topo-p)) / 2);
+  margin-right: 0;
+  box-sizing: border-box;
+  /* mola: acelera até chegar (~0,4s), passa ~4%, volta ~1% e assenta (curva gerada, 45 pontos) */
+  transition: --topo-p 0.95s linear(0, 0.0074, 0.0286, 0.0621, 0.1063, 0.1597, 0.2207, 0.2879, 0.3596, 0.4343,
+    0.5105, 0.5866, 0.6612, 0.7326, 0.7993, 0.8598, 0.9126, 0.956, 0.9886, 1.01, 1.0254, 1.0355, 1.0408, 1.0418,
+    1.0394, 1.0344, 1.0278, 1.0204, 1.013, 1.0062, 1.0003, 0.9956, 0.9923, 0.9902, 0.9894, 0.9895, 0.9904, 0.9919,
+    0.9937, 0.9956, 0.9974, 0.9991, 1.0005, 1.0015, 1);
+}
+html.na-prancheta .topo__barra {
+  --topo-p: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .topo__barra {
+    transition: none;
+  }
+}

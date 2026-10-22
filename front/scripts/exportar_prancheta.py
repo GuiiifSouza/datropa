@@ -147,7 +147,9 @@ css += f'\n{ESCOPO}{{position:relative}}\n{ESCOPO}.prancheta-dc--apres>div{{posi
 ini = molde.index('<header class="topo">')
 fim = molde.index('</header>', ini) + len('</header>')
 molde = molde[:ini] + molde[fim:]
-molde = trocar(molde, 'style="height: 100vh; min-height: 760px;', 'style="height: calc(100vh - var(--altura-topo-site, 64px)); min-height: 640px;')
+# a prancheta ocupa exatamente o que sobra entre o topo e o rodapé do site (medidos em paginas/Prancheta.tsx):
+# a página inteira cabe na tela, sem rolagem. dvh acompanha a barra do navegador no tablet.
+molde = trocar(molde, 'style="height: 100vh; min-height: 760px;', 'style="height: calc(100dvh - var(--altura-topo-site, 64px) - var(--altura-rodape-site, 0px)); min-height: 520px;')
 molde = trocar_blobs(molde)
 # o palco (mapa, peças, linhas, spike, calor) precisa ter sempre a proporção do mapa: com height 100% e
 # max-width 100%, numa área mais estreita que o mapa (tablet) a largura era cortada e a altura não, o <img>
@@ -161,6 +163,165 @@ molde = trocar(molde, 'Lugares com um ou outro evento ficam sem cor.</p>',
                'Lugares com um ou outro evento ficam sem cor.</p>\n'
                '              <sc-if value="{{calorAviso}}" hint-placeholder-val="{{ false }}">'
                '<p style="margin: 0; font-size: 12px; line-height: 1.5; color: #F9A23B;">{{calorAvisoTxt}}</p></sc-if>')
+# round real: o placar de vivos ficava no centro do topo do mapa, por cima das peças. Vai para o canto
+# superior esquerdo, espelhando os botões Visão e Nomes (top 12px, right 12px).
+molde = trocar(molde, '<div class="vivos" onPointerDown="{{parar}}">', '<div class="vivos" onPointerDown="{{parar}}" style="left: 12px; transform: none;">')
+# round real: a lista de partidas abria embaixo dos rounds, com todas as partidas do mapa e sem busca.
+# Agora abre logo abaixo do botão Partida, com busca por time ou torneio e rolagem própria.
+LISTA_P_ANTIGA = ('          <sc-if value="{{listaPartidas}}" hint-placeholder-val="{{ false }}">\n'
+                  '            <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #22303C; padding-top: 12px;">\n'
+                  '              <p class="lbl">{{nPartidas}} partidas em {{mapaNome}}</p>\n'
+                  '              <sc-for list="{{listaP}}" as="lp" hint-placeholder-count="6">\n'
+                  '                <button type="button" class="{{lp.cls}}" onClick="{{lp.pick}}" style="padding: 8px 10px;">\n'
+                  '                  <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">\n'
+                  '                    <span style="font-size: 13px;">{{lp.titulo}}</span>\n'
+                  '                    <span style="font-size: 11px; color: #9AA6B2;">{{lp.sub}}</span>\n'
+                  '                  </span>\n'
+                  '                </button>\n'
+                  '              </sc-for>\n'
+                  '            </div>\n'
+                  '          </sc-if>\n')
+molde = trocar(molde, LISTA_P_ANTIGA, '')
+molde = trocar(molde, '            </button>\n          </div>\n          <div class="placar">',
+               '            </button>\n'
+               '            <sc-if value="{{listaPartidas}}" hint-placeholder-val="{{ false }}">\n'
+               '              <input class="campo" type="search" value="{{buscaP}}" onChange="{{mudarBuscaP}}" placeholder="Buscar time ou torneio" aria-label="Buscar partida" style="width: 100%;">\n'
+               '              <p class="lbl">{{nListaP}} de {{nPartidas}} partidas em {{mapaNome}}</p>\n'
+               '              <div class="lista-p" style="max-height: min(360px, 45vh); overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 4px; overscroll-behavior: contain;">\n'
+               '                <sc-for list="{{listaP}}" as="lp" hint-placeholder-count="6">\n'
+               '                  <button type="button" class="{{lp.cls}}" onClick="{{lp.pick}}" style="padding: 8px 10px;">\n'
+               '                    <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">\n'
+               '                      <span style="font-size: 13px;">{{lp.titulo}}</span>\n'
+               '                      <span style="font-size: 11px; color: #9AA6B2;">{{lp.sub}}</span>\n'
+               '                    </span>\n'
+               '                  </button>\n'
+               '                </sc-for>\n'
+               '                <sc-if value="{{semListaP}}" hint-placeholder-val="{{ false }}">\n'
+               '                  <p style="margin: 0; padding: 8px 2px; font-size: 12px; color: #9AA6B2;">Nenhuma partida encontrada.</p>\n'
+               '                </sc-if>\n'
+               '              </div>\n'
+               '            </sc-if>\n'
+               '          </div>\n          <div class="placar">')
+# listas com rolagem (eventos do round e partidas): os itens não encolhem; quando não cabem, a lista rola.
+# Antes, com muitos eventos, cada linha era espremida e os ícones dos agentes saíam cortados.
+css += f'\n{ESCOPO} .feed-lista>*,{ESCOPO} .lista-p>*{{flex-shrink:0}}\n'
+# round real: o seletor de partida parecia só um rótulo. Vira um botão de destaque (cor da marca e lupa),
+# só com os times e o placar: mapa, torneio e data já aparecem na lista ao abrir. Classe própria porque o
+# .btn do tema força borda e fundo com !important.
+molde = trocar(molde,
+               '<button type="button" class="btn ghost" onClick="{{toggleListaPartidas}}" aria-expanded="{{listaPartidas}}" style="justify-content: space-between; width: 100%; height: auto; min-height: 56px; padding: 8px 14px; text-align: left;">\n'
+               '              <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">\n'
+               '                <span style="font-size: 15px;">{{partidaTitulo}}</span>\n'
+               '                <span style="font-size: 12px; font-weight: 400; color: #9AA6B2;">{{partidaSub}}</span>\n'
+               '              </span>\n'
+               '              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>\n'
+               '            </button>',
+               '<button type="button" class="sel-partida" onClick="{{toggleListaPartidas}}" aria-expanded="{{listaPartidas}}" aria-label="Trocar partida: {{partidaTitulo}}" title="Trocar a partida">\n'
+               '              <span class="sp-ico"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>\n'
+               '              <span class="sp-tit">{{partidaTitulo}}</span>\n'
+               '            </button>')
+css += (f'{ESCOPO} .sel-partida{{display:flex;align-items:center;gap:12px;width:100%;box-sizing:border-box;min-height:60px;padding:10px 12px;'
+        'border-radius:18px;border:1.5px solid rgba(255,70,85,.6);background:linear-gradient(135deg,#2A1520 0%,#1C2A36 100%);color:#ECE8E1;'
+        'text-align:left;cursor:pointer;font:inherit;transition:border-color .15s,box-shadow .15s,transform .15s}\n'
+        f'{ESCOPO} .sel-partida:hover,{ESCOPO} .sel-partida[aria-expanded="true"]{{border-color:#FF4655;box-shadow:0 0 0 4px rgba(255,70,85,.15)}}\n'
+        f'{ESCOPO} .sel-partida:hover{{transform:translateY(-1px)}}\n'
+        f'{ESCOPO} .sel-partida:focus-visible{{outline:none;border-color:#FF4655;box-shadow:0 0 0 4px rgba(255,70,85,.35)}}\n'
+        f'{ESCOPO} .sp-ico{{flex:none;width:36px;height:36px;border-radius:12px;background:rgba(255,70,85,.16);color:#FF4655;display:grid;place-items:center}}\n'
+        f'{ESCOPO} .sel-partida:hover .sp-ico,{ESCOPO} .sel-partida[aria-expanded="true"] .sp-ico{{background:#FF4655;color:#fff}}\n'
+        f'{ESCOPO} .sp-tit{{flex:1;min-width:0;font-size:14px;font-weight:700;line-height:1.3}}\n')
+# espaçamento único de 16px por fora dos cartões (acima e abaixo da barra, entre as colunas e nas bordas, igual ao
+# respiro lateral do topo do site, que nesta página ocupa a largura toda: src/prancheta/pagina.css) e 16px entre
+# as seções dentro dos painéis. Antes eram 10, 8, 14 e 16 por fora e 20 por dentro. Mesmo raio (28px) em tudo.
+molde = trocar(molde, 'margin: 0 0 14px 14px; border-radius: 24px;', 'margin: 0 0 16px 16px; border-radius: 24px;')
+molde = trocar(molde, 'margin: 0 14px 14px 0; border-radius: 24px;', 'margin: 0 16px 16px 0; border-radius: 24px;')
+molde = trocar(molde, 'padding: 0 14px 14px; box-sizing: border-box;', 'padding: 0 16px 16px; box-sizing: border-box;')
+molde = trocar(molde, 'overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px;',
+               'overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;', vezes=2)
+# (mapa e painéis não passam da altura das colunas: no Planejar o mapa sobrava 2px e os painéis descontavam
+# só 14px da margem, e os dois comiam o respiro de baixo)
+molde = trocar(molde, 'max-height: calc(100% - 14px)', 'max-height: calc(100% - 16px)', vezes=2)
+css += (f'{ESCOPO} header.barra-pr{{margin:16px !important}}\n'
+        f'{ESCOPO} .vista{{border-radius:28px !important}}\n'
+        f'{ESCOPO} main{{max-height:100%}}\n')
+# o protótipo pinta o próprio fundo (cor e brilhos em gradiente), que no site recomeçava logo abaixo do topo e
+# deixava uma emenda: fora da apresentação a prancheta fica transparente e aparece o fundo contínuo do site,
+# que é o mesmo. Na apresentação (tela cheia, por cima de tudo) o fundo do protótipo continua.
+css += (f'{ESCOPO}:not(.prancheta-dc--apres),{ESCOPO}:not(.prancheta-dc--apres)>div'
+        '{background:transparent !important}\n')
+# as camadas da prancheta (a barra das abas tem z-index 50) passavam por cima do topo do site (30): o painel do
+# Tropa AI e a dica do botão Prancheta ficavam por baixo das abas. Fora da apresentação, a prancheta isola as
+# próprias camadas e fica toda abaixo do topo; na apresentação (tela cheia, z-index 200) ela continua por cima.
+css += f'{ESCOPO}:not(.prancheta-dc--apres){{isolation:isolate}}\n'
+# grupos segmentados (.seg) com a pílula vermelha que desliza, igual ao trilho das abas: src/prancheta/deslize.ts
+# marca o grupo (data-desliza) e passa posição e tamanho do botão ativo em --dz-*; o botão ativo fica transparente
+# e a pílula passa por baixo. Mesma cor, duração e curva do .deslize do trilho.
+css += (f'{ESCOPO} [data-desliza]{{position:relative}}\n'
+        f'{ESCOPO} [data-desliza]::before{{content:"";position:absolute;left:var(--dz-x);top:var(--dz-y);width:var(--dz-w);height:var(--dz-h);'
+        'border-radius:999px;background:var(--vermelho,#FF4655);z-index:0;pointer-events:none}\n'
+        f'{ESCOPO} [data-desliza-pronto]::before{{transition:left .36s cubic-bezier(.2,.8,.2,1),width .36s cubic-bezier(.2,.8,.2,1),'
+        'top .36s cubic-bezier(.2,.8,.2,1),height .36s cubic-bezier(.2,.8,.2,1)}\n'
+        f'{ESCOPO} [data-desliza]>.seg{{position:relative;z-index:1}}\n'
+        f'{ESCOPO} [data-desliza]>.seg.on{{background:transparent !important;box-shadow:none !important}}\n'
+        f'@media (prefers-reduced-motion: reduce){{{ESCOPO} [data-desliza-pronto]::before{{transition:none}}}}\n')
+# mapa de calor: o painel da esquerda ficava apertado e a lista de times, ao abrir, esticava a aba e criava uma
+# segunda rolagem. O "Filtrar por" vai para o topo do painel da direita, que tem espaço, antes do Recorte que
+# ele muda; a lista tem altura máxima e rola sozinha. Fica embaixo dos textos (Recorte e Rounds nesta área),
+# separado por linha como as outras seções, com borda vermelha para chamar atenção.
+molde = trocar(molde, '<div style="display: flex; flex-direction: column; gap: 10px;">\n            <p class="lbl">Filtrar por</p>',
+               '<div class="bloco-times" style="display: flex; flex-direction: column; gap: 10px;">\n            <p class="lbl">Filtrar por</p>')
+molde = trocar(molde, '<div style="display: flex; flex-direction: column; gap: 2px; max-height: 360px; overflow-y: auto; border: 1px solid #263442;',
+               '<div class="lista-times" style="display: flex; flex-direction: column; gap: 2px; max-height: min(320px, 40vh); overflow-y: auto; border: 1px solid #263442;')
+_i = molde.index('          <div class="bloco-times"')
+_fim = '            </sc-if>\n          </div>\n'
+_j = molde.index(_fim, _i) + len(_fim)
+BLOCO_TIMES = molde[_i:_j]
+molde = molde[:_i] + molde[_j:]
+BLOCO_TIMES = BLOCO_TIMES.replace('class="bloco-times" style="', 'class="bloco-times" style="border-top: 1px solid #22303C; padding-top: 14px; ', 1)
+_FIM_TOPO = '          </div>\n        </div>\n        <div style="flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 0 16px 16px;'
+molde = trocar(molde, _FIM_TOPO, '          </div>\n' + BLOCO_TIMES + _FIM_TOPO[len('          </div>\n'):])
+# a parte de cima da aba não encolhia (flex-shrink 0) e a lista aberta passava do fim da aba: agora ela pode
+# encolher, e quem cede altura é só a lista de times, que termina antes do fim da aba e rola por dentro
+molde = trocar(molde, '<div style="flex-shrink: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px;">\n          <p class="lbl">Recorte</p>',
+               '<div style="flex: 0 1 auto; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px;">\n          <p class="lbl">Recorte</p>')
+css += (f'{ESCOPO} .bloco-times{{min-height:0}}\n'
+        f'{ESCOPO} .lista-times{{flex:0 1 auto;min-height:96px}}\n'
+        f'{ESCOPO} .lista-times>*{{flex-shrink:0}}\n'
+        f'{ESCOPO} .bloco-times .btn{{border-color:rgba(255,70,85,.6) !important}}\n'
+        f'{ESCOPO} .bloco-times .btn:hover,{ESCOPO} .bloco-times .btn[aria-expanded="true"]{{border-color:#FF4655 !important;box-shadow:0 0 0 3px rgba(255,70,85,.15) !important}}\n')
+# planejar: nome e tempo da etapa usavam label.campo, que o tema redefine como pílula de 44px (ficava torta com
+# rótulo e campo dentro). Agora: rótulo .lbl como no resto da prancheta, campo com cantos de 12px, e o tempo
+# vira um seletor −5s / tempo / +5s (dá para digitar; ↑ e ↓ também somam e tiram 5s; "20" vira "0:20").
+molde = trocar(molde,
+               '            <div style="display: flex; gap: 8px; margin-top: 8px; padding-top: 16px; border-top: 1px solid #22303C;">\n'
+               '              <label class="campo" style="flex: 1;">Nome da etapa<input value="{{etNome}}" onChange="{{mudarNome}}"></label>\n'
+               '              <label class="campo" style="width: 84px;">Tempo<input value="{{etTempo}}" onChange="{{mudarTempo}}" placeholder="0:20"></label>\n'
+               '            </div>',
+               '            <div class="et-edicao">\n'
+               '              <label class="et-campo"><span class="lbl">Nome da etapa</span>'
+               '<input class="et-input" value="{{etNome}}" onChange="{{mudarNome}}" placeholder="Ex.: Entrada no site A"></label>\n'
+               '              <div class="et-campo"><span class="lbl">Tempo da etapa</span>\n'
+               '                <div class="et-tempo" role="group" aria-label="Tempo da etapa">\n'
+               '                  <button type="button" class="et-passo" onClick="{{tempoMenos}}" aria-label="Tirar 5 segundos">−5s</button>\n'
+               '                  <input class="et-input et-tempo-valor" value="{{etTempo}}" onChange="{{mudarTempo}}" onBlur="{{normalizarTempo}}" onKeyDown="{{teclaTempo}}" placeholder="0:00" inputMode="numeric" aria-label="Tempo no formato minutos:segundos">\n'
+               '                  <button type="button" class="et-passo" onClick="{{tempoMais}}" aria-label="Somar 5 segundos">+5s</button>\n'
+               '                </div>\n'
+               '              </div>\n'
+               '            </div>')
+css += (f'{ESCOPO} .et-edicao{{display:flex;flex-direction:column;gap:16px;margin-top:8px;padding-top:16px;border-top:1px solid #22303C}}\n'
+        f'{ESCOPO} .et-campo{{display:flex;flex-direction:column;gap:8px;margin:0}}\n'
+        f'{ESCOPO} .et-input{{height:40px;box-sizing:border-box;width:100%;min-width:0;border-radius:12px;border:1px solid rgba(236,232,225,.14);'
+        "background:#16212C;color:#ECE8E1;padding:0 12px;font:500 14px 'Inter Tight',system-ui,sans-serif;outline:none;"
+        'transition:border-color .15s,box-shadow .15s}\n'
+        f'{ESCOPO} .et-input:hover{{border-color:rgba(236,232,225,.28)}}\n'
+        f'{ESCOPO} .et-input:focus{{border-color:#FF4655;box-shadow:0 0 0 3px rgba(255,70,85,.18)}}\n'
+        f'{ESCOPO} .et-tempo{{display:flex;align-items:center;gap:6px}}\n'
+        f"{ESCOPO} .et-tempo-valor{{flex:1;text-align:center;font:700 16px 'JetBrains Mono',monospace;letter-spacing:.02em}}\n"
+        f'{ESCOPO} .et-passo{{flex:none;height:40px;min-width:52px;padding:0 10px;border-radius:12px;border:1px solid rgba(236,232,225,.14);'
+        "background:#1C2A36;color:#ECE8E1;font:700 13px 'Inter Tight',system-ui,sans-serif;cursor:pointer;"
+        'transition:border-color .15s,background .15s,transform .1s}\n'
+        f'{ESCOPO} .et-passo:hover{{border-color:#FF4655;background:#2A1520}}\n'
+        f'{ESCOPO} .et-passo:active{{transform:scale(.96)}}\n'
+        f'{ESCOPO} .et-passo:focus-visible{{outline:none;border-color:#FF4655;box-shadow:0 0 0 3px rgba(255,70,85,.3)}}\n')
 for q in quadros:
     molde = re.sub(r'(animation(?:-name)?\s*:\s*)' + re.escape(q) + r'\b', r'\1dcp-' + q, molde)
 
@@ -230,6 +391,29 @@ js = trocar(js, "    if (AMB.reais && this.state.modo === 'round') AMB.reais.det
 # round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
 # mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
 js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
+# round real: busca na lista de partidas (time ou torneio, sem acento, todas as palavras precisam bater).
+# Escolher uma partida fecha a lista e limpa a busca.
+js = trocar(js, "fantasma: null, listaPartidas: false }) }));", "fantasma: null, listaPartidas: false, buscaP: '' }) }));")
+js = trocar(js, "    // mapa de calor real: abates (posição da vítima",
+            "    const semAcento = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g, '');\n"
+            "    const termosP = semAcento(s.buscaP).split(/\\s+/).filter(Boolean);\n"
+            "    const listaPF = termosP.length ? listaP.filter((x) => { const t = semAcento(x.titulo + ' ' + x.sub); return termosP.every((w) => t.includes(w)); }) : listaP;\n"
+            "    // mapa de calor real: abates (posição da vítima")
+js = trocar(js, "nPartidas: partidasR.length, listaP,",
+            "nPartidas: partidasR.length, listaP: listaPF, nListaP: listaPF.length, semListaP: !listaPF.length,\n"
+            "      buscaP: s.buscaP || '', mudarBuscaP: (e) => this.setState({ buscaP: e.target.value }),")
+# planejar: tempo da etapa com passos de 5s (botões e setas do teclado) e normalização ao sair do campo.
+# Aceita "0:20", "1:05" ou só segundos ("20", "65"); fica entre 0:00 e 5:00.
+js = trocar(js, "      mudarTempo: (e) => { const v = e.target.value; this.editar((e2) => { e2.tempo = v; }, false); },",
+            "      mudarTempo: (e) => { const v = e.target.value; this.editar((e2) => { e2.tempo = v; }, false); },\n"
+            "      tempoMenos: () => this.passoTempo(-5), tempoMais: () => this.passoTempo(5),\n"
+            "      normalizarTempo: () => { const t = et.tempo || ''; if (!t.trim()) return; const n = this.fmtTempo(this.segTempo(t)); if (n !== t) this.editar((e2) => { e2.tempo = n; }, false); },\n"
+            "      teclaTempo: (e) => { if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); this.passoTempo(e.key === 'ArrowUp' ? 5 : -5); } },")
+js = trocar(js, '  zoomPara(z2, cx, cy, vista) {',
+            "  segTempo(t) { const m = String(t || '').trim().match(/^(\\d+):(\\d{1,2})$/); const s = m ? Number(m[1]) * 60 + Number(m[2]) : parseInt(t, 10); return Math.min(300, Math.max(0, isNaN(s) ? 0 : s)); }\n"
+            "  fmtTempo(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }\n"
+            "  passoTempo(d) { const et = this.state.etapas[this.state.etapa]; const n = this.fmtTempo(Math.min(300, Math.max(0, Math.round((this.segTempo(et.tempo) + d) / 5) * 5))); this.editar((e2) => { e2.tempo = n; }, false); }\n"
+            '  zoomPara(z2, cx, cy, vista) {')
 # entrada pelo link: ?j= (jogada compartilhada) ou ?partida_id=&round= (round real)
 js = trocar(js, '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n',
             '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n    if (AMB.inicio) AMB.inicio(this);\n')
