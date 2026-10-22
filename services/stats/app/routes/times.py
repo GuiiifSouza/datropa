@@ -21,6 +21,7 @@ router = APIRouter()
 
 TIMES_LISTA_SQL = carregar_sql("times_lista.sql")
 TIME_ECONOMIA_SQL = carregar_sql("time_economia.sql")
+TIME_POS_PLANT_RETAKE_SQL = carregar_sql("time_pos_plant_retake.sql")
 
 
 @router.get("/api/stats/times")
@@ -343,4 +344,110 @@ def economia_time(
             503,
             "DATA_UNAVAILABLE",
             "Economia do time temporariamente indisponível.",
+        )
+
+@router.get("/api/stats/times/{time_id}/pos-plant-retake")
+@coordenar_consultas
+def pos_plant_retake_time(
+    request: Request,
+    time_id: str,
+    mapa_id: str | None = None,
+    torneio_id: str | None = None,
+    data_inicio: str | None = None,
+    data_fim: str | None = None,
+):
+    validar_parametros(
+        request,
+        {
+            "mapa_id",
+            "torneio_id",
+            "data_inicio",
+            "data_fim",
+        },
+    )
+
+    identificadores = {
+        "time_id": time_id,
+        "mapa_id": mapa_id,
+        "torneio_id": torneio_id,
+    }
+
+    validar_identificadores(identificadores)
+    inicio, fim = validar_periodo(data_inicio, data_fim)
+
+    chave_cache = (
+        "gold_336_v1",
+        "time_pos_plant_retake_publico_v1",
+        time_id,
+        mapa_id,
+        torneio_id,
+        inicio,
+        fim,
+    )
+
+    resposta_cache = obter_cache(chave_cache)
+
+    if resposta_cache is not None:
+        logging.getLogger("uvicorn.error").info(
+            "Pos-plant retake: cache HIT"
+        )
+        return resposta_cache
+
+    logging.getLogger("uvicorn.error").info(
+        "Pos-plant retake: cache MISS"
+    )
+
+    config = bigquery.QueryJobConfig(
+        maximum_bytes_billed=MAXIMUM_BYTES_BILLED,
+        query_parameters=[
+            *[
+                bigquery.ScalarQueryParameter(
+                    campo, "STRING", valor
+                )
+                for campo, valor in identificadores.items()
+            ],
+            bigquery.ScalarQueryParameter(
+                "data_inicio", "DATE", inicio
+            ),
+            bigquery.ScalarQueryParameter(
+                "data_fim", "DATE", fim
+            ),
+        ],
+    )
+
+    try:
+        with conexao_bigquery() as client:
+            rows = client.query(
+                TIME_POS_PLANT_RETAKE_SQL,
+                job_config=config,
+            ).result(timeout=30)
+
+            resultado = next(iter(rows), None)
+
+            if resultado is None:
+                raise ApiError(
+                    404,
+                    "NOT_FOUND",
+                    "Time não encontrado.",
+                )
+
+            resposta = {
+                "data": converter_resultado(resultado),
+                "meta": {"atualizado_em": None},
+            }
+
+        salvar_cache(chave_cache, resposta)
+        return resposta
+
+    except ApiError:
+        raise
+
+    except Exception:
+        logging.exception(
+            "Falha ao consultar pos-plant e retake do time"
+        )
+        raise ApiError(
+            503,
+            "DATA_UNAVAILABLE",
+            "Pós-plant e retake temporariamente indisponíveis.",
         )
