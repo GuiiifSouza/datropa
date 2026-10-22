@@ -19,7 +19,7 @@ WITH filtros AS (
 ), identidade AS (
   SELECT jogador_id AS id, nome FROM historico
   QUALIFY ROW_NUMBER() OVER (
-    ORDER BY inicio DESC NULLS LAST, partida_id
+    ORDER BY inicio DESC NULLS LAST, partida_id DESC
   ) = 1
 ), recorte AS (
   SELECT h.* FROM historico h CROSS JOIN filtros f
