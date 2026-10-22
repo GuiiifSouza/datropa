@@ -1,0 +1,9 @@
+.venv/
+.venv64/
+__pycache__/
+**/__pycache__/
+*.pyc
+.env
+.env.*
+.git/
+sql/
