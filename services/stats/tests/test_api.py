@@ -69,6 +69,7 @@ class ApiTests(unittest.TestCase):
                 "/api/stats/partidas/{partida_id}/rounds/{round}/eventos",
                 "/api/stats/mapas",
                 "/api/stats/agentes",
+                "/api/stats/busca",
             },
         )
         self.client_factory.assert_not_called()
