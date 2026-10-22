@@ -9,6 +9,9 @@ e não entra nas taxas (vai para rounds_sem_classificacao).
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
+
 from .. import catalogos
 from ..bq import Consulta
 from . import ErroTool, resolver_mapa, taxa, tool
@@ -132,16 +135,27 @@ def economia_time(time_id: str, mapa: str | None = None) -> dict:
     if not resumo:
         raise ErroTool("nenhum round desse time nesse recorte (confira o id com buscar_entidade)")
 
+    # Validar rounds antes de gastar com detalhes. Contexto separado por worker.
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="coach-economia") as executor:
+        futuro_contra = executor.submit(
+            copy_context().run, CONTRA_ADVERSARIO.rodar, time_id=time_id, mapa_id=m
+        )
+        futuro_pistol = executor.submit(
+            copy_context().run, POS_PISTOL.rodar, time_id=time_id, mapa_id=m
+        )
+        linhas_contra = futuro_contra.result()
+        linhas_pistol = futuro_pistol.result()
+
     contra = [
         {"compra_time": l["categoria"], "compra_adversario": l["categoria_adversario"],
          "rounds": l["rounds"], "vitorias": l["vitorias"],
          "taxa_vitoria_pct": taxa(l["vitorias"], l["rounds"])}
-        for l in CONTRA_ADVERSARIO.rodar(time_id=time_id, mapa_id=m)
+        for l in linhas_contra
     ]
     contra.sort(key=lambda i: (_ordem(i["compra_time"]), _ordem(i["compra_adversario"])))
 
     pos_pistol = {}
-    for l in POS_PISTOL.rodar(time_id=time_id, mapa_id=m):
+    for l in linhas_pistol:
         chave = "apos_vencer_pistol" if l["venceu_pistol"] else "apos_perder_pistol"
         pos_pistol[chave] = {"rounds": l["rounds"], "vitorias": l["vitorias"],
                              "taxa_vitoria_pct": taxa(l["vitorias"], l["rounds"])}

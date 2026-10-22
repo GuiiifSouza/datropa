@@ -90,3 +90,23 @@ para o servidor local. Nao publicar nem alterar variaveis do Cloud Run.
 sem GCP, incluindo isolamento de contextos, preservacao de erros/respostas,
 retries, cache de consulta, propagacao para thread HTTP e gravacao do CLI.
 Nenhum tempo real do Google foi medido ainda. Nenhuma otimizacao foi aplicada.
+
+
+## Experimento: economia em paralelo
+
+Resolução do time e `por_categoria` continuam primeiro. Recortes sem rounds não
+executam detalhes. Com rounds, `contra_adversario` e `pos_pistol` usam dois workers
+por chamada, cada um com cópia do contexto de medição. SQL, parâmetros, limites,
+cálculos e formato permanecem iguais. Falha retorna erro sem resposta parcial nem
+retry adicional; a outra consulta já iniciada pode terminar mesmo na falha.
+Tempos de BigQuery podem se sobrepor: não somar para obter duração total.
+
+Base recebida, uma execução CLI sobre force do Wolf Gaming: 13,25 s totais,
+6,44 s Gemini e 6,77 s BigQuery. Os dois detalhes levaram 1,25 s e 1,03 s em
+sequência. Sobrepor sugere cerca de 1 s de redução, ainda não comprovada.
+A primeira consulta permanece sequencial para evitar gastos em recortes vazios.
+
+Validar com `uv run --frozen pytest -q`, usando mocks sem serviços reais.
+Sem teste em massa. Combinar com o time antes de outra medição real devido ao
+orçamento. Ganho real e comportamento no Cloud Run ainda não medidos.
+Sem deploy ou alteração de infraestrutura.

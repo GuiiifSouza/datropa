@@ -494,3 +494,47 @@ def test_ranking_times(bq):
     assert r["ranking"][0]["pos_plant"] == {"oportunidades": 53, "vitorias": 49, "taxa_sucesso_pct": 92.45}
     assert r["ranking"][0]["posicao"] == 1 and r["ranking"][0]["time"] == "Time A"
     assert "erro" in executar("ranking_times", ordenar_por="kd")
+
+
+
+def test_economia_paralela_contexto(bq, monkeypatch):
+    from threading import Barrier
+    from coach.medicao import medir, sessao
+    bq.respostas["economia_time.por_categoria"] = ECONOMIA
+    barreira = Barrier(2, timeout=3)
+    detalhes = {"economia_time.contra_adversario", "economia_time.pos_pistol"}
+
+    def rodar(self, **valores):
+        with medir("bigquery", self.nome):
+            if self.nome in detalhes:
+                barreira.wait()
+            return bq(self, **valores)
+
+    monkeypatch.setattr(Consulta, "rodar", rodar)
+    with sessao("teste") as medicao:
+        resultado = executar("economia_time", time_id="t", mapa="Lotus")
+    assert "erro" not in resultado
+    assert {e["nome"] for e in medicao.eventos} == {
+        "ids.times", "economia_time.por_categoria", *detalhes}
+    assert len(bq.chamadas) == 4
+    assert all(v == {"time_id": "t", "mapa_id": "jam"}
+               for n, v in bq.chamadas if n in detalhes)
+
+
+def test_economia_sem_rounds_sem_detalhes(bq):
+    assert "erro" in executar("economia_time", time_id="t")
+    assert [n for n, _ in bq.chamadas] == ["ids.times", "economia_time.por_categoria"]
+
+
+@pytest.mark.parametrize("falha", ["economia_time.contra_adversario", "economia_time.pos_pistol"])
+def test_economia_falha_sem_resposta_parcial(bq, monkeypatch, falha):
+    bq.respostas["economia_time.por_categoria"] = ECONOMIA
+
+    def rodar(self, **valores):
+        if self.nome == falha:
+            raise RuntimeError("falha simulada")
+        return bq(self, **valores)
+
+    monkeypatch.setattr(Consulta, "rodar", rodar)
+    assert executar("economia_time", time_id="t") == {
+        "erro": "falha ao consultar os dados; tente de novo ou reformule"}
