@@ -88,6 +88,10 @@ não estiver disponível.
 ## Catálogos e coordenadas
 
 Nomes e classes dos agentes vêm do catálogo estático local.
+Nomes amigáveis dos torneios vêm de `app/catalogos/torneios.json`.
+
+Nome de jogador é o nick da partida mais recente, em todas as rotas.
+O detalhe da partida também traz `nome_partida`, o nick daquela partida.
 Armas e armaduras também usam arquivos locais; suas fontes estão
 registradas em `app/catalogos/README.md`.
 
@@ -166,7 +170,8 @@ PYTHONPATH=services/stats services/stats/.venv/bin/python \
   -m unittest discover -s services/stats/tests -v
 ```
 
-Último resultado informado: 20 testes aprovados.
+Último resultado informado: 26 testes aprovados (22/10/2026,
+com `tests/test_ajustes_front.py`).
 
 Os testes usam BigQuery simulado e não precisam de credenciais.
 Cobrem comportamentos de ranking, jogador, listagem de times,
