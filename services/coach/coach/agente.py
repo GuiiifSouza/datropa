@@ -19,6 +19,7 @@ from google import genai
 from google.genai import errors, types
 
 from . import config
+from .medicao import medir
 from .prompt import SISTEMA
 from .tools import REGISTRO
 
@@ -92,14 +93,16 @@ class Conversa:
     def _gerar(self) -> types.GenerateContentResponse:
         for tentativa in range(1, TENTATIVAS + 1):
             try:
-                return cliente().models.generate_content(
-                    model=config.MODELO, contents=self.historico, config=self._config
-                )
+                with medir("gemini", "generate_content", tentativa=tentativa):
+                    return cliente().models.generate_content(
+                        model=config.MODELO, contents=self.historico, config=self._config
+                    )
             except Exception as e:
                 if tentativa == TENTATIVAS or not _transitorio(e):
                     raise
                 log.warning("Vertex falhou (%s), tentativa %d de %d", type(e).__name__, tentativa, TENTATIVAS)
-                time.sleep(0.5 * tentativa)
+                with medir("espera_retry", "vertex", tentativa=tentativa):
+                    time.sleep(0.5 * tentativa)
         raise AssertionError("inalcançável")
 
     def perguntar(self, pergunta: str) -> Resposta:
@@ -135,7 +138,10 @@ class Conversa:
             for fc in pedidos:
                 args = dict(fc.args or {})
                 tool = REGISTRO.get(fc.name)
-                resultado = tool.executar(args) if tool else {"erro": f"tool inexistente: {fc.name}"}
+                with medir("tool", fc.name) as medicao:
+                    resultado = tool.executar(args) if tool else {"erro": f"tool inexistente: {fc.name}"}
+                    if "erro" in resultado:
+                        medicao["status"] = "erro_tool"
                 log.info("tool %s %s -> %s", fc.name, json.dumps(args, ensure_ascii=False),
                          "erro" if "erro" in resultado else "ok")
                 chamadas.append(ChamadaTool(fc.name, args, resultado))

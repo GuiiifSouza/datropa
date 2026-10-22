@@ -17,6 +17,7 @@ from typing import Any, Callable
 from google.cloud import bigquery
 
 from . import config
+from .medicao import medir
 
 # Todas as consultas declaradas, para o dry run listar.
 CONSULTAS: dict[str, "Consulta"] = {}
@@ -59,8 +60,13 @@ class Consulta:
         )
 
     def rodar(self, **valores) -> list[dict[str, Any]]:
-        job = cliente().query(self.texto(), job_config=self._job_config(valores, False))
-        return [_limpar(dict(linha)) for linha in job.result()]
+        with medir("bigquery", self.nome) as medicao:
+            job = cliente().query(self.texto(), job_config=self._job_config(valores, False))
+            linhas = [_limpar(dict(linha)) for linha in job.result()]
+            medicao["cache_hit"] = getattr(job, "cache_hit", None)
+            medicao["bytes_processados"] = getattr(job, "total_bytes_processed", None)
+            medicao["linhas"] = len(linhas)
+            return linhas
 
     def dry_run(self, **valores) -> int:
         """Bytes que a consulta processaria, sem rodar nem cobrar."""
