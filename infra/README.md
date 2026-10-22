@@ -36,6 +36,8 @@ O `bq` usa a mesma credencial do `gcloud`. Confira também a conta e o projeto a
 
 
 - chico e gugu: `bigquery.jobUser` no projeto e escrita (`WRITER`) no dataset `valorant`.
+- chico e gugu: `aiplatform.user` no projeto (22/10), para rodar o coach local e no Cloud Shell. Cada chamada gasta Gemini. Tirar depois do hackathon.
+- Qualquer pessoa usa o coach pelo caminho público, sem cadastro: o front entra com login anônimo do Firebase e chama `/api/coach/perguntar`, que usa a `sa-coach`. Para medir latência, use esse caminho (token anônimo pela REST do Identity Toolkit com a `apiKey` de `/__/firebase/init.json`). O custo fica preso pelo limite diário do coach e pelo corte em R$ 80.
 - O front não precisa de acesso ao GCP para rodar local.
 - A organização do GCP só aceita contas do próprio domínio. O projeto `datropa` tem exceção na política `iam.allowedPolicyMemberDomains` para aceitar Gmail. Tirar depois do hackathon:
 
