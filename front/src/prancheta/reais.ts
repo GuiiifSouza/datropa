@@ -122,7 +122,15 @@ export function criarReais(op: Opcoes) {
         const i = idx(j.jogador_id);
         return q && i >= 0 ? [[i, q[0], q[1], null] as [number, number, number, null]] : [];
       });
-      return [tipo[e.tipo], e.tempo_ms ?? 0, idx(e.ator_id), e.tipo === 'abate' ? idx(e.vitima_id) : -1,
+      const vitima = e.tipo === 'abate' ? idx(e.vitima_id) : -1;
+      // abate: a vítima fica onde morreu (evento.posicao), mesmo quando o snapshot não traz ela.
+      // A lógica já desenha quem é a vítima como eliminada e a linha do tiro termina nesse ponto.
+      // Sem posição válida não se inventa nada: a vítima fica como veio no snapshot (ou sem ícone).
+      if (vitima >= 0 && pos) {
+        const s = snaps.find((p) => p[0] === vitima);
+        if (s) { s[1] = pos[0]; s[2] = pos[1]; } else snaps.push([vitima, pos[0], pos[1], null]);
+      }
+      return [tipo[e.tipo], e.tempo_ms ?? 0, idx(e.ator_id), vitima,
         pos ? pos[0] : NaN, pos ? pos[1] : NaN, snaps, e.site ?? undefined] as Ev;
     });
   }
