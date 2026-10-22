@@ -1,0 +1,903 @@
+<div onKeyDown="{{tecla}}" onKeyUp="{{teclaSolta}}" style="height: calc(100vh - var(--altura-topo-site, 64px)); min-height: 640px; display: flex; flex-direction: column; background: radial-gradient(900px 520px at 88% -8%, rgba(255,70,85,.10), transparent 62%), radial-gradient(760px 560px at -12% 28%, rgba(249,162,59,.07), transparent 62%), #0F1923; color: #ECE8E1; font-family: 'Inter Tight', system-ui, sans-serif;">
+<svg width="0" height="0" style="position: absolute; width: 0; height: 0; overflow: hidden;" aria-hidden="true"><defs><symbol id="ico-spike" viewBox="0 0 128 116.92"><path fill="currentColor" d="M89.94,65.61l-5.67,5.5-8.09,5.01-6.72,1.82h-9.58l-5.83-.83-9.41-5.06-7.05-6.77-8.48,5.94,27.41,45.69h15.58l26.92-45.3-9.08-6ZM51.98,101.83l12.02-18.74,11.97,18.74h-23.99Z"></path><path fill="currentColor" d="M118.86,0h-49.87v11.01l3.52.78,6.07,2.15,4.87,2.97,5.08,4.67,4.87,6.94,3.63,8.83.92,9.41-2.94,10.11,8.71,5.37,24.28-42.28v-5.12L118.86,0ZM97.95,23.97l10.55-18.99,10.55,20.93-21.1-1.94Z"></path><path fill="currentColor" d="M9.3,0L0,15.06v4.95l24.12,42.23,8.75-5.61-1.82-7.84-.24-4.95,1.23-10.4,4.05-7.97,5.08-5.82,3.34-2.93,3.92-2.72,3.59-1.57,4.17-.99,2.77-.54V0H9.3ZM8.25,25.8L20,5.02l10.82,18.94-22.57,1.84Z"></path><path fill="currentColor" d="M64,19.6l-21.06,11.53v24.86l21,12.06,21-12.06v-24.86l-20.94-11.53ZM76.95,50.81l-13.49,7.71-12.39-7.38v-14.86l12.92-7.38,12.95,7.38v14.53Z"></path></symbol></defs></svg>
+
+
+  <sc-if value="{{naoApres}}" hint-placeholder-val="{{ true }}">
+  
+  <header class="barra-pr" style="position: relative; z-index: 50; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px 20px; padding: 10px 20px; margin: 14px 14px 6px; border-radius: 30px; border: 1px solid rgba(236,232,225,.09); background: rgba(22,33,44,.74); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: 0 18px 44px rgba(0,0,0,.26);">
+    <div style="display: flex; align-items: center; gap: 12px 20px; min-width: 0;">
+    <span class="rotulo-pr">PRANCHETA TÁTICA</span>
+<div style="position: relative; display: flex; align-items: center; gap: 8px;">
+      <button type="button" class="{{mapaBanCls}}" onClick="{{toggleMapas}}" aria-expanded="{{mapaAberto}}" aria-label="Mapa: {{mapaNome}}. Trocar mapa" style="width: 168px; height: 44px; font-size: 20px; background-color: {{mapaCor}};">
+        {{mapaNomeUp}}
+        <sc-if value="{{podeTrocarMapa}}" hint-placeholder-val="{{ true }}">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+        </sc-if>
+      </button>
+      <sc-if value="{{sempre}}" hint-placeholder-val="{{ true }}">
+        <button type="button" class="{{ladoCls}}" onClick="{{trocarLado}}" aria-label="Trocar lado, agora {{ladoNome}}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 00-14.3-4.9L4 8"></path><path d="M4 3v5h5"></path><path d="M4 13a8 8 0 0014.3 4.9L20 16"></path><path d="M20 21v-5h-5"></path></svg>
+          {{ladoNome}}
+        </button>
+      </sc-if>
+      <sc-if value="{{isRound}}" hint-placeholder-val="{{ false }}">
+        <span style="font-size: 12px; color: #9AA6B2;">mapa da partida</span>
+      </sc-if>
+      <sc-if value="{{mapaAberto}}" hint-placeholder-val="{{ false }}">
+        <div style="position: absolute; top: 52px; left: 0; width: 280px; z-index: 30; display: flex; flex-direction: column; gap: 6px; background: #16212C; border: 1px solid #2E3D4C; border-radius: 10px; padding: 8px; box-shadow: 0 12px 32px rgba(0,0,0,.5); max-height: 560px; overflow-y: auto;">
+          <p style="margin: 2px 4px 4px; font-size: 12px; color: #9AA6B2;">Com vetor: Lotus, Haven, Ascent, Breeze e Fracture. Cada mapa guarda a própria estratégia.</p>
+          <sc-for list="{{mapas}}" as="m" hint-placeholder-count="13">
+            <button type="button" class="{{m.cls}}" onClick="{{m.pick}}" aria-disabled="{{m.off}}" style="height: 56px; font-size: 18px; background-color: {{m.cor}};">{{m.nome}}</button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+
+    </div>
+    <nav aria-label="Modo da prancheta" class="trilho" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 4px;">
+      <span class="deslize" aria-hidden="true" style="top: 4px; bottom: 4px; left: 4px; width: calc((100% - 16px) / 3); transform: translateX(calc({{modoIdx}} * (100% + 4px)));"></span>
+      <sc-for list="{{modos}}" as="m" hint-placeholder-count="3">
+        <button type="button" class="{{m.cls}}" onClick="{{m.pick}}">{{m.nome}}</button>
+      </sc-for>
+    </nav>
+
+    <div style="display: flex; flex-wrap: nowrap; justify-content: flex-end; gap: 6px; min-width: 0;">
+      <button type="button" class="btn ghost" onClick="{{toggleApres}}" title="Modo apresentação: só o mapa e o play">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"></rect><path d="M8 20h8M12 16v4"></path></svg>
+        Apresentar
+      </button>
+      <button type="button" class="btn ghost" onClick="{{abrirNova}}">Nova estratégia</button>
+      <button type="button" class="btn ghost" onClick="{{abrirJogadas}}">Salvar</button>
+      <button type="button" class="btn prim" onClick="{{abrirCompartilhar}}">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1"></path><path d="M14 10a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"></path></svg>
+        Compartilhar
+      </button>
+    </div>
+  </header>
+  </sc-if>
+
+  <div style="flex: 1; min-height: 0; display: flex; flex-wrap: wrap; overflow: hidden;">
+
+    <sc-if value="{{naoApres}}" hint-placeholder-val="{{ true }}">
+    <aside style="flex: 1 1 300px; max-width: 340px; min-width: 280px; margin: 0 0 14px 14px; border-radius: 24px; border: 1px solid rgba(236,232,225,.09); background: rgba(22,33,44,.62); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 18px 44px rgba(0,0,0,.26); box-sizing: border-box; display: flex; flex-direction: column; min-height: 0; max-height: calc(100% - 14px); overflow: hidden;">
+
+      <sc-if value="{{isPlanejar}}" hint-placeholder-val="{{ true }}">
+        <div role="tablist" aria-label="Paleta" style="display: flex; gap: 4px; padding: 14px 16px 0;">
+          <sc-for list="{{abasEsq}}" as="a" hint-placeholder-count="3">
+            <button type="button" role="tab" aria-selected="{{a.on}}" class="{{a.cls}}" onClick="{{a.pick}}">{{a.nome}}</button>
+          </sc-for>
+        </div>
+
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px;">
+          <sc-if value="{{isAbaAg}}" hint-placeholder-val="{{ true }}">
+            <div role="group" aria-label="Time das peças" class="trilho" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <span class="deslize" aria-hidden="true" style="top: 3px; bottom: 3px; left: 3px; width: calc((100% - 8px) / 2); transform: translateX(calc({{timeIdx}} * (100% + 2px)));"></span>
+              <button type="button" class="{{timeMeuCls}}" onClick="{{pickMeu}}" style="flex: 1;">Meu time</button>
+              <button type="button" class="{{timeInimCls}}" onClick="{{pickInim}}" style="flex: 1;">Inimigos</button>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{funcoes}}" as="fn" hint-placeholder-count="5">
+                <button type="button" class="{{fn.cls}}" onClick="{{fn.pick}}">{{fn.nome}}</button>
+              </sc-for>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;">
+              <sc-for list="{{agentes}}" as="a" hint-placeholder-count="16">
+                <button type="button" class="{{a.cls}}" onClick="{{a.pick}}" draggable="true" onDragStart="{{a.drag}}" aria-label="Colocar {{a.nome}} no mapa" title="{{a.nome}} · {{a.funcao}}">
+                  <span class="spr spr-ag ini" style="background-position: {{a.bp}};"></span>
+                  <span>{{a.nome}}</span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isAbaHab}}" hint-placeholder-val="{{ false }}">
+            <div role="group" aria-label="Habilidades de qual time" class="trilho" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <span class="deslize" aria-hidden="true" style="top: 3px; bottom: 3px; left: 3px; width: calc((100% - 8px) / 2); transform: translateX(calc({{timeIdx}} * (100% + 2px)));"></span>
+              <button type="button" class="{{timeMeuCls}}" onClick="{{pickMeu}}" style="flex: 1;">Meu time</button>
+              <button type="button" class="{{timeInimCls}}" onClick="{{pickInim}}" style="flex: 1;">Inimigos</button>
+            </div>
+            <sc-if value="{{semHabGrupos}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #C5CBD3;">Coloque agentes desse time no mapa: as habilidades de cada um aparecem aqui.</p>
+            </sc-if>
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+              <sc-for list="{{habGrupos}}" as="g" hint-placeholder-count="5">
+                <div class="{{g.cls}}">
+                  <span class="spr spr-ag" title="{{g.nome}}" style="width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background-color: #263442; background-position: {{g.bp}};"></span>
+                  <div style="flex: 1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px;">
+                    <sc-for list="{{g.itens}}" as="h" hint-placeholder-count="4">
+                      <button type="button" class="habm" onClick="{{h.pick}}" draggable="true" onDragStart="{{h.drag}}" aria-label="{{h.nome}} ({{h.tecla}})" title="{{h.tecla}} · {{h.nome}}">
+                        <span class="spr spr-hab" style="background-position: {{h.bp}};"></span>
+                        <span class="tecla">{{h.tecla}}</span>
+                      </button>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 12px; color: #9AA6B2;">Passe o mouse para ver o nome da habilidade.</p>
+          </sc-if>
+
+          <sc-if value="{{isAbaMk}}" hint-placeholder-val="{{ false }}">
+            <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px;">
+              <button type="button" class="mk" onClick="{{mk.spike.pick}}" draggable="true" onDragStart="{{mk.spike.drag}}">
+                <svg width="24" height="24" viewBox="0 0 128 128" aria-hidden="true"><use href="#ico-spike"></use></svg><span>Spike</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.largo.pick}}" draggable="true" onDragStart="{{mk.largo.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20L3 8a13 13 0 0118 0z"></path></svg><span>Visão larga</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.estreito.pick}}" draggable="true" onDragStart="{{mk.estreito.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20L8.5 5a8 8 0 017 0z"></path></svg><span>Visão estreita</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.linha.pick}}" draggable="true" onDragStart="{{mk.linha.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 19V4"></path><circle cx="12" cy="20" r="1.5" fill="currentColor"></circle></svg><span>Linha de tiro</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.pino.pick}}" draggable="true" onDragStart="{{mk.pino.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-6-6-11a6 6 0 0112 0c0 5-6 11-6 11z"></path><circle cx="12" cy="10" r="2"></circle></svg><span>Pino</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.alerta.pick}}" draggable="true" onDragStart="{{mk.alerta.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4"></path><path d="M12 17h.01"></path></svg><span>Alerta</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.bandeira.pick}}" draggable="true" onDragStart="{{mk.bandeira.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h11l-2 4 2 4H6"></path></svg><span>Bandeira</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.ancora.pick}}" draggable="true" onDragStart="{{mk.ancora.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><path d="M12 7v13"></path><path d="M5 13a7 7 0 0014 0"></path><path d="M8 10h8"></path></svg><span>Âncora</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.mira.pick}}" draggable="true" onDragStart="{{mk.mira.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg><span>Mira</span>
+              </button>
+              <button type="button" class="mk" onClick="{{mk.estrela.pick}}" draggable="true" onDragStart="{{mk.estrela.drag}}">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"></path></svg><span>Estrela</span>
+              </button>
+            </div>
+          </sc-if>
+
+          <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9AA6B2;">Arraste direto para o mapa, ou clique para colocar perto do agente.</p>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isRound}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Partida</p>
+            <button type="button" class="btn ghost" onClick="{{toggleListaPartidas}}" aria-expanded="{{listaPartidas}}" style="justify-content: space-between; width: 100%; height: auto; min-height: 56px; padding: 8px 14px; text-align: left;">
+              <span style="display: flex; flex-direction: column; align-items: flex-start; gap: 2px;">
+                <span style="font-size: 15px;">{{partidaTitulo}}</span>
+                <span style="font-size: 12px; font-weight: 400; color: #9AA6B2;">{{partidaSub}}</span>
+              </span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+          <div class="placar">
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0;"><span class="tA"></span><span class="pnome">{{nomeA}}</span></div>
+            <span class="pnum">{{placarA}}<span style="color: #6B7885; margin: 0 6px;">:</span>{{placarB}}</span>
+            <div style="display: flex; align-items: center; gap: 8px; min-width: 0; justify-content: flex-end;"><span class="pnome" style="text-align: right;">{{nomeB}}</span><span class="tB"></span></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">1º tempo</p>
+            <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px;">
+              <sc-for list="{{rounds1}}" as="r" hint-placeholder-count="12">
+                <button type="button" class="{{r.cls}}" onClick="{{r.pick}}" aria-label="Round {{r.n}}: {{r.dica}}" title="{{r.dica}}">{{r.n}}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{temRounds2}}" hint-placeholder-val="{{ true }}">
+              <p class="lbl" style="margin-top: 6px;">2º tempo</p>
+              <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px;">
+                <sc-for list="{{rounds2}}" as="r" hint-placeholder-count="12">
+                  <button type="button" class="{{r.cls}}" onClick="{{r.pick}}" aria-label="Round {{r.n}}: {{r.dica}}" title="{{r.dica}}">{{r.n}}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{temRoundsOT}}" hint-placeholder-val="{{ false }}">
+              <p class="lbl" style="margin-top: 6px;">Prorrogação</p>
+              <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px;">
+                <sc-for list="{{roundsOT}}" as="r" hint-placeholder-count="2">
+                  <button type="button" class="{{r.cls}}" onClick="{{r.pick}}" aria-label="Round {{r.n}}: {{r.dica}}" title="{{r.dica}}">{{r.n}}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <p style="margin: 0; font-size: 12px; color: #9AA6B2;">A barrinha embaixo mostra quem venceu. Passe o mouse para ver como.</p>
+          </div>
+          <sc-if value="{{listaPartidas}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 4px; border-top: 1px solid #22303C; padding-top: 12px;">
+              <p class="lbl">{{nPartidas}} partidas em {{mapaNome}}</p>
+              <sc-for list="{{listaP}}" as="lp" hint-placeholder-count="6">
+                <button type="button" class="{{lp.cls}}" onClick="{{lp.pick}}" style="padding: 8px 10px;">
+                  <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                    <span style="font-size: 13px;">{{lp.titulo}}</span>
+                    <span style="font-size: 11px; color: #9AA6B2;">{{lp.sub}}</span>
+                  </span>
+                </button>
+              </sc-for>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isCalor}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 20px;">
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">O que pintar</p>
+            <div role="group" aria-label="Tipo de evento" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <sc-for list="{{tiposCalor}}" as="o" hint-placeholder-count="3">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}" style="flex: 1; padding: 0 6px;">{{o.nome}}</button>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9AA6B2;">{{calorAjuda}}</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Lado</p>
+            <div role="group" aria-label="Lado" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <sc-for list="{{ladosCalor}}" as="o" hint-placeholder-count="3">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}" style="flex: 1; padding: 0 6px;">{{o.nome}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Momento do round</p>
+            <div role="group" aria-label="Momento do round" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <sc-for list="{{fasesCalor}}" as="o" hint-placeholder-count="4">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}" style="flex: 1; padding: 0 4px; font-size: 13px;">{{o.nome}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Compra do time</p>
+            <div role="group" aria-label="Compra do time" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <sc-for list="{{ecosCalor}}" as="o" hint-placeholder-count="5">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}" style="flex: 1; padding: 0 2px; font-size: 12px;">{{o.nome}}</button>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Filtrar por</p>
+            <button type="button" class="btn ghost" onClick="{{toggleListaTimes}}" aria-expanded="{{listaTimes}}" style="justify-content: space-between; width: 100%; height: 44px;">
+              <span><span style="color: #9AA6B2; font-weight: 500;">Time</span> · {{calorTimeNome}}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <sc-if value="{{listaTimes}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; flex-direction: column; gap: 2px; max-height: 360px; overflow-y: auto; border: 1px solid #263442; border-radius: 16px; padding: 4px; background: #16212C;">
+                <sc-for list="{{timesCalor}}" as="tm" hint-placeholder-count="6">
+                  <button type="button" class="{{tm.cls}}" onClick="{{tm.pick}}" style="padding: 8px 10px; font-size: 13px;">{{tm.nome}}</button>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <p class="lbl">Visual</p>
+            <div role="group" aria-label="Tipo de visual" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <button type="button" class="{{visManchaCls}}" onClick="{{pickMancha}}" style="flex: 1;">Mancha</button>
+              <button type="button" class="{{visPontosCls}}" onClick="{{pickPontos}}" style="flex: 1;">Pontos</button>
+            </div>
+          </div>
+          <sc-if value="{{calorMancha}}" hint-placeholder-val="{{ true }}">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <p class="lbl">Concentração</p>
+              <div style="height: 12px; border-radius: 6px; background: linear-gradient(90deg, #3B0F70, #8C2981, #DE4968, #FE9F6D, #FCFDBF);"></div>
+              <div style="display: flex; justify-content: space-between; font-size: 12px; color: #9AA6B2;"><span>pouco</span><span>onde mais acontece</span></div>
+              <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9AA6B2;">Só aparecem as áreas com concentração relevante. Lugares com um ou outro evento ficam sem cor.</p>
+            </div>
+          </sc-if>
+          <sc-if value="{{calorPontos}}" hint-placeholder-val="{{ false }}">
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #D5D9DE;">
+              <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #F9A23B;"></span>{{legPontoA}}</span>
+              <span style="display: flex; align-items: center; gap: 8px;"><span style="width: 10px; height: 10px; border-radius: 50%; background: #32E0C4;"></span>{{legPontoB}}</span>
+              <span style="font-size: 12px; color: #9AA6B2;">{{pontosNota}}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </aside>
+    </sc-if>
+
+    <main onPointerMove="{{mover}}" onPointerUp="{{soltar}}" onPointerLeave="{{sairMapa}}" style="position: relative; flex: 999 1 560px; min-width: 0; display: flex; align-items: stretch; justify-content: center; gap: 12px; padding: 0 14px 14px; box-sizing: border-box;">
+
+      <sc-if value="{{mostrarFerr}}" hint-placeholder-val="{{ true }}">
+        <div role="toolbar" aria-label="Ferramentas" aria-orientation="vertical" onPointerDown="{{parar}}" onWheel="{{parar}}" style="position: absolute; left: 30px; top: 50%; transform: translateY(-50%); z-index: 25; display: flex; flex-direction: column; gap: 4px; background: rgba(22,33,44,.86); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); border: 1px solid #2E3D4C; border-radius: 12px; padding: 6px; box-shadow: 0 10px 28px rgba(0,0,0,.45);">
+          <button type="button" class="{{f.mover.cls}}" onClick="{{f.mover.pick}}" aria-label="Selecionar e mover (V). Arraste no fundo para selecionar vários" title="Selecionar e mover (V) · arraste no fundo para selecionar vários · Shift soma">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3l14 8-6 2-2 6z"></path></svg><span class="kbd" aria-hidden="true">V</span>
+          </button>
+          <button type="button" class="{{f.mao.cls}}" onClick="{{f.mao.pick}}" aria-label="Mão: mover o mapa (H ou segure Espaço)" title="Mão: mover o mapa (H ou segure Espaço)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 12V5.5a1.5 1.5 0 013 0V11"></path><path d="M11 10V4.5a1.5 1.5 0 013 0V11"></path><path d="M14 10.5V6a1.5 1.5 0 013 0v7a7 7 0 01-7 7h-.5a6 6 0 01-4.7-2.3L3 15.5a1.5 1.5 0 012.3-1.9L8 16"></path></svg><span class="kbd" aria-hidden="true">H</span>
+          </button>
+          <button type="button" class="{{f.lapis.cls}}" onClick="{{f.lapis.pick}}" aria-label="Lápis (P)" title="Lápis (P)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"></path></svg><span class="kbd" aria-hidden="true">P</span>
+          </button>
+          <sc-if value="{{mostraPaleta}}" hint-placeholder-val="{{ false }}">
+            <div class="paleta" role="group" aria-label="Cor do traço">
+              <sc-for list="{{coresLapis}}" as="c" hint-placeholder-count="6">
+                <button type="button" class="{{c.cls}}" onClick="{{c.pick}}" aria-label="{{c.nome}}" aria-pressed="{{c.on}}" title="{{c.nome}}" style="--cor: {{c.cor}};"></button>
+              </sc-for>
+            </div>
+          </sc-if>
+          <button type="button" class="{{f.seta.cls}}" onClick="{{f.seta.pick}}" aria-label="Seta (A)" title="Seta (A)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 19L19 5"></path><path d="M9 5h10v10"></path></svg><span class="kbd" aria-hidden="true">A</span>
+          </button>
+          <button type="button" class="{{f.texto.cls}}" onClick="{{f.texto.pick}}" aria-label="Texto (T)" title="Texto (T)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6h14"></path><path d="M12 6v13"></path></svg><span class="kbd" aria-hidden="true">T</span>
+          </button>
+          <button type="button" class="{{f.borracha.cls}}" onClick="{{f.borracha.pick}}" aria-label="Borracha (E): apaga só os desenhos" title="Borracha (E) · apaga só lápis e setas">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 20h12"></path><path d="M4 15l9-9 6 6-7 7H8z"></path></svg><span class="kbd" aria-hidden="true">E</span>
+          </button>
+          <div style="height: 1px; background: #263442; margin: 4px 6px;"></div>
+          <button type="button" class="{{desfCls}}" onClick="{{desfazer}}" aria-label="Desfazer (Ctrl+Z)" title="Desfazer (Ctrl+Z)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h11a5 5 0 010 10h-3"></path></svg>
+          </button>
+          <button type="button" class="{{refCls}}" onClick="{{refazer}}" aria-label="Refazer (Ctrl+Shift+Z)" title="Refazer (Ctrl+Shift+Z ou Ctrl+Y)">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5"></path><path d="M20 9H9a5 5 0 000 10h3"></path></svg>
+          </button>
+          <div style="height: 1px; background: #263442; margin: 4px 6px;"></div>
+          <button type="button" class="{{lixoCls}}" onPointerDown="{{parar}}" onClick="{{excluirSel}}" aria-label="Lixeira: arraste itens até aqui para apagar" title="{{lixoTxt}}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16"></path><path d="M10 11v6M14 11v6"></path><path d="M6 7l1 13h10l1-13"></path><path d="M9 7V4h6v3"></path></svg>
+          </button>
+          <div style="height: 1px; background: #263442; margin: 4px 6px;"></div>
+          <button type="button" class="{{ajudaCls}}" onClick="{{toggleAjuda}}" aria-expanded="{{ajuda}}" aria-label="Atalhos (?)" title="Atalhos (?)" style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 18px;">?</button>
+        </div>
+      </sc-if>
+
+      <div class="vista" tabIndex="0" aria-label="Mapa da prancheta" onPointerDown="{{fundoDown}}" onWheel="{{rolar}}" onDragOver="{{sobreMapa}}" onDrop="{{largarNoMapa}}" style="position: relative; flex: 1; min-width: 0; height: 100%; box-sizing: border-box; padding: 16px; overflow: hidden; border-radius: 36px; border: 1px solid rgba(236,232,225,.09); background: radial-gradient(circle at 50% 42%, #172431 0%, #111C26 70%); box-shadow: 0 30px 80px rgba(0,0,0,.4); display: flex; align-items: center; justify-content: center; cursor: {{cursor}};">
+      <div class="{{palcoCls}}" style="position: relative; height: 100%; max-width: 100%; aspect-ratio: {{aspecto}}; transform-origin: 0 0; transform: translate({{ox}}px, {{oy}}px) scale({{z}});">
+        <img src="{{mapaImg}}" alt="" draggable="false" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none;">
+        <sc-for list="{{sitios}}" as="st" hint-placeholder-count="3">
+          <span class="sitio" style="left: {{st.x}}%; top: {{st.y}}%;">{{st.t}}</span>
+        </sc-for>
+
+        <sc-if value="{{isCalor}}" hint-placeholder-val="{{ false }}">
+          <sc-if value="{{calorMancha}}" hint-placeholder-val="{{ true }}">
+            <div class="{{mascaraCls}}" style="position: absolute; inset: 0; pointer-events: none; z-index: 1; mix-blend-mode: screen;">
+            <div style="position: absolute; inset: 0; filter: blur(0.55cqw);">
+              <sc-for list="{{celulas}}" as="b" hint-placeholder-count="0">
+                <div style="position: absolute; left: {{b.x}}%; top: {{b.y}}%; width: {{b.w}}%; height: {{b.h}}%; background: {{b.cor}};"></div>
+              </sc-for>
+            </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{temArea}}" hint-placeholder-val="{{ false }}">
+            <div class="anel-calor" style="left: {{areaX}}%; top: {{areaY}}%; width: {{areaW}}%;"></div>
+          </sc-if>
+          <sc-for list="{{pontosCalor}}" as="p" hint-placeholder-count="0">
+            <div class="pcal" style="left: {{p.x}}%; top: {{p.y}}%; background: {{p.cor}};"></div>
+          </sc-for>
+        </sc-if>
+
+        <sc-for list="{{formas}}" as="h" hint-placeholder-count="0">
+          <svg viewBox="{{vb}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;" aria-hidden="true"><g transform="{{tview}}">
+            <path d="{{h.d}}" fill="{{h.fill}}" stroke="{{h.stroke}}" style="stroke-width: {{h.sw}}; stroke-dasharray: {{h.dash}}; stroke-linejoin: round; stroke-linecap: round;"></path>
+          </g></svg>
+        </sc-for>
+        <svg viewBox="{{vb}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1;" aria-hidden="true"><g transform="{{tview}}">
+          <path d="{{hg.atkIn}}" fill="rgba(249,162,59,.16)" stroke="rgba(251,191,110,.75)" style="stroke-width: 1.5; stroke-linejoin: round;"></path>
+          <path d="{{hg.defIn}}" fill="rgba(50,224,196,.16)" stroke="rgba(126,235,217,.75)" style="stroke-width: 1.5; stroke-linejoin: round;"></path>
+          <path d="{{hg.atk}}" fill="rgba(249,162,59,.30)" stroke="rgba(251,191,110,.9)" style="stroke-width: 1.8; stroke-linejoin: round;"></path>
+          <path d="{{hg.def}}" fill="rgba(50,224,196,.30)" stroke="rgba(126,235,217,.9)" style="stroke-width: 1.8; stroke-linejoin: round;"></path>
+          <path d="{{hg.fio}}" fill="none" stroke="#FF5A5A" style="stroke-width: 2.5; stroke-linecap: round;"></path>
+          <path d="{{anel}}" fill="none" stroke="{{anelCor}}" style="stroke-width: 2; stroke-dasharray: 8 6;"></path>
+          <path d="{{tracer}}" fill="none" stroke="{{tracerCor}}" style="stroke-width: 2.5; stroke-dasharray: 2 5; stroke-linecap: round;"></path>
+          <path d="{{fios}}" fill="none" stroke="rgba(236,232,225,.75)" style="stroke-width: 1.6; stroke-dasharray: 5 4; stroke-linecap: round;"></path>
+          <path d="{{cg.atkIn}}" fill="rgba(249,162,59,.10)" stroke="rgba(251,191,110,.55)" style="stroke-width: 1; stroke-linejoin: round;"></path>
+          <path d="{{cg.defIn}}" fill="rgba(50,224,196,.10)" stroke="rgba(126,235,217,.55)" style="stroke-width: 1; stroke-linejoin: round;"></path>
+          <path d="{{cg.atk}}" fill="rgba(249,162,59,.20)" stroke="rgba(251,191,110,.6)" style="stroke-width: 1.2; stroke-linejoin: round;"></path>
+          <path d="{{cg.def}}" fill="rgba(50,224,196,.20)" stroke="rgba(126,235,217,.6)" style="stroke-width: 1.2; stroke-linejoin: round;"></path>
+          <path d="{{cg.linha}}" fill="none" stroke="#F5E36B" style="stroke-width: 3; stroke-linecap: round;"></path>
+        </g></svg>
+
+        <sc-if value="{{temRiscos}}" hint-placeholder-val="{{ false }}">
+          <svg viewBox="{{vb}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 8;" aria-hidden="true"><g transform="{{tview}}">
+            <sc-for list="{{riscosLista}}" as="r" hint-placeholder-count="0">
+              <path d="{{r.d}}" fill="none" stroke="{{r.cor}}" style="stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 3px rgba(15,25,35,.8));"></path>
+            </sc-for>
+          </g></svg>
+        </sc-if>
+        <sc-for list="{{tracos}}" as="t" hint-placeholder-count="0">
+          <svg viewBox="{{vb}}" preserveAspectRatio="none" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2;" aria-hidden="true"><g transform="{{tview}}">
+            <defs><marker id="{{t.mid}}" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="{{t.cor}}"></path></marker></defs>
+            <path d="{{t.d}}" fill="none" stroke="{{t.cor}}" onPointerDown="{{t.down}}" style="stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: {{t.dash}}; marker-end: {{t.ponta}}; pointer-events: {{t.pe}}; filter: {{t.brilho}};"></path>
+          </g></svg>
+        </sc-for>
+
+        <sc-for list="{{textos}}" as="t" hint-placeholder-count="0">
+          <div class="{{t.cls}}" onPointerDown="{{t.down}}" style="left: {{t.x}}%; top: {{t.y}}%; width: {{t.w}}%; min-height: {{t.h}}%;">
+            <textarea aria-label="Anotação" value="{{t.txt}}" onChange="{{t.mudar}}" onPointerDown="{{t.digitar}}" style="font-size: {{t.fs}}cqw;"></textarea>
+            <sc-if value="{{t.sel}}" hint-placeholder-val="{{ false }}">
+              <span class="txres" onPointerDown="{{t.resDown}}" role="img" aria-label="Redimensionar"></span>
+            </sc-if>
+          </div>
+        </sc-for>
+
+        <sc-for list="{{marcas}}" as="m" hint-placeholder-count="0">
+          <div class="{{m.cls}}" onPointerDown="{{m.down}}" style="left: {{m.x}}%; top: {{m.y}}%;" aria-label="{{m.nome}}" role="img">
+            <sc-if value="{{m.spike}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 128 128" aria-hidden="true"><use href="#ico-spike"></use></svg></sc-if>
+            <sc-if value="{{m.pino}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-6-6-6-11a6 6 0 0112 0c0 5-6 11-6 11z"></path><circle cx="12" cy="10" r="2"></circle></svg></sc-if>
+            <sc-if value="{{m.alerta}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l9 16H3z"></path><path d="M12 10v4"></path><path d="M12 17h.01"></path></svg></sc-if>
+            <sc-if value="{{m.bandeira}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 21V4"></path><path d="M6 4h11l-2 4 2 4H6"></path></svg></sc-if>
+            <sc-if value="{{m.ancora}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="5" r="2"></circle><path d="M12 7v13"></path><path d="M5 13a7 7 0 0014 0"></path><path d="M8 10h8"></path></svg></sc-if>
+            <sc-if value="{{m.mira}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"></circle><circle cx="12" cy="12" r="2.5"></circle><path d="M12 2v4M12 18v4M2 12h4M18 12h4"></path></svg></sc-if>
+            <sc-if value="{{m.estrela}}" hint-placeholder-val="{{ false }}"><svg width="60%" height="60%" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3l2.8 5.8 6.2.9-4.5 4.4 1 6.2L12 17.4 6.5 20.3l1-6.2L3 9.7l6.2-.9z"></path></svg></sc-if>
+          </div>
+        </sc-for>
+
+        <sc-for list="{{notasMapa}}" as="n" hint-placeholder-count="0">
+          <span class="npeca" style="left: {{n.x}}%; top: {{n.y}}%;">{{n.txt}}</span>
+        </sc-for>
+        <sc-for list="{{fantasmas}}" as="g" hint-placeholder-count="0">
+          <div class="{{g.cls}}" style="left: {{g.x}}%; top: {{g.y}}%;" title="{{g.nome}}"><span class="spr spr-ag" style="background-position: {{g.bp}};"></span></div>
+        </sc-for>
+        <sc-for list="{{pecas}}" as="p" hint-placeholder-count="10">
+          <div class="{{p.cls}}" onPointerDown="{{p.down}}" style="left: {{p.x}}%; top: {{p.y}}%;" title="{{p.nome}}"><span class="{{p.spr}}" style="background-position: {{p.bp}};"></span>
+            <sc-if value="{{p.bMorte}}" hint-placeholder-val="{{ false }}"><span class="badge morte" aria-label="morreu"><svg width="70%" height="70%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></span></sc-if>
+            <sc-if value="{{p.bFb}}" hint-placeholder-val="{{ false }}"><span class="badge esq fb" title="First blood" aria-label="first blood"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c-.4 0-.7.2-.9.5C9 6.3 5.5 10.6 5.5 14.5a6.5 6.5 0 0013 0c0-3.9-3.5-8.2-5.6-11.5-.2-.3-.5-.5-.9-.5z"></path></svg></span></sc-if>
+            <sc-if value="{{p.bTr}}" hint-placeholder-val="{{ false }}"><span class="badge esq tr" title="Trade" aria-label="trade"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5"></path><path d="M20 16H7l3.5 3.5"></path></svg></span></sc-if>
+            <sc-if value="{{p.bMata}}" hint-placeholder-val="{{ false }}"><span class="badge mata" aria-label="abateu"><svg width="72%" height="72%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="6.5"></circle><path d="M12 2v5M12 17v5M2 12h5M17 12h5"></path></svg></span></sc-if>
+            <sc-if value="{{p.bPlant}}" hint-placeholder-val="{{ false }}"><span class="badge plant" aria-label="plantou"><svg width="70%" height="70%" viewBox="0 0 128 128" aria-hidden="true"><use href="#ico-spike"></use></svg></span></sc-if>
+            <sc-if value="{{p.bDefuse}}" hint-placeholder-val="{{ false }}"><span class="badge defuse" aria-label="desarmou"><svg width="70%" height="70%" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span></sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{soVer}}" hint-placeholder-val="{{ false }}"><div class="trava-ver" aria-hidden="true"></div></sc-if>
+
+        <sc-if value="{{temMira}}" hint-placeholder-val="{{ false }}">
+          <div class="mira-b" style="left: {{miraX}}%; top: {{miraY}}%; width: {{miraD}}%;"></div>
+        </sc-if>
+        <sc-if value="{{temLaco}}" hint-placeholder-val="{{ false }}">
+          <div class="laco" style="left: {{laco.x}}%; top: {{laco.y}}%; width: {{laco.w}}%; height: {{laco.h}}%;"></div>
+        </sc-if>
+        <sc-if value="{{temPontas}}" hint-placeholder-val="{{ false }}">
+          <div class="giro" onPointerDown="{{paDown}}" style="left: {{paX}}%; top: {{paY}}%;" role="img" aria-label="Ponta da parede"></div>
+          <div class="giro" onPointerDown="{{pbDown}}" style="left: {{pbX}}%; top: {{pbY}}%;" role="img" aria-label="Ponta da parede"></div>
+        </sc-if>
+        <sc-if value="{{temCurva}}" hint-placeholder-val="{{ false }}">
+          <div class="curvador" onPointerDown="{{pcDown}}" style="left: {{pcX}}%; top: {{pcY}}%;" role="img" aria-label="Curvar a parede" title="Arraste para curvar a parede"></div>
+        </sc-if>
+        <sc-if value="{{temGiro}}" hint-placeholder-val="{{ false }}">
+          <div class="giro" onPointerDown="{{giroDown}}" style="left: {{giroX}}%; top: {{giroY}}%;" role="img" aria-label="Girar visão"></div>
+        </sc-if>
+
+        <sc-if value="{{temMini}}" hint-placeholder-val="{{ false }}">
+          <div class="mini" role="group" aria-label="{{miniTitulo}}" onPointerDown="{{parar}}" style="left: {{miniX}}%; top: {{miniY}}%;">
+            <span style="display: flex; flex-direction: column; justify-content: center; padding: 2px 6px;">
+              <span style="font-size: 11px; color: #D5D9DE; white-space: nowrap;">{{miniTitulo}}</span>
+              <sc-if value="{{miniAviso}}" hint-placeholder-val="{{ false }}">
+                <span style="font-size: 11px; font-weight: 600; white-space: nowrap; color: {{miniAvisoCor}};">{{miniAviso}}</span>
+              </sc-if>
+            </span>
+            <sc-for list="{{miniOps}}" as="o" hint-placeholder-count="3">
+              <button type="button" class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button>
+            </sc-for>
+            <sc-if value="{{temNota}}" hint-placeholder-val="{{ false }}">
+              <input class="minota" aria-label="Instrução para o jogador" placeholder="Instrução pro jogador nesta etapa…" value="{{notaVal}}" onChange="{{notaMudar}}">
+            </sc-if>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{isRound}}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{nomesRound}}" as="n" hint-placeholder-count="0">
+            <span class="{{n.cls}}" style="left: {{n.x}}%; top: {{n.y}}%;">{{n.txt}}</span>
+          </sc-for>
+          <div class="{{xCls}}" style="left: {{xX}}%; top: {{xY}}%;"></div>
+        </sc-if>
+      </div>
+
+        <sc-if value="{{ajudaAberta}}" hint-placeholder-val="{{ false }}">
+          <div class="ajuda" role="dialog" aria-label="Atalhos" onPointerDown="{{parar}}">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 16px; letter-spacing: .04em;">Atalhos</span>
+              <button type="button" class="tb" onClick="{{toggleAjuda}}" aria-label="Fechar" style="width: 32px; height: 32px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              </button>
+            </div>
+            <sc-for list="{{atalhos}}" as="g" hint-placeholder-count="4">
+              <p class="lbl" style="margin: 12px 0 6px;">{{g.titulo}}</p>
+              <sc-for list="{{g.itens}}" as="a" hint-placeholder-count="3">
+                <div style="display: flex; align-items: center; gap: 10px; padding: 4px 0;">
+                  <span style="display: flex; flex-wrap: wrap; gap: 4px; width: 128px; flex-shrink: 0;">
+                    <sc-for list="{{a.teclas}}" as="k" hint-placeholder-count="1">
+                      <span class="kb">{{k.t}}</span>
+                    </sc-for>
+                  </span>
+                  <span style="font-size: 13px; color: #D5D9DE;">{{a.desc}}</span>
+                </div>
+              </sc-for>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{temBarraSel}}" hint-placeholder-val="{{ false }}">
+          <div role="group" aria-label="Seleção" onPointerDown="{{parar}}" style="position: absolute; top: 12px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; background: rgba(22,33,44,.95); border: 1px solid #44566A; border-radius: 10px; padding: 6px 6px 6px 14px; z-index: 7; box-shadow: 0 8px 24px rgba(0,0,0,.45);">
+            <span style="font-size: 13px; font-weight: 600; white-space: nowrap;">{{nSel}} selecionados</span>
+            <button type="button" class="btn ghost" onClick="{{excluirSel}}" style="height: 34px; padding: 0 12px;">Excluir <span style="font-size: 11px; color: #9AA6B2;">Del</span></button>
+            <button type="button" class="btn ghost" onClick="{{limparSel}}" style="height: 34px; padding: 0 12px;">Cancelar <span style="font-size: 11px; color: #9AA6B2;">Esc</span></button>
+          </div>
+        </sc-if>
+
+        <div style="position: absolute; top: 12px; right: 12px; display: flex; gap: 8px; z-index: 6;">
+          <sc-if value="{{temVisao}}" hint-placeholder-val="{{ true }}">
+            <button type="button" class="{{visaoCls}}" onPointerDown="{{parar}}" onClick="{{toggleVisao}}" aria-pressed="{{visao}}"><span class="dot"></span>Visão</button>
+            <button type="button" class="{{nomesCls}}" onPointerDown="{{parar}}" onClick="{{toggleNomes}}" aria-pressed="{{nomes}}"><span class="dot"></span>Nomes</button>
+          </sc-if>
+        </div>
+
+        <sc-if value="{{naoRound}}" hint-placeholder-val="{{ true }}">
+        <div style="position: absolute; left: 12px; bottom: 12px; display: flex; align-items: center; gap: 6px; background: rgba(15,25,35,.85); border: 1px solid #263442; border-radius: 6px; padding: 4px 10px; font-size: 11px; color: #C5CBD3; z-index: 6;">
+          <span style="width: 6px; height: 6px; border-radius: 50%; background: #F5E36B;"></span>
+          {{rodape}}
+        </div>
+        </sc-if>
+
+        <sc-if value="{{temRoundUI}}" hint-placeholder-val="{{ false }}">
+          <div class="vivos" onPointerDown="{{parar}}">
+            <span class="tA"></span><span class="vnome">{{nomeA}}</span>
+            <span class="vnum">{{vivosA}}</span><span style="color: #6B7885; font-size: 12px;">vivos</span><span class="vnum">{{vivosB}}</span>
+            <span class="vnome">{{nomeB}}</span><span class="tB"></span>
+          </div>
+          <div class="linhatempo" onPointerDown="{{parar}}">
+            <span class="lt-ext">0:00</span>
+            <div class="lt-trilho">
+              <div class="lt-feito" style="width: {{ltPos}}%;"></div>
+              <sc-for list="{{marcasTempo}}" as="m" hint-placeholder-count="6">
+                <button type="button" class="{{m.cls}}" onClick="{{m.pick}}" style="left: {{m.pos}}%;" aria-label="{{m.rotulo}}" title="{{m.rotulo}}"></button>
+              </sc-for>
+            </div>
+            <span class="lt-ext">{{ltFim}}</span>
+          </div>
+        </sc-if>
+
+        <div role="group" aria-label="Zoom" onPointerDown="{{parar}}" style="position: absolute; right: 12px; bottom: 12px; display: flex; flex-direction: column; align-items: center; gap: 4px; z-index: 6;">
+          <button type="button" class="tb zb" onClick="{{zoomMais}}" aria-label="Aproximar" title="Aproximar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+          </button>
+          <button type="button" class="tb zb" onClick="{{zoomMenos}}" aria-label="Afastar" title="Afastar">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14"></path></svg>
+          </button>
+          <button type="button" class="tb zb" onClick="{{zoomReset}}" aria-label="Mostrar o mapa inteiro" title="Mostrar o mapa inteiro">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"></path></svg>
+          </button>
+          <span style="font-size: 11px; font-weight: 600; color: #C5CBD3;">{{zoomPct}}</span>
+        </div>
+
+        <sc-if value="{{apresentacao}}" hint-placeholder-val="{{ false }}">
+          <div role="group" aria-label="Apresentação" onPointerDown="{{parar}}" style="position: absolute; left: 50%; bottom: 16px; transform: translateX(-50%); display: flex; align-items: center; gap: 12px; background: rgba(22,33,44,.95); border: 1px solid #44566A; border-radius: 16px; padding: 10px 12px 10px 10px; z-index: 8; box-shadow: 0 10px 30px rgba(0,0,0,.5);">
+            <button type="button" class="tb zb" onClick="{{passoAnt}}" aria-label="Anterior">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg>
+            </button>
+            <button type="button" class="play" onClick="{{togglePlay}}" aria-label="{{playLabel}}">
+              <sc-if value="{{tocando}}" hint-placeholder-val="{{ false }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+              </sc-if>
+              <sc-if value="{{parado}}" hint-placeholder-val="{{ true }}">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+              </sc-if>
+            </button>
+            <button type="button" class="tb zb" onClick="{{passoProx}}" aria-label="Próxima">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg>
+            </button>
+            <div style="display: flex; flex-direction: column; gap: 2px; min-width: 180px; padding: 0 6px;">
+              <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 18px;">{{posTitulo}}</span>
+              <span style="font-size: 13px; color: #C5CBD3;">{{posSub}}</span>
+            </div>
+            <button type="button" class="{{lapisApCls}}" onClick="{{toggleLapisAp}}" aria-pressed="{{apLapisOn}}" aria-label="Lápis temporário (P): o desenho some ao sair da apresentação" title="Lápis temporário (P) · some ao sair">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16l-1 4z"></path><path d="M14 6l3 3"></path></svg>
+            </button>
+            <sc-if value="{{apLapisAtivo}}" hint-placeholder-val="{{ true }}">
+              <div class="paleta-ap" role="group" aria-label="Cor do lápis">
+                <sc-for list="{{coresApres}}" as="c" hint-placeholder-count="6">
+                  <button type="button" class="{{c.cls}}" onClick="{{c.pick}}" aria-label="{{c.nome}}" aria-pressed="{{c.on}}" title="{{c.nome}}" style="--cor: {{c.cor}};"></button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{temRiscos}}" hint-placeholder-val="{{ false }}">
+              <button type="button" class="tb zb" onClick="{{limparRiscos}}" aria-label="Apagar os desenhos" title="Apagar os desenhos">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
+              </button>
+            </sc-if>
+            <sc-if value="{{naoSoVer}}" hint-placeholder-val="{{ true }}">
+              <button type="button" class="btn ghost" onClick="{{toggleApres}}">Sair <span style="font-size: 11px; color: #9AA6B2;">Esc</span></button>
+            </sc-if>
+            <sc-if value="{{soVer}}" hint-placeholder-val="{{ false }}">
+              <span class="selo-ver"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>Só visualização</span>
+              <button type="button" class="btn ghost" onClick="{{editarCopia}}" style="white-space: nowrap;" title="Abre a jogada na sua prancheta para editar. A original de quem mandou não muda.">Editar uma cópia</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </main>
+    <sc-if value="{{jogadasAberta}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim" onPointerDown="{{fecharJogadas}}">
+        <div class="janela" role="dialog" aria-label="Minhas jogadas" onPointerDown="{{parar}}" style="width: min(720px, 100%);">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <p class="rotulo-pr">BIBLIOTECA DE JOGADAS</p>
+              <h2 style="margin: 0; font-size: 52px; line-height: .9;">Minhas jogadas</h2>
+              <p style="margin: 0; font-size: 14px; color: #C5CBD3;">Salve a estratégia montada para usar de novo nos rounds. Ela fica guardada neste navegador.</p>
+            </div>
+            <button type="button" class="btn ghost" onClick="{{fecharJogadas}}">Fechar <span style="font-size: 11px; color: #9AA6B2;">Esc</span></button>
+          </div>
+          <div class="cartao-j">
+            <label class="lbl" for="nome-jogada">Salvar a prancheta atual</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input id="nome-jogada" class="campo" value="{{nomeJogada}}" onChange="{{mudarNomeJogada}}" placeholder="Nome da jogada" style="flex: 1 1 260px;">
+              <button type="button" class="btn prim" onClick="{{salvarJogada}}">Salvar jogada</button>
+            </div>
+            <span style="font-size: 12px; color: #9AA6B2;">{{resumoAtual}}</span>
+            <sc-if value="{{temAvisoJogada}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #32E0C4;">{{avisoJogada}}</span></sc-if>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <p class="lbl">Salvas · {{nJogadas}}</p>
+            <sc-if value="{{semJogadas}}" hint-placeholder-val="{{ true }}">
+              <p style="margin: 0; font-size: 14px; color: #9AA6B2;">Nenhuma jogada salva ainda.</p>
+            </sc-if>
+            <sc-for list="{{jogadas}}" as="j" hint-placeholder-count="0">
+              <div class="linha-j">
+                <img src="{{j.arte}}" alt="" class="linha-j__arte">
+                <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1;">
+                  <b class="fnome" style="max-width: 100%; font-size: 15px;">{{j.nome}}</b>
+                  <span style="font-size: 12px; color: #9AA6B2;">{{j.info}}</span>
+                </div>
+                <button type="button" class="btn ghost" onClick="{{j.abrir}}">Abrir</button>
+                <button type="button" class="btn ghost" onClick="{{j.compartilhar}}" aria-label="{{j.ariaComp}}">Código</button>
+                <button type="button" class="tb" onClick="{{j.apagar}}" aria-label="{{j.ariaApagar}}" title="Apagar">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
+                </button>
+              </div>
+            </sc-for>
+          </div>
+          <div class="cartao-j">
+            <label class="lbl" for="codigo-import">Abrir jogada de um link ou código</label>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input id="codigo-import" class="campo" value="{{codigoImport}}" onChange="{{mudarCodigoImport}}" placeholder="Cole aqui o link ou o código que recebeu" style="flex: 1 1 260px;">
+              <button type="button" class="btn ghost" onClick="{{importarCodigo}}">Abrir</button>
+            </div>
+            <sc-if value="{{temErroImport}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #FF8A80;">{{erroImport}}</span></sc-if>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{compAberta}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim" onPointerDown="{{fecharComp}}">
+        <div class="janela" role="dialog" aria-label="Compartilhar jogada" onPointerDown="{{parar}}" style="width: min(620px, 100%);">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <p class="rotulo-pr">COMPARTILHAR</p>
+              <h2 style="margin: 0; font-size: 44px; line-height: .9;">{{compTitulo}}</h2>
+              <p style="margin: 0; font-size: 14px; color: #C5CBD3;">Mande o link para o time. Quem abrir vê exatamente o mesmo plano, com todas as etapas.</p>
+            </div>
+            <button type="button" class="btn ghost" onClick="{{fecharComp}}">Fechar</button>
+          </div>
+          <div class="cartao-j">
+            <p class="lbl">Quem abrir o link pode</p>
+            <div role="group" aria-label="Permissão do link" style="display: flex; gap: 2px; background: #16212C; border: 1px solid #263442; border-radius: 999px; padding: 3px;">
+              <sc-for list="{{modosLink}}" as="o" hint-placeholder-count="2">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="flex: 1; padding: 0 10px;">{{o.nome}}</button>
+              </sc-for>
+            </div>
+            <span style="font-size: 12px; color: #9AA6B2;">{{modoLinkDica}}</span>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input class="campo" readonly="true" value="{{compLink}}" onFocus="{{selecionarTudo}}" aria-label="Link da jogada" style="flex: 1 1 260px; font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+              <button type="button" class="btn prim" onClick="{{copiarLink}}">Copiar link</button>
+            </div>
+            <sc-if value="{{temAvisoLink}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #32E0C4;">{{compAvisoLink}}</span></sc-if>
+            <span style="font-size: 12px; color: #9AA6B2;">No site, o link abre a jogada direto. Aqui no protótipo, cole o link em Salvar › "Abrir jogada".</span>
+          </div>
+          <details class="mais-cod">
+            <summary>Prefere mandar o código?</summary>
+            <div style="display: flex; flex-direction: column; gap: 10px; padding-top: 10px;">
+              <textarea class="campo" readonly="true" value="{{compCodigo}}" onFocus="{{selecionarTudo}}" aria-label="Código da jogada" style="height: 90px; font-family: 'JetBrains Mono', monospace; font-size: 11px; resize: none; border-radius: 18px; padding: 12px;"></textarea>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <button type="button" class="btn ghost" onClick="{{copiarCodigo}}">Copiar código</button>
+                <span style="font-size: 13px; color: #32E0C4;">{{compAviso}}</span>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{novaAberta}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim" onPointerDown="{{fecharNova}}">
+        <div class="janela" role="dialog" aria-label="Nova estratégia" onPointerDown="{{parar}}">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <p class="lbl">Prancheta tática</p>
+              <h2 style="margin: 0; font-size: 56px; line-height: .9;">Nova estratégia</h2>
+              <p style="margin: 0; font-size: 14px; color: #C5CBD3;">Escolha o mapa. A prancheta começa limpa: o plano atual deste mapa é apagado.</p>
+            </div>
+            <button type="button" class="btn ghost" onClick="{{fecharNova}}">Cancelar <span style="font-size: 11px; color: #9AA6B2;">Esc</span></button>
+          </div>
+          <div class="nova-grade">
+            <sc-for list="{{novaMapas}}" as="m" hint-placeholder-count="5">
+              <button type="button" class="nova-card" onClick="{{m.pick}}" aria-label="{{m.aria}}">
+                <img src="{{m.arte}}" alt="">
+                <span class="nova-nome">{{m.nome}}</span>
+                <span class="nova-atual">{{m.atual}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{naoApres}}" hint-placeholder-val="{{ true }}">
+    <aside style="flex: 1 1 300px; max-width: 340px; min-width: 280px; margin: 0 14px 14px 0; border-radius: 24px; border: 1px solid rgba(236,232,225,.09); background: rgba(22,33,44,.62); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); box-shadow: 0 18px 44px rgba(0,0,0,.26); box-sizing: border-box; display: flex; flex-direction: column; min-height: 0; max-height: calc(100% - 14px); overflow: hidden;">
+
+      <sc-if value="{{temPlay}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; align-items: center; gap: 14px; padding: 16px; border-bottom: 1px solid #22303C;">
+          <button type="button" class="play" onClick="{{togglePlay}}" aria-label="{{playLabel}}">
+            <sc-if value="{{tocando}}" hint-placeholder-val="{{ false }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"></rect><rect x="14" y="5" width="4" height="14" rx="1"></rect></svg>
+            </sc-if>
+            <sc-if value="{{parado}}" hint-placeholder-val="{{ true }}">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"></path></svg>
+            </sc-if>
+          </button>
+          <div style="display: flex; flex-direction: column; gap: 3px; min-width: 0;">
+            <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 18px;">{{posTitulo}}</span>
+            <span style="font-size: 13px; color: #C5CBD3;">{{posSub}}</span>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isPlanejar}}" hint-placeholder-val="{{ true }}">
+        <div role="tablist" aria-label="Painel da estratégia" style="display: flex; gap: 4px; padding: 14px 16px 0;">
+          <sc-for list="{{abasDir}}" as="a" hint-placeholder-count="3">
+            <button type="button" role="tab" aria-selected="{{a.on}}" class="{{a.cls}}" onClick="{{a.pick}}">{{a.nome}}</button>
+          </sc-for>
+        </div>
+
+        <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <sc-if value="{{isAbaEt}}" hint-placeholder-val="{{ true }}">
+            <sc-for list="{{etapasLista}}" as="e" hint-placeholder-count="3">
+              <div class="etapa-linha">
+                <button type="button" class="{{e.cls}}" onClick="{{e.pick}}" style="flex: 1; min-width: 0;">
+                  <span class="num">{{e.n}}</span>
+                  <span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{e.nome}}</span>
+                  <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 600; font-size: 13px; color: #C5CBD3;">{{e.tempo}}</span>
+                </button>
+                <sc-if value="{{podeRemoverEtapa}}" hint-placeholder-val="{{ true }}">
+                  <button type="button" class="tb etapa-x" onClick="{{e.remover}}" aria-label="{{e.ariaRemover}}" title="Remover etapa (Ctrl+Z desfaz)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"></path></svg>
+                  </button>
+                </sc-if>
+              </div>
+            </sc-for>
+            <button type="button" class="item" onClick="{{novaEtapa}}" style="color: #C5CBD3; border: 1px dashed #2E3D4C;">
+              <span class="num" style="background: transparent;">+</span>
+              <span>Nova etapa (copia a atual)</span>
+            </button>
+            <div style="display: flex; gap: 8px; margin-top: 8px; padding-top: 16px; border-top: 1px solid #22303C;">
+              <label class="campo" style="flex: 1;">Nome da etapa<input value="{{etNome}}" onChange="{{mudarNome}}"></label>
+              <label class="campo" style="width: 84px;">Tempo<input value="{{etTempo}}" onChange="{{mudarTempo}}" placeholder="0:20"></label>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{isAbaIn}}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; font-size: 13px; color: #C5CBD3;">O que cada jogador faz em {{posSub}}.</p>
+            <sc-if value="{{semInstr}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 14px; line-height: 1.5; color: #9AA6B2;">Clique num agente, habilidade ou marcador no mapa para escrever a instrução nesta etapa.</p>
+            </sc-if>
+            <sc-for list="{{instrucoes}}" as="n" hint-placeholder-count="2">
+              <button type="button" class="item" onClick="{{n.pick}}">
+                <span class="{{n.ico}}" style="width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background-color: #263442; background-position: {{n.bp}}; display: flex; align-items: center; justify-content: center; font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 15px; color: #F5E36B;">{{n.letra}}</span>
+                <span style="display: flex; flex-direction: column; gap: 2px; min-width: 0;">
+                  <span style="font-size: 12px; color: #9AA6B2;">{{n.nome}}</span>
+                  <span>{{n.txt}}</span>
+                </span>
+              </button>
+            </sc-for>
+          </sc-if>
+
+          <sc-if value="{{isAbaCmp}}" hint-placeholder-val="{{ false }}">
+            <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #C5CBD3;">Coloca por cima do plano onde os jogadores estavam de verdade no round {{roundSel}} da partida escolhida no Round real. Seu time = {{nomeA}}.</p>
+            <sc-if value="{{cmpIndisp}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #F5E36B;">Escolha uma partida e um round no modo Round real: os momentos dele aparecem aqui.</p>
+            </sc-if>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <sc-for list="{{fantOps}}" as="o" hint-placeholder-count="5">
+                <button type="button" class="{{o.cls}}" onClick="{{o.pick}}">{{o.nome}}</button>
+              </sc-for>
+            </div>
+            <sc-if value="{{temFantasma}}" hint-placeholder-val="{{ false }}">
+              <p class="lbl" style="margin-top: 8px;">Quanto cada um fugiu do plano</p>
+            </sc-if>
+            <sc-for list="{{desvios}}" as="d" hint-placeholder-count="0">
+              <div style="display: flex; align-items: center; gap: 12px; padding: 6px 2px;">
+                <span class="spr spr-ag" style="width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; background-color: #263442; background-position: {{d.bp}};"></span>
+                <span style="flex: 1; font-size: 14px;">{{d.nome}}</span>
+                <span style="font-size: 14px; font-weight: 700; color: {{d.cor}};">{{d.txt}}</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{temFantasma}}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; font-size: 12px; color: #9AA6B2;">Acima de 10 m fica em vermelho.</p>
+            </sc-if>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isRound}}" hint-placeholder-val="{{ false }}">
+        <div style="flex: 1; min-height: 0; overflow: hidden; padding: 16px; display: flex; flex-direction: column; gap: 10px;">
+          <div class="resumo" style="flex-shrink: 0;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+              <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 16px;">Round {{rdNum}}</span>
+              <span class="{{ladoAtkCls2}}">{{atkNome}} ataca</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+              <span class="{{vencDot}}"></span><span>Vitória de <b>{{vencNome}}</b></span>
+            </div>
+            <span style="font-size: 13px; color: #C5CBD3;">{{rdComo}}</span>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid #263442; font-size: 13px;">
+              <span style="display: flex; justify-content: space-between; gap: 8px;"><span class="lbl" style="font-size: 11px;">First blood</span><span style="display: flex; align-items: center; gap: 6px; min-width: 0;"><span class="{{fbDot}}"></span><span class="fnome">{{fbTxt}}</span></span></span>
+              <span style="display: flex; justify-content: space-between; gap: 8px;"><span class="lbl" style="font-size: 11px;">Trades</span><span style="display: flex; align-items: center; gap: 6px;"><span class="tA"></span>{{tradesA}}<span style="color: #6B7885;">·</span>{{tradesB}}<span class="tB"></span></span></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; padding-top: 8px; border-top: 1px solid #263442;">
+              <span class="lbl" style="font-size: 11px;">Compra</span>
+              <div style="display: flex; justify-content: space-between; font-size: 13px;"><span style="display: flex; align-items: center; gap: 6px;"><span class="tA"></span>{{ecoA}}</span><span style="display: flex; align-items: center; gap: 6px;">{{ecoB}}<span class="tB"></span></span></div>
+            </div>
+          </div>
+          <p class="lbl" style="margin-top: 6px; display: flex; justify-content: space-between;"><span>Eventos</span><span style="text-transform: none; letter-spacing: 0;">{{nFeed}}</span></p>
+          <div class="feed-lista" style="flex: 1 1 0; min-height: 120px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-right: -8px; padding-right: 8px; overscroll-behavior: contain;">
+          <sc-for list="{{feed}}" as="e" hint-placeholder-count="6">
+            <button type="button" class="{{e.cls}}" onClick="{{e.pick}}">
+              <span class="ftempo">{{e.t}}</span>
+              <sc-if value="{{e.ehAbate}}" hint-placeholder-val="{{ true }}">
+                <span class="{{e.icoA}}" style="background-position: {{e.bpA}};" title="{{e.nomeA}}"></span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9AA6B2" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+                <span class="{{e.icoV}}" style="background-position: {{e.bpV}};" title="{{e.nomeV}}"></span>
+                <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0; margin-left: 4px;">
+                  <span class="fnome">{{e.nomeA}}</span>
+                  <span class="fnome" style="color: #9AA6B2;">{{e.nomeV}}</span>
+                </span>
+              </sc-if>
+              <sc-if value="{{e.temTag}}" hint-placeholder-val="{{ false }}">
+                <span class="{{e.tagCls}}" title="{{e.tag}}" aria-label="{{e.tag}}">
+                  <sc-if value="{{e.ehFb}}" hint-placeholder-val="{{ true }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c-.4 0-.7.2-.9.5C9 6.3 5.5 10.6 5.5 14.5a6.5 6.5 0 0013 0c0-3.9-3.5-8.2-5.6-11.5-.2-.3-.5-.5-.9-.5z"></path></svg></sc-if>
+                  <sc-if value="{{e.ehTr}}" hint-placeholder-val="{{ false }}"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h13l-3.5-3.5"></path><path d="M20 16H7l3.5 3.5"></path></svg></sc-if>
+                  <span class="ftag-txt">{{e.tag}}</span>
+                </span>
+              </sc-if>
+              <sc-if value="{{e.ehSpike}}" hint-placeholder-val="{{ false }}">
+                <span class="fspike"><svg width="16" height="16" viewBox="0 0 128 128" aria-hidden="true"><use href="#ico-spike"></use></svg></span>
+                <span style="display: flex; flex-direction: column; gap: 1px; min-width: 0;">
+                  <span class="fnome">{{e.titulo}}</span>
+                  <span class="fnome" style="color: #9AA6B2;">{{e.nomeA}}</span>
+                </span>
+              </sc-if>
+            </button>
+          </sc-for>
+          </div>
+          <div style="flex-shrink: 0; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid #22303C; padding-top: 16px; margin-top: 6px;">
+            <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #9AA6B2;">Cada evento é uma foto das posições naquele instante. O play pula de foto em foto: o movimento entre elas não existe na base.</p>
+            <button type="button" class="btn ghost" onClick="{{copiarRound}}" style="width: 100%; justify-content: center; height: 44px;" title="Vira um plano com uma etapa por evento. Ctrl+Z traz o plano anterior de volta.">Levar o round inteiro para a prancheta</button>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isCalor}}" hint-placeholder-val="{{ false }}">
+        <div style="flex-shrink: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+          <p class="lbl">Recorte</p>
+          <div style="display: flex; flex-direction: column; gap: 4px; background: #16212C; border: 1px solid #22303C; border-radius: 10px; padding: 16px;">
+            <span style="font-family: 'Big Shoulders Display', sans-serif; font-weight: 700; font-size: 32px;">{{calorN}}</span>
+            <span style="font-size: 13px; color: #C5CBD3;">{{calorRotulo}} em {{mapaNome}}</span>
+          </div>
+          <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9AA6B2;">{{calorAjuda}}</p>
+          <div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #22303C; padding-top: 14px;">
+            <p class="lbl" style="display: flex; justify-content: space-between; align-items: center;"><span>Rounds nesta área</span>
+              <sc-if value="{{temArea}}" hint-placeholder-val="{{ false }}"><button type="button" class="tb" onClick="{{limparArea}}" style="width: auto; height: 24px; padding: 0 8px; font-size: 12px; text-transform: none; letter-spacing: 0;">Limpar</button></sc-if>
+            </p>
+            <sc-if value="{{semArea}}" hint-placeholder-val="{{ true }}">
+              <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9AA6B2;">Clique numa mancha do mapa para listar os rounds que tiveram eventos ali. Escolha um para abrir no Round real.</p>
+            </sc-if>
+            <sc-if value="{{temArea}}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; color: #9AA6B2;">{{areaResumo}}</span>
+            </sc-if>
+          </div>
+        </div>
+        <div style="flex: 1 1 0; min-height: 0; overflow-y: auto; padding: 0 16px 16px; display: flex; flex-direction: column; gap: 8px; overscroll-behavior: contain;">
+          <sc-for list="{{areaLista}}" as="a" hint-placeholder-count="0">
+            <button type="button" class="rarea" onClick="{{a.pick}}">
+              <span style="display: flex; justify-content: space-between; width: 100%; gap: 8px;"><b>{{a.cab}}</b><span style="font-size: 12px; color: #9AA6B2;">{{a.extra}}</span></span>
+              <span class="fnome" style="max-width: 100%; color: #C5CBD3;">{{a.jogo}}</span>
+              <span class="fnome" style="max-width: 100%;">{{a.desc}}</span>
+            </button>
+          </sc-for>
+        </div>
+      </sc-if>
+    </aside>
+    </sc-if>
+  </div>
+</div>

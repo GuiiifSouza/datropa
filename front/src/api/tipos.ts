@@ -140,6 +140,21 @@ export type JogadorPartida = {
   first_deaths?: number;
   multikills?: { k3: number; k4: number; k5: number };
 };
+export type PosicaoEvento = { x: number; y: number };
+export type EventoRound = {
+  id: string;
+  ordem: number;
+  tipo: 'abate' | 'plant' | 'defuse';
+  tempo_ms: number | null;
+  ator_id: string | null;
+  vitima_id: string | null;
+  site: string | null;
+  ator_time_id: string | null;
+  vitima_time_id: string | null;
+  posicao: PosicaoEvento | null;
+  jogadores: { jogador_id: string; time_id: string | null; agente_id: string | null; posicao: PosicaoEvento | null }[];
+};
+export type EventosRound = { partida_id: string; mapa_id: string; round: number; eventos: EventoRound[] };
 export type PartidaDetalhe = Omit<PartidaItem, 'rounds'> & {
   jogadores: JogadorPartida[];
   rounds: RoundDetalhe[];

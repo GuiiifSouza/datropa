@@ -9,7 +9,7 @@ SPA do Da Tropa no Firebase Hosting (`devs.datropa.com`). Vite + React + TypeScr
 Lhobregat e RhuanK trocaram de frente:
 
 - **Lhobregat:** esqueleto do app, páginas (panorama, partidas, partida, times, time, jogador, estatísticas, meta), Tropa AI (painel e tela cheia), login e identidade visual.
-- **RhuanK:** prancheta tática (mapa, peças, desenho, etapas, salvar, round real) e mapa de calor. Entra na rota `/prancheta` (`src/paginas/Prancheta.tsx`), que hoje é só o ponto de encaixe.
+- **RhuanK:** prancheta tática (mapa, peças, desenho, etapas, salvar, round real) e mapa de calor. Rota `/prancheta` (`src/paginas/Prancheta.tsx`), exportada do protótipo por `scripts/exportar_prancheta.py` (ver README). Não edite `src/prancheta/gerado/` à mão.
 
 ## Regras
 
