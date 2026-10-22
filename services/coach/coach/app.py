@@ -22,7 +22,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from . import auth, config
+from . import auth, config, cota
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s %(message)s")
 log = logging.getLogger("coach.app")
@@ -104,6 +104,21 @@ class _Limite:
 
 
 limite = _Limite()
+cota_diaria = cota.Cota()
+
+_MENSAGEM_COTA = {
+    "usuario": "Você chegou ao limite de {n} perguntas por dia na Tropa AI. Volte amanhã.",
+    "global": "A Tropa AI chegou ao limite de perguntas de hoje. Volte amanhã.",
+}
+
+
+def contar_pergunta(uid: str) -> None:
+    try:
+        cota_diaria.contar(uid)
+    except cota.CotaEsgotada as e:
+        raise ErroApi(429, "RESOURCE_EXHAUSTED",
+                      _MENSAGEM_COTA[e.escopo].format(n=config.LIMITE_DIARIO_USUARIO),
+                      {"escopo": e.escopo}, headers={"Retry-After": str(e.segundos_ate_virar)}) from None
 
 
 class Turno(BaseModel):
@@ -126,6 +141,7 @@ def perguntar(pedido: Pedido, uid: str = Depends(usuario)):
     if not pedido.pergunta.strip():
         raise ErroApi(400, "INVALID_ARGUMENT", "pergunta vazia", {"field": "pergunta"})
     limite.conferir(uid)
+    contar_pergunta(uid)
 
     inicio = time.monotonic()
     conversa = Conversa([(t.papel, t.texto) for t in pedido.historico])
