@@ -3,7 +3,7 @@
  * e entrega para a lógica do protótipo, que filtra na hora (time, lado, momento e compra). Assim trocar
  * de filtro é instantâneo e o resultado bate com o que a API calcularia com os mesmos parâmetros.
  *
- * A rota devolve no máximo 100 pontos por página: as páginas vêm em paralelo (poucas por vez) e a
+ * A rota devolve no máximo 1.000 pontos por página: as páginas vêm em paralelo (poucas por vez) e a
  * tela mostra "carregando X de Y" até fechar o recorte, como pede o docs/api.md. Página que falha
  * (429, 5xx, rede) é tentada de novo sozinha; se mesmo assim não vier, o que já chegou fica.
  */
@@ -17,11 +17,12 @@ export type PontoPrancheta = Omit<PontoCalor, 'x' | 'y'> & { x: number; y: numbe
 // feitas: páginas já guardadas. Depois de um erro, a próxima tentativa só busca as que faltam.
 type Estado = {
   pontos: PontoPrancheta[]; total: number | null; lidos: number; feitas: Set<number>;
-  rodando: boolean; pronto: boolean; erro: boolean; erroEm: number;
+  porPagina: number; rodando: boolean; pronto: boolean; erro: boolean; erroEm: number;
 };
 
 const TIPO: Record<string, TipoCalor> = { abates: 'abate', mortes: 'morte', plants: 'plant' };
-const POR_PAGINA = 100;
+const POR_PAGINA = 1000;
+const PAGINA_COMPATIVEL = 100;
 const SIMULTANEAS = 4;
 const TENTATIVAS = 4;
 // depois de desistir, só tenta de novo quando a tela mudar e já tiver passado esse tempo
@@ -34,14 +35,14 @@ const passageiro = (err: unknown) => err instanceof ErroApi && (err.status === 0
 export function criarCalor() {
   const estados: Record<string, Estado> = {};
 
-  async function pagina(chave: string, tipo: TipoCalor, page: number, tentativa = 0): Promise<Lista<PontoCalor>> {
+  async function pagina(chave: string, tipo: TipoCalor, page: number, porPagina = POR_PAGINA, tentativa = 0): Promise<Lista<PontoCalor>> {
     try {
-      return await dados.calorMapa(MAPA_ID[chave], tipo, page, POR_PAGINA);
+      return await dados.calorMapa(MAPA_ID[chave], tipo, page, porPagina);
     } catch (err) {
       // espera o que a API pedir (ou 1 s, 2 s, 4 s...) e tenta de novo só esta página
       if (passageiro(err) && tentativa < TENTATIVAS) {
         await espera(((err as ErroApi).retryAfter ?? 2 ** tentativa) * 1000);
-        return pagina(chave, tipo, page, tentativa + 1);
+        return pagina(chave, tipo, page, porPagina, tentativa + 1);
       }
       throw err;
     }
@@ -63,15 +64,25 @@ export function criarCalor() {
     e.rodando = true;
     e.erro = false;
     try {
-      if (!e.feitas.has(1)) guardar(1, await pagina(chave, tipo, 1));
-      const paginas = Math.max(1, Math.ceil((e.total ?? 0) / POR_PAGINA));
+      // API antiga aceita só 100: manter compatibilidade durante a publicação.
+      if (!e.feitas.has(1)) {
+        let primeira: Lista<PontoCalor>;
+        try { primeira = await pagina(chave, tipo, 1); }
+        catch (err) {
+          if (!(err instanceof ErroApi) || err.status !== 400) throw err;
+          primeira = await pagina(chave, tipo, 1, PAGINA_COMPATIVEL);
+        }
+        e.porPagina = primeira.pagination.page_size;
+        guardar(1, primeira);
+      }
+      const paginas = Math.max(1, Math.ceil((e.total ?? 0) / e.porPagina));
       const fila: number[] = [];
       for (let p = 2; p <= paginas; p++) if (!e.feitas.has(p)) fila.push(p);
       let falhou = false;
       const trabalhador = async () => {
         while (!falhou && fila.length) {
           const p = fila.shift()!;
-          try { guardar(p, await pagina(chave, tipo, p)); } catch { falhou = true; }
+          try { guardar(p, await pagina(chave, tipo, p, e.porPagina)); } catch { falhou = true; }
         }
       };
       await Promise.all(Array.from({ length: SIMULTANEAS }, trabalhador));
@@ -91,7 +102,7 @@ export function criarCalor() {
       if (!tipo || !MAPA_ID[chave]) return;
       const k = `${chave}|${tipo}`;
       const e = (estados[k] ??= {
-        pontos: [], total: null, lidos: 0, feitas: new Set(), rodando: false, pronto: false, erro: false, erroEm: 0,
+        pontos: [], total: null, lidos: 0, feitas: new Set(), porPagina: POR_PAGINA, rodando: false, pronto: false, erro: false, erroEm: 0,
       });
       if (e.rodando || e.pronto) return;
       if (e.erro && Date.now() - e.erroEm < PAUSA_APOS_ERRO_MS) return;

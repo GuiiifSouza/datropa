@@ -380,7 +380,7 @@ js = trocar(js, '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>', """if (A
           if (pt && p && Math.pow(q.x - pt[0], 2) + Math.pow(q.y - pt[1], 2) <= R2) {
             const ch = pi + ':' + (q.round - 1);
             if (vistos[ch]) { vistos[ch].n++; return; }
-            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
+            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, alvo: q.evento_id, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
             areaRounds.push(vistos[ch]);
           }
         });

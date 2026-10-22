@@ -96,3 +96,43 @@ SQLs/planos de teste removidos do checkout continuam no historico Git.
 - [ ] Revisar PR e integrar na API com Gugu; conferir JSON e erros HTTP.
 - [ ] Preparar consultas de time e partida em tarefas seguintes.
 Esta entrega contem SQL e documentacao; nao altera Dockerfile, rotas, cache ou ranking.
+
+
+## Otimização do carregamento do calor — 22/10/2026
+
+Preparada na branch existente chico/consultas-api-jogador, sem republicar Gold.
+A rota de calor aceita page_size até 1000; outras coleções continuam até 100.
+Front solicita 1000 e usa 100 se a API antiga rejeitar a primeira página com 400.
+Para 11714 pontos, reduz de 118 para 12 requisições quando a API está atualizada.
+SQL, filtros, coordenadas e os quatro downloads simultâneos foram preservados.
+37 testes offline da API aprovados; tipos e build do front aprovados; teste
+sintético do carregador confere 11714 pontos únicos e compatibilidade com API antiga.
+Comando do teste: cd front && node scripts/testes/calor-paginacao.mjs.
+Não foram feitas consultas reais, chamadas Gemini, deploy nem medição real do ganho.
+Pendente: revisar/publicar backend e frontend por PR e medir uma carga de Ascent.
+O build local sem as artes privadas avisa caminhos ausentes; não houve inspeção
+visual desta otimização. Alteração não reduz o volume total de pontos transferidos;
+reduz páginas e repetição de consultas. Não promete 90% menos tempo ou custo.
+
+## Navegação do calor para o evento — 22/10/2026
+
+Chico confirmou carga de Ascent em aproximadamente 5 s (antes ~40 s).
+Corrigido o clique da área do calor: preserva evento_id e seleciona o evento
+correspondente após carregar o round, em vez de selecionar sempre o índice zero.
+ID preservado no adaptador de eventos; nenhuma consulta ou coordenada alterada.
+Fonte do protótipo e exportador atualizados, com lógica regenerada.
+Teste offline aprovado para round em cache, carga tardia, eventos no mesmo
+segundo e navegação manual. Tipos e build aprovados. Sem teste visual local
+com as artes privadas; validar o clique de 0:32 na interface publicada.
+
+## Retratos dos agentes no restante do site — 22/10/2026
+
+O componente Agente buscava arquivos individuais inexistentes. Agora usa o
+sprite já publicado em /arte/prancheta/agentes.png, com os 29 retratos do ZIP.
+Preservados tamanhos p/m/g, formato circular, bordas por classe e nomes acessíveis.
+Artes não adicionadas ao Git; publicação reaproveita o bucket existente.
+VITE_ARTE_RIOT habilitado por padrão; 0 continua permitindo desativação explícita.
+Tipos, build com artes locais e teste offline dos 29 agentes nos três tamanhos
+aprovados. Teste: cd front && node scripts/testes/agentes-retratos.mjs.
+Navegador local indisponível (Chromium ausente); confirmar visualmente filtros,
+tabelas, perfil do jogador e página da partida após publicação.

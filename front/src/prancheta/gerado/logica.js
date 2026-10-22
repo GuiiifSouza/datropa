@@ -314,9 +314,27 @@ class Component extends DCLogic {
     if (patch && typeof patch === 'object' && Object.prototype.hasOwnProperty.call(patch, 'sel') && !Object.prototype.hasOwnProperty.call(patch, 'sels')) patch = Object.assign({}, patch, { sels: [] });
     return super.setState(patch, cb);
   }
+  abrirEventoCalor(a) {
+    this.pararPlay();
+    this.alvoCalor = a.alvo ? { mapa: this.state.mapa, partida: a.pi, round: a.ri + 1, id: a.alvo } : null;
+    this.setState({ modo: 'round', partida: a.pi, round: a.ri + 1, evento: a.ei, tocando: false, fantasma: null, listaPartidas: false, z: 1, ox: 0, oy: 0 });
+  }
   componentDidUpdate() {
     if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());
     if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(this.state.mapa, this.state.partida, this.state.round);
+    // O round pode chegar depois do clique: selecionar pelo ID, nunca pelo segundo arredondado.
+    const alvo = this.alvoCalor, s = this.state;
+    if (alvo) {
+      if (s.modo !== 'round' || s.mapa !== alvo.mapa || s.partida !== alvo.partida || s.round !== alvo.round) this.alvoCalor = null;
+      else {
+        const p = s.reais[s.mapa]?.partidas[s.partida], r = p?.rounds.find((r) => r.n === s.round);
+        if (r?.ev) {
+          this.alvoCalor = null;
+          const i = r.ev.findIndex((e) => e[8] === alvo.id);
+          if (i >= 0 && i !== s.evento) { this.setState({ evento: i }); return; }
+        }
+      }
+    }
     if (this.state.modo !== 'round' || this.ultimoEvVisto === this.state.evento + ':' + this.state.round) return;
     this.ultimoEvVisto = this.state.evento + ':' + this.state.round;
     try {
@@ -1160,7 +1178,7 @@ class Component extends DCLogic {
           if (pt && p && Math.pow(q.x - pt[0], 2) + Math.pow(q.y - pt[1], 2) <= R2) {
             const ch = pi + ':' + (q.round - 1);
             if (vistos[ch]) { vistos[ch].n++; return; }
-            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
+            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, alvo: q.evento_id, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
             areaRounds.push(vistos[ch]);
           }
         });
@@ -1432,7 +1450,7 @@ class Component extends DCLogic {
       areaX: s.calorPt ? pct(s.calorPt[0], s.calorPt[1]).x : 0, areaY: s.calorPt ? pct(s.calorPt[0], s.calorPt[1]).y : 0, areaW: (RAIO_AREA * W * 2 / VW * 100).toFixed(2),
       areaResumo: areaRounds.length ? areaRounds.length + (areaRounds.length === 1 ? ' round' : ' rounds') + ' com eventos aqui, dentro dos filtros' + (areaRounds.length > 40 ? ' (mostrando os 40 primeiros)' : '') + '.' : 'Nenhum evento do recorte nesta área. Tente outro ponto ou afrouxe os filtros.',
       areaLista: areaRounds.slice(0, 40).map((a) => ({ cab: a.cab, jogo: a.jogo, desc: a.desc, extra: a.n > 1 ? a.n + ' eventos' : '',
-        pick: () => { this.pararPlay(); this.setState({ modo: 'round', partida: a.pi, round: a.ri + 1, evento: a.ei, tocando: false, fantasma: null, listaPartidas: false, z: 1, ox: 0, oy: 0 }); } })),
+        pick: () => this.abrirEventoCalor(a) })),
       limparArea: () => this.setState({ calorPt: null }),
       calorRotulo: s.tipoCalor === 'plants' ? 'plants' : (s.tipoCalor === 'mortes' ? 'mortes' : 'abates'),
       calorAjuda: s.tipoCalor === 'plants' ? 'Onde a spike foi plantada. Com um time escolhido, só os plants dele.'

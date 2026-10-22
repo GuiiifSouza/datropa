@@ -22,6 +22,28 @@ class CalorCanvasHttpTests(unittest.TestCase):
                 self.assertEqual(res.status_code, 400)
         self.client_factory.assert_not_called()
 
+    def test_paginas_maiores_sem_alterar_demais_rotas(self):
+        pontos = [dict(evento_id=f"e{i}", x=i, y=i, peso=1) for i in range(1000)]
+        resultado = base.row(pontos=pontos, total=11714, eventos_elegiveis=11714,
+                             pontos_excluidos=0, transformacao_disponivel=True)
+        self.query_results([resultado])
+        url = "/api/stats/mapas/ascent/calor?tipo=abate&page=2&page_size=1000"
+        r = self.http.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["data"], pontos)
+        self.assertEqual(r.json()["pagination"], {"page": 2, "page_size": 1000, "total": 11714})
+        params = {p.name: p.value for p in self.bq.query.call_args.kwargs["job_config"].query_parameters}
+        self.assertEqual(params["limite"], 1000)
+        self.assertEqual(params["deslocamento"], 1000)
+        self.assertEqual(self.http.get(url).json(), r.json())
+        for url_invalida in (
+            "/api/stats/mapas/ascent/calor?tipo=abate&page_size=1001",
+            "/api/stats/mapas?page_size=101",
+            "/api/stats/ranking?page_size=101",
+        ):
+            self.assertEqual(self.http.get(url_invalida).status_code, 400)
+        self.assertEqual(self.bq.query.call_count, 1)
+
     def test_parametros_contexto_e_chaves_distintas(self):
         ponto = dict(
             partida_id="p1", round=1, evento_id="e1", x=10.0, y=20.0,

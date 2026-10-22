@@ -34,7 +34,7 @@ Os exemplos JSON abaixo são fictícios, não resultados da base.
 - Datas de filtro usam YYYY-MM-DD, inclusivas.
 - Início desconhecido permanece null; filtros de data excluem
   registros sem data conhecida.
-- Coleções usam `page`, padrão 1, e `page_size`, padrão 20, máximo 100.
+- Coleções usam `page`, padrão 1, e `page_size`, padrão 20, máximo 100 (exceto mapa de calor, máximo 1000).
 - Paginação exige inteiros positivos.
 - Ordem estável, usando ID como desempate.
 - Percentuais em 0–100.
@@ -691,6 +691,9 @@ por um limite de coordenada nem tratá-lo como regra universal.
 
 Filtros gerais, com mapa definido pelo path, mais `time_id`,
 `jogador_id` e `tipo` obrigatório: abate, plant ou morte. Usa paginação.
+Nesta rota, `page_size` aceita de 1 a 1000 (padrão 20); demais coleções
+continuam limitadas a 100. O front usa 1000, com retorno a 100 se a API
+ainda não atualizada rejeitar o tamanho com HTTP 400.
 
 | Parâmetro opcional | Regra |
 |---|---|

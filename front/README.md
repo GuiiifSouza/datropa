@@ -23,7 +23,7 @@ Variáveis opcionais em `.env.local` (modelo em [.env.example](.env.example)):
 | `VITE_FONTE_DADOS` | `auto` (padrão): API real e, se a rota não responder, o snapshot. `api` ou `snapshot` forçam uma fonte |
 | `VITE_API_PROXY` | Em dev, manda `/api/**` e `/__/**` para outro host (ex.: `https://datropa.web.app`) |
 | `VITE_FIREBASE_*` | Config web do Firebase fora do Hosting. No Hosting ela vem sozinha de `/__/firebase/init.json` |
-| `VITE_ARTE_RIOT` | `1` liga as artes de agente da Riot. **Só depois do OK da organização** |
+| `VITE_ARTE_RIOT` | `1` (padrão) usa os retratos já publicados em `/arte/prancheta/agentes.png`; `0` desliga |
 
 ## Telas
 
