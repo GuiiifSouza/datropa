@@ -8,7 +8,48 @@ export function criarPrancheta(DCLogic, AMB) {
 var RAIO_AREA = 0.035;
 var CHAVE_JOGADAS = 'dt-prancheta-jogadas';
 // código da jogada: o JSON do plano em base64 (sem servidor; quem recebe cola e abre)
+// DT1: JSON em base64. DT2: JSON comprimido (deflate-raw) em base64url, bem mais curto no link.
 function paraCodigo(obj) { return 'DT1.' + btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
+function bytesB64url(b) { var t = ''; for (var i = 0; i < b.length; i += 0x8000) t += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+function b64urlBytes(t) { var x = atob(t.replace(/-/g, '+').replace(/_/g, '/')), b = new Uint8Array(x.length); for (var i = 0; i < x.length; i++) b[i] = x.charCodeAt(i); return b; }
+function passarPor(fluxo, bytes) { return new Response(new Blob([bytes]).stream().pipeThrough(fluxo)).arrayBuffer().then(function (b) { return new Uint8Array(b); }); }
+// versão comprimida do código; sem CompressionStream (ou se não ficar menor) fica o DT1
+function paraCodigoCurto(obj) {
+  var dt1 = paraCodigo(obj);
+  if (typeof CompressionStream === 'undefined') return Promise.resolve(dt1);
+  return Promise.resolve().then(function () { return passarPor(new CompressionStream('deflate-raw'), new TextEncoder().encode(JSON.stringify(obj))); })
+    .then(function (b) { var c = 'DT2.' + bytesB64url(b); return encodeURIComponent(c).length < encodeURIComponent(dt1).length ? c : dt1; })
+    .catch(function () { return dt1; });
+}
+// lê DT1 ou DT2; devolve uma Promise com a jogada (ou null se o código não abrir)
+function lerCodigo(txt) {
+  var s = String(txt || '').trim();
+  if (s.indexOf('DT2.') !== 0) return Promise.resolve(deCodigo(s));
+  if (typeof DecompressionStream === 'undefined') return Promise.resolve(null);
+  return Promise.resolve().then(function () { return passarPor(new DecompressionStream('deflate-raw'), b64urlBytes(s.slice(4))); })
+    .then(function (b) { return JSON.parse(new TextDecoder().decode(b)); })
+    .catch(function () { return null; });
+}
+// link acima disso o Firebase Hosting recusa (414, perto de 8.150 caracteres)
+var LIMITE_LINK = 8000;
+// confere a jogada que veio de link, código ou do navegador; devolve uma cópia limpa ou null
+function normalizarJogada(j) {
+  if (!j || typeof j !== 'object' || !MAPA_INFO[j.mapa] || !Array.isArray(j.etapas)) return null;
+  var num = function (v) { return typeof v === 'number' && isFinite(v); };
+  var obj = function (o) { return !!o && typeof o === 'object' && !Array.isArray(o); };
+  var ponto = function (q) { return Array.isArray(q) && q.length >= 2 && num(q[0]) && num(q[1]); };
+  var lista = function (l) { return Array.isArray(l) ? l.filter(obj) : []; };
+  var etapas = j.etapas.filter(obj).map(function (e, i) {
+    var et = { nome: typeof e.nome === 'string' && e.nome ? e.nome : 'Etapa ' + (i + 1), tempo: typeof e.tempo === 'string' ? e.tempo : '',
+      pecas: lista(e.pecas).filter(function (o) { return num(o.x) && num(o.y); }),
+      marcas: lista(e.marcas).filter(function (o) { return num(o.x) && num(o.y); }),
+      tracos: lista(e.tracos).filter(function (o) { return Array.isArray(o.pts) && o.pts.length && o.pts.every(ponto); }),
+      textos: lista(e.textos).filter(function (o) { return num(o.x) && num(o.y) && num(o.w) && num(o.h); }) };
+    return Object.assign({}, e, et);
+  });
+  if (!etapas.length) return null;
+  return { nome: typeof j.nome === 'string' ? j.nome : '', mapa: j.mapa, lado: j.lado === 'defesa' ? 'defesa' : 'ataque', etapas: JSON.parse(JSON.stringify(etapas)) };
+}
 var BASE_LINK = AMB.baseLink || 'https://datropa.web.app/prancheta';
 function paraLink(codigo, soVer) { return BASE_LINK + '?j=' + encodeURIComponent(codigo) + (soVer ? '&modo=ver' : ''); }
 // aceita link (…?j=DT1…&modo=ver) ou o código puro; devolve { codigo, soVer }
@@ -23,7 +64,7 @@ function lerLinkOuCodigo(txt) {
   });
   return { codigo: cod, soVer: ver };
 }
-AMB.decodificar = function (t) { var l = lerLinkOuCodigo(t); return { jogada: deCodigo(l.codigo), soVer: l.soVer }; };
+AMB.decodificar = function (t) { var l = lerLinkOuCodigo(t); return lerCodigo(l.codigo).then(function (j) { return { jogada: j, soVer: l.soVer }; }); };
 function deCodigo(txt) { var s = String(txt || '').trim(); if (s.indexOf('DT1.') !== 0) return null; try { return JSON.parse(decodeURIComponent(escape(atob(s.slice(4))))); } catch (e) { return null; } }
 // cores do lápis (tokens do site: giz, vermelho, âmbar, menta, alerta) + roxo para destacar
 var CORES_LAPIS = [['#ECE8E1', 'Branco'], ['#FF4655', 'Vermelho'], ['#F9A23B', 'Âmbar'], ['#32E0C4', 'Menta'], ['#F5E36B', 'Amarelo'], ['#9B8CFF', 'Roxo']];
@@ -345,19 +386,30 @@ class Component extends DCLogic {
     if (!AMB.reais || (this.state.reais && this.state.reais[chave])) return;
     AMB.reais.listar(chave, (d) => { const novo = Object.assign({}, this.state.reais); novo[chave] = d; this.setState({ reais: novo }); });
   }
-  // ---- Minhas jogadas: guardadas neste navegador (protótipo) ----
-  lerJogadas() { try { return JSON.parse(localStorage.getItem(CHAVE_JOGADAS) || '[]'); } catch (e) { return this.jogadasMem || []; } }
+  // ---- Minhas jogadas: guardadas neste navegador (localStorage) ----
+  lerJogadas() { let l; try { l = JSON.parse(localStorage.getItem(CHAVE_JOGADAS) || '[]'); } catch (e) { l = this.jogadasMem || []; } return Array.isArray(l) ? l.filter((j) => j && MAPA_INFO[j.mapa] && Array.isArray(j.etapas)) : []; }
   gravarJogadas(lista) { this.jogadasMem = lista; try { localStorage.setItem(CHAVE_JOGADAS, JSON.stringify(lista)); return true; } catch (e) { return false; } }
-  abrirJogada(j, soVer) {
-    if (!j || !MAPA_INFO[j.mapa] || !Array.isArray(j.etapas) || !j.etapas.length) return false;
+  abrirJogada(jogada, soVer) {
+    const j = normalizarJogada(jogada);
+    if (!j) return false;
     this.pararPlay();
     this.salvos = this.salvos || {};
     this.carregarReais(j.mapa);
-    this.setState({ mapa: j.mapa, lado: j.lado === 'defesa' ? 'defesa' : 'ataque', etapas: JSON.parse(JSON.stringify(j.etapas)), etapa: 0,
+    this.setState({ mapa: j.mapa, lado: j.lado === 'defesa' ? 'defesa' : 'ataque', etapas: j.etapas, etapa: 0,
       hist: this.state.mapa === j.mapa ? this.state.hist.concat([JSON.stringify(this.state.etapas)]).slice(-30) : [], futuro: [],
       sel: null, sels: [], fantasma: null, mini: false, z: 1, ox: 0, oy: 0, modo: 'planejar', tocando: false, jogadasAberta: false, compAberta: false, mapaAberto: false,
-      soVer: !!soVer, apres: !!soVer, apLapis: false, riscos: [], ferramenta: soVer ? 'mao' : this.state.ferramenta });
+      soVer: !!soVer, apres: !!soVer, apLapis: false, riscos: [], ferramenta: soVer ? 'mao' : this.state.ferramenta, nomeJogada: j.nome });
     return true;
+  }
+  // link de jogada que não abre: avisa e deixa a prancheta vazia no mapa atual
+  jogadaInvalida() {
+    this.pararPlay();
+    this.setState({ etapas: etapaVazia(), etapa: 0, hist: [], futuro: [], sel: null, sels: [], fantasma: null, modo: 'planejar', tocando: false,
+      soVer: false, apres: false, linkInvalido: true });
+  }
+  // troca o código da janela de compartilhar pela versão comprimida, se ela ainda mostra o mesmo
+  encurtarCodigo(obj, cod) {
+    paraCodigoCurto(obj).then((c) => { if (c !== cod && this.state.compAberta && this.state.compCodigo === cod) this.setState({ compCodigo: c }); });
   }
   novaEstrategia(chave) {
     // prancheta limpa no mapa escolhido (o plano anterior desse mapa é descartado)
@@ -1221,20 +1273,26 @@ class Component extends DCLogic {
         info: (MAPA_INFO[j.mapa] ? MAPA_INFO[j.mapa].nome : j.mapa) + ' · ' + (j.lado === 'defesa' ? 'defesa' : 'ataque') + ' · ' + j.etapas.length + (j.etapas.length === 1 ? ' etapa' : ' etapas') + ' · ' + new Date(j.criado).toLocaleDateString('pt-BR'),
         ariaComp: 'Código de ' + j.nome, ariaApagar: 'Apagar ' + j.nome,
         abrir: () => this.abrirJogada(j),
-        compartilhar: () => this.setState({ compAberta: true, jogadasAberta: false, compTitulo: j.nome, compCodigo: paraCodigo({ nome: j.nome, mapa: j.mapa, lado: j.lado, etapas: j.etapas }), compAviso: '', compAvisoLink: '' }),
+        compartilhar: () => { const obj = { nome: j.nome, mapa: j.mapa, lado: j.lado, etapas: j.etapas }, cod = paraCodigo(obj);
+          this.setState({ compAberta: true, jogadasAberta: false, compTitulo: j.nome, compCodigo: cod, compAviso: '', compAvisoLink: '' }); this.encurtarCodigo(obj, cod); },
         apagar: () => { this.gravarJogadas(this.lerJogadas().filter((x) => x.id !== j.id)); this.setState({ avisoJogada: '“' + j.nome + '” apagada.' }); } })),
       codigoImport: s.codigoImport || '', mudarCodigoImport: (e) => this.setState({ codigoImport: e.target.value, erroImport: '' }),
       temErroImport: !!s.erroImport, erroImport: s.erroImport || '',
       importarCodigo: () => {
-        const lido = lerLinkOuCodigo(s.codigoImport), j = deCodigo(lido.codigo);
-        if (!j || !this.abrirJogada(j, lido.soVer)) { this.setState({ erroImport: 'Link ou código inválido. Confira se copiou ele inteiro.' }); return; }
-        this.setState({ codigoImport: '' });
-        const lista = this.lerJogadas(); lista.unshift({ id: 'j' + Date.now(), nome: j.nome || 'Jogada recebida', mapa: j.mapa, lado: j.lado, etapas: j.etapas, criado: new Date().toISOString() }); this.gravarJogadas(lista.slice(0, 60));
+        const lido = lerLinkOuCodigo(s.codigoImport);
+        lerCodigo(lido.codigo).then((cru) => {
+          const j = normalizarJogada(cru);
+          if (!j || !this.abrirJogada(j, lido.soVer)) { this.setState({ erroImport: 'Link ou código inválido. Confira se copiou ele inteiro.' }); return; }
+          this.setState({ codigoImport: '' });
+          const lista = this.lerJogadas(); lista.unshift({ id: 'j' + Date.now(), nome: j.nome || 'Jogada recebida', mapa: j.mapa, lado: j.lado, etapas: j.etapas, criado: new Date().toISOString() }); this.gravarJogadas(lista.slice(0, 60));
+        });
       },
       abrirCompartilhar: () => { this.pararPlay(); const nome = (s.nomeJogada || '').trim() || (info.nome + ' · ' + (atk ? 'Ataque' : 'Defesa'));
-        this.setState({ compAberta: true, tocando: false, mapaAberto: false, compTitulo: nome, compCodigo: paraCodigo({ nome: nome, mapa: s.mapa, lado: s.lado, etapas: s.etapas }), compAviso: '', compAvisoLink: '' }); },
+        const obj = { nome: nome, mapa: s.mapa, lado: s.lado, etapas: s.etapas }, cod = paraCodigo(obj);
+        this.setState({ compAberta: true, tocando: false, mapaAberto: false, compTitulo: nome, compCodigo: cod, compAviso: '', compAvisoLink: '' }); this.encurtarCodigo(obj, cod); },
       fecharComp: () => this.setState({ compAberta: false }), compTitulo: s.compTitulo || '', compCodigo: s.compCodigo || '', compAviso: s.compAviso || '',
-      compLink: paraLink(s.compCodigo || '', !!s.compVer),
+      compLink: paraLink(s.compCodigo || '', !!s.compVer), linkLongo: paraLink(s.compCodigo || '', !!s.compVer).length > LIMITE_LINK,
+      linkInvalido: !!s.linkInvalido, fecharLinkInvalido: () => this.setState({ linkInvalido: false }),
       modosLink: [[false, 'Editar uma cópia'], [true, 'Só visualizar']].map((o) => ({ nome: o[1], on: !!s.compVer === o[0] ? 'true' : 'false', cls: 'seg' + (!!s.compVer === o[0] ? ' on' : ''), pick: () => this.setState({ compVer: o[0], compAvisoLink: '' }) })),
       modoLinkDica: s.compVer ? 'Abre direto na apresentação, sem poder mexer. Bom para o jogador estudar antes do treino.' : 'Abre a jogada na prancheta da pessoa, pronta para mexer. A sua original não muda.',
       temAvisoLink: !!s.compAvisoLink, compAvisoLink: s.compAvisoLink || '',

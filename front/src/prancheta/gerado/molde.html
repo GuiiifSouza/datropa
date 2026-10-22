@@ -650,6 +650,20 @@
         </div>
       </div>
     </sc-if>
+    <sc-if value="{{linkInvalido}}" hint-placeholder-val="{{ false }}">
+      <div class="scrim" onPointerDown="{{fecharLinkInvalido}}">
+        <div class="janela" role="alertdialog" aria-label="Link inválido" onPointerDown="{{parar}}" style="width: min(520px, 100%);">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <p class="rotulo-pr">LINK INVÁLIDO</p>
+              <h2 style="margin: 0; font-size: 44px; line-height: .9;">Não deu para abrir a jogada</h2>
+              <p style="margin: 0; font-size: 14px; color: #C5CBD3;">O link veio incompleto ou estragado. A prancheta abriu vazia. Peça o link de novo para quem mandou.</p>
+            </div>
+            <button type="button" class="btn ghost" onClick="{{fecharLinkInvalido}}">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </sc-if>
     <sc-if value="{{compAberta}}" hint-placeholder-val="{{ false }}">
       <div class="scrim" onPointerDown="{{fecharComp}}">
         <div class="janela" role="dialog" aria-label="Compartilhar jogada" onPointerDown="{{parar}}" style="width: min(620px, 100%);">
@@ -674,7 +688,8 @@
               <button type="button" class="btn prim" onClick="{{copiarLink}}">Copiar link</button>
             </div>
             <sc-if value="{{temAvisoLink}}" hint-placeholder-val="{{ false }}"><span style="font-size: 13px; color: #32E0C4;">{{compAvisoLink}}</span></sc-if>
-            <span style="font-size: 12px; color: #9AA6B2;">No site, o link abre a jogada direto. Aqui no protótipo, cole o link em Salvar › "Abrir jogada".</span>
+            <sc-if value="{{linkLongo}}" hint-placeholder-val="{{ false }}"><span role="alert" style="font-size: 13px; color: #FF8A80;">Link grande demais para abrir; reduza etapas ou desenhos.</span></sc-if>
+            <span style="font-size: 12px; color: #9AA6B2;">O link abre a jogada direto. Também dá para colar em Salvar › "Abrir jogada".</span>
           </div>
           <details class="mais-cod">
             <summary>Prefere mandar o código?</summary>

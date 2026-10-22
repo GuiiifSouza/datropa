@@ -174,7 +174,8 @@ js = trocar(js, 'p.rounds.forEach((r, ri) => r.ev.forEach(', 'p.rounds.forEach((
 js = js.replace('document.querySelector(', '(this.raizEl || document).querySelector(')
 js = trocar(js, "var BASE_LINK = 'https://datropa.web.app/prancheta';", "var BASE_LINK = AMB.baseLink || 'https://datropa.web.app/prancheta';")
 # o site abre a jogada que vier no link (?j=...&modo=ver) com o mesmo leitor do protótipo
-js = trocar(js, 'function deCodigo(txt) {', 'AMB.decodificar = function (t) { var l = lerLinkOuCodigo(t); return { jogada: deCodigo(l.codigo), soVer: l.soVer }; };\nfunction deCodigo(txt) {')
+# (assíncrono: o código DT2 vem comprimido e é aberto com DecompressionStream)
+js = trocar(js, 'function deCodigo(txt) {', 'AMB.decodificar = function (t) { var l = lerLinkOuCodigo(t); return lerCodigo(l.codigo).then(function (j) { return { jogada: j, soVer: l.soVer }; }); };\nfunction deCodigo(txt) {')
 # mapa de calor: a aba fica igual ao protótipo, mas vazia até a API ter os eventos do mapa inteiro
 # (somar só os rounds já abertos no Round real daria um calor enganoso)
 js = trocar(js, 'partidasR.forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(', '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(')

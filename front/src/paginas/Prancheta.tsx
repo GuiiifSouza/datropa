@@ -21,6 +21,7 @@ import '../prancheta/gerado/prancheta.css';
 type Logica = {
   trocarMapa: (chave: string) => void;
   abrirJogada: (j: unknown, soVer?: boolean) => boolean;
+  jogadaInvalida: () => void;
   setState: (p: Record<string, unknown>) => void;
 };
 
@@ -43,10 +44,13 @@ export function Prancheta() {
       reais: criarReais({ nomeAgente: (id) => agenteRef.current(id), nomeTime, partidaInicial: partidaId }),
     };
     amb.inicio = (c: Logica) => {
-      const decodificar = amb.decodificar as ((t: string) => { jogada: unknown; soVer: boolean }) | undefined;
+      const decodificar = amb.decodificar as ((t: string) => Promise<{ jogada: unknown; soVer: boolean }>) | undefined;
       if (link && decodificar) {
-        const r = decodificar(link);
-        if (r.jogada) c.abrirJogada(r.jogada, r.soVer);
+        // link estragado (cortado, editado à mão, de versão velha): avisa e abre a prancheta vazia
+        Promise.resolve()
+          .then(() => decodificar(link))
+          .then((r) => { if (!r.jogada || !c.abrirJogada(r.jogada, r.soVer)) c.jogadaInvalida(); })
+          .catch(() => c.jogadaInvalida());
         return;
       }
       if (partidaId) {
