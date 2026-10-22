@@ -5,7 +5,7 @@
  */
 import { comFallback, ErroApi, getStats, MODO } from './cliente';
 import * as S from './snapshot';
-import type { Catalogos, EventosRound, Filtros, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem, TimeDetalhe } from './tipos';
+import type { Catalogos, EventosRound, Filtros, PontoCalor, TipoCalor, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem, TimeDetalhe } from './tipos';
 
 const enc = encodeURIComponent;
 type Pag = { page?: number; page_size?: number };
@@ -204,6 +204,9 @@ export const dados = {
     comFallback(`/partidas/${enc(id)}`, undefined, () => local(() => S.partida(id)))
       .then((r) => comExtras(r, (x) => extrasPartida(x, id)))
       .then(ordenarPartida),
+  // Pontos do mapa de calor (docs/api.md, /mapas/{id}/calor). Só API; até 100 por página.
+  calorMapa: (mapaId: string, tipo: TipoCalor, page: number, page_size = 100) =>
+    getStats<Lista<PontoCalor>>(`/mapas/${enc(mapaId)}/calor`, { tipo, page, page_size }),
   // Eventos de um round (docs/api.md, seção 6). Só API: o snapshot não tem eventos com posição.
   eventosRound: (id: string, round: number) => getStats<Objeto<EventosRound>>(`/partidas/${enc(id)}/rounds/${round}/eventos`),
   busca: (q: string, tipo?: 'time' | 'jogador' | 'mapa') => comFallback('/busca', { q, tipo }, () => local(() => S.busca(q, tipo))),

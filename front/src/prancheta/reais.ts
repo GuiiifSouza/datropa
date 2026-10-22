@@ -14,7 +14,7 @@ import type { EventoRound, PartidaDetalhe, PartidaItem } from '../api/tipos';
 
 type Ev = [string, number, number, number, number, number, [number, number, number, null][], string?];
 type Round = { n: number; venc: 'A' | 'B'; atk: 'A' | 'B'; res: string; cer: string; eA: number | null; eB: number | null; ev: Ev[] | null };
-type Partida = { id: string; a: string; b: string; pa: number; pb: number; torneio: string; data: string; jog: [string, string, 'A' | 'B'][]; rounds: Round[] };
+type Partida = { id: string; ta: string; tb: string; a: string; b: string; pa: number; pb: number; torneio: string; data: string; jog: [string, string, 'A' | 'B'][]; rounds: Round[] };
 export type DadosMapa = { mapa: string; partidas: Partida[] };
 
 // chave da prancheta -> id do mapa na base (codinome interno)
@@ -86,7 +86,7 @@ export function criarReais(op: Opcoes) {
     porMapa[chave] = {
       mapa: chave,
       partidas: itens.map((p) => ({
-        id: p.id, a: op.nomeTime(p.times[0].nome), b: op.nomeTime(p.times[1].nome), pa: p.times[0].rounds_ganhos, pb: p.times[1].rounds_ganhos,
+        id: p.id, ta: p.times[0].id, tb: p.times[1].id, a: op.nomeTime(p.times[0].nome), b: op.nomeTime(p.times[1].nome), pa: p.times[0].rounds_ganhos, pb: p.times[1].rounds_ganhos,
         torneio: p.torneio_id, data: dataCurta(p.inicio), jog: [], rounds: [],
       })),
     };
@@ -122,7 +122,15 @@ export function criarReais(op: Opcoes) {
         const i = idx(j.jogador_id);
         return q && i >= 0 ? [[i, q[0], q[1], null] as [number, number, number, null]] : [];
       });
-      return [tipo[e.tipo], e.tempo_ms ?? 0, idx(e.ator_id), e.tipo === 'abate' ? idx(e.vitima_id) : -1,
+      const vitima = e.tipo === 'abate' ? idx(e.vitima_id) : -1;
+      // abate: a vítima fica onde morreu (evento.posicao), mesmo quando o snapshot não traz ela.
+      // A lógica já desenha quem é a vítima como eliminada e a linha do tiro termina nesse ponto.
+      // Sem posição válida não se inventa nada: a vítima fica como veio no snapshot (ou sem ícone).
+      if (vitima >= 0 && pos) {
+        const s = snaps.find((p) => p[0] === vitima);
+        if (s) { s[1] = pos[0]; s[2] = pos[1]; } else snaps.push([vitima, pos[0], pos[1], null]);
+      }
+      return [tipo[e.tipo], e.tempo_ms ?? 0, idx(e.ator_id), vitima,
         pos ? pos[0] : NaN, pos ? pos[1] : NaN, snaps, e.site ?? undefined] as Ev;
     });
   }

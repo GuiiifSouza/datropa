@@ -315,6 +315,7 @@ class Component extends DCLogic {
     return super.setState(patch, cb);
   }
   componentDidUpdate() {
+    if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());
     if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(this.state.mapa, this.state.partida, this.state.round);
     if (this.state.modo !== 'round' || this.ultimoEvVisto === this.state.evento + ':' + this.state.round) return;
     this.ultimoEvVisto = this.state.evento + ':' + this.state.round;
@@ -836,7 +837,7 @@ class Component extends DCLogic {
       // linha do tiro: de quem matou até a vítima
       if (ev.raw[0] === 'k') {
         const k = ev.j.find((p) => p[7] === ev.raw[2]);
-        if (k) { tracer = 'M' + k[2] + ' ' + k[3] + 'L' + ev.raw[4] + ' ' + ev.raw[5]; tracerCor = k[0] === 'a' ? '#FBBF6E' : '#7EEBD9'; }
+        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = 'M' + k[2] + ' ' + k[3] + 'L' + ev.raw[4] + ' ' + ev.raw[5]; tracerCor = k[0] === 'a' ? '#FBBF6E' : '#7EEBD9'; }
       }
       const iEv = EVR.indexOf(ev), porIdx = {};
       ev.j.forEach((p, k) => { porIdx[p[7]] = { peca: pecas[k], p: p }; });
@@ -1128,7 +1129,36 @@ class Component extends DCLogic {
       const G = 88, grade = new Float32Array(G * G), tipo = s.tipoCalor, pts = [];
       const fase = s.calorFase || 'todo', ladoF = s.calorLado || 'todos', ecoF = s.calorEco || 'todas';
       const pt = s.calorPt, R2 = Math.pow(W * RAIO_AREA, 2), vistos = {};
-      (AMB.calorVazio ? [] : partidasR).forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach((e, ei) => {
+      if (AMB.calor) {
+        const idxP = {}; partidasR.forEach((p, i) => { idxP[p.id] = i; });
+        const rotulo = tipo === 'plants' ? 'Plant' : (tipo === 'mortes' ? 'Morte' : 'Abate');
+        AMB.calor.pontos(s.mapa, tipo).forEach((q) => {
+          const pi = idxP[q.partida_id], p = pi == null ? null : partidasR[pi];
+          const nomeTime = p ? (q.time_id === p.ta ? p.a : (q.time_id === p.tb ? p.b : '')) : '';
+          if (s.calorTime && nomeTime !== s.calorTime) return;
+          const atacando = q.lado === 'ataque';
+          if (ladoF === 'atk' && q.lado !== 'ataque') return;
+          if (ladoF === 'def' && q.lado !== 'defesa') return;
+          if (fase !== 'todo') {
+            if (q.tempo_ms == null) return;
+            const seg = q.tempo_ms / 1000;
+            if (fase === 'inicio' && seg >= 30) return;
+            if (fase === 'meio' && (seg < 30 || seg >= 60)) return;
+            if (fase === 'fim' && seg < 60) return;
+          }
+          if (ecoF !== 'todas' && (q.compra === 'force' ? 'forca' : q.compra) !== ecoF) return;
+          const cx = Math.floor(q.x / W * G), cy = Math.floor(q.y / H * G);
+          if (cx >= 0 && cy >= 0 && cx < G && cy < G) grade[cy * G + cx] += q.peso || 1;
+          pts.push([q.x, q.y, atacando ? 'a' : 'd']);
+          calorN++;
+          if (pt && p && Math.pow(q.x - pt[0], 2) + Math.pow(q.y - pt[1], 2) <= R2) {
+            const ch = pi + ':' + (q.round - 1);
+            if (vistos[ch]) { vistos[ch].n++; return; }
+            vistos[ch] = { pi: pi, ri: q.round - 1, ei: 0, n: 1, cab: 'R' + q.round + (q.tempo_ms == null ? '' : ' · ' + fmtT(q.tempo_ms)), jogo: p.a + ' x ' + p.b, desc: rotulo + (nomeTime ? ' · ' + nomeTime : '') };
+            areaRounds.push(vistos[ch]);
+          }
+        });
+      } else (AMB.calorVazio ? [] : partidasR).forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach((e, ei) => {
         if (tipo === 'plants' ? e[0] !== 'p' : e[0] !== 'k') return;
         // de quem é o ponto de vista: quem matou (abates), quem morreu (mortes) ou quem plantou (plants)
         const quem = p.jog[tipo === 'mortes' ? e[3] : e[2]]; if (!quem) return;
@@ -1385,7 +1415,8 @@ class Component extends DCLogic {
       visManchaCls: 'seg' + (visual === 'mancha' ? ' on' : ''), visPontosCls: 'seg' + (visual === 'pontos' ? ' on' : ''),
       pickMancha: () => this.setState({ calorVisual: 'mancha' }), pickPontos: () => this.setState({ calorVisual: 'pontos' }),
       legPontoA: s.tipoCalor === 'plants' ? 'Plant' : (s.tipoCalor === 'mortes' ? 'Morreu atacando' : 'Matou atacando'), legPontoB: s.tipoCalor === 'plants' ? '—' : (s.tipoCalor === 'mortes' ? 'Morreu defendendo' : 'Matou defendendo'),
-      pontosNota: AMB.calorVazio ? 'Os eventos do mapa de calor entram assim que a base estiver no ar.' : calorN > 2500 ? 'Mostrando uma amostra de 2.500 dos ' + calorN + ' eventos. Filtre por time para ver todos.' : 'Todos os ' + calorN + ' eventos do recorte.',
+      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),
+      pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ? 'Os eventos do mapa de calor entram assim que a base estiver no ar.' : calorN > 2500 ? 'Mostrando uma amostra de 2.500 dos ' + calorN + ' eventos. Filtre por time para ver todos.' : 'Todos os ' + calorN + ' eventos do recorte.',
       ecosCalor: [['todas', 'Todas'], ['pistol', 'Pistol'], ['eco', 'Eco'], ['forca', 'Força'], ['full', 'Full']].map((o) => ({ nome: o[1], cls: 'seg' + ((s.calorEco || 'todas') === o[0] ? ' on' : ''), pick: () => this.setState({ calorEco: o[0] }) })),
       temArea: !!s.calorPt, semArea: !s.calorPt,
       areaX: s.calorPt ? pct(s.calorPt[0], s.calorPt[1]).x : 0, areaY: s.calorPt ? pct(s.calorPt[0], s.calorPt[1]).y : 0, areaW: (RAIO_AREA * W * 2 / VW * 100).toFixed(2),
