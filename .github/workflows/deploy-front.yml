@@ -68,9 +68,18 @@ jobs:
       - name: Arte da prancheta (bucket privado)
         if: hashFiles('front/package.json') != ''
         run: |
+          # Sem arte o deploy segue: a prancheta abre sem mapa e sem rostos, e o próximo deploy
+          # inclui a arte quando ela estiver no bucket.
           mkdir -p front/public
-          gcloud storage cp -r "gs://$BUCKET_ARTE/arte" front/public/
-          test -d front/public/arte/prancheta || { echo "::error::front/public/arte/prancheta não veio de gs://$BUCKET_ARTE/arte."; exit 1; }
+          if saida=$(gcloud storage cp -r "gs://$BUCKET_ARTE/arte" front/public/ 2>&1); then
+            echo "Arte copiada de gs://$BUCKET_ARTE/arte."
+          elif grep -qi -e 'matched no objects' -e 'No URLs matched' -e 'not found' <<<"$saida"; then
+            echo "::warning::gs://$BUCKET_ARTE/arte está vazio. O front sobe sem a arte da prancheta."
+          else
+            echo "$saida"
+            echo "::warning::Não deu para copiar gs://$BUCKET_ARTE/arte. O front sobe sem a arte da prancheta."
+          fi
+          test -d front/public/arte/prancheta || echo "::warning::front/public/arte/prancheta não existe. A prancheta abre sem mapa e sem rostos."
 
       - name: Build do front (ou página provisória)
         run: |
