@@ -690,9 +690,24 @@ por um limite de coordenada nem tratá-lo como regra universal.
 ### GET /mapas/{mapa_id}/calor
 
 Filtros gerais, com mapa definido pelo path, mais `time_id`,
-`jogador_id` e `tipo` obrigatório: abate ou plant. Usa paginação.
+`jogador_id` e `tipo` obrigatório: abate, plant ou morte. Usa paginação.
 
-Item:
+| Parâmetro opcional | Regra |
+|---|---|
+| lado | ataque ou defesa, lado real do time de referência naquele round |
+| compra | pistol, eco, force ou full, categoria de equipamento da Gold |
+| tempo_inicio_ms | Inteiro não negativo, início inclusivo desde o começo do round |
+| tempo_fim_ms | Inteiro não negativo, fim exclusivo desde o começo do round |
+
+Tempos limitados ao INT64. Com ambas as extremidades, início deve ser menor
+que fim. Para 0–30 segundos: `tempo_inicio_ms=0&tempo_fim_ms=30000`.
+Um evento em 30000 ms pertence à próxima faixa, sem duplicação.
+
+O time/jogador de referência é o autor para abate e plant, e a vítima
+para morte. Os filtros time_id, jogador_id, lado e compra sempre usam essa
+mesma referência, inclusive quando time_id não for enviado.
+
+Item (campos novos são adicionais):
 
 ```json
 {
@@ -701,25 +716,38 @@ Item:
   "evento_id": "evento-demo",
   "x": 120.0,
   "y": -50.0,
-  "peso": 1
+  "peso": 1,
+  "tempo_ms": 25000,
+  "time_id": "time-demo",
+  "jogador_id": "jogador-demo",
+  "lado": "ataque",
+  "compra": "pistol"
 }
 ```
 
-Abate usa posição da vítima, filtrado pelo autor.
+Abate usa posição da vítima, filtrado pelo autor. Exige abate_adversario
+verdadeiro e dano final conhecido, excluindo Bomb, Fall e Crush.
 Plant usa posição da bomba, filtrado pelo planter/time atacante.
+Morte usa posição e identidade da vítima em eventos de abate, incluindo
+mortes ambientais, self-kills e fogo amigo. Essa camada conta eventos,
+não substitui deaths do placar. Não cria eventos novos na Gold.
 
-Calor de abates exige:
+Lado vem dos IDs de ataque/defesa de rounds, inclusive overtime.
+Compra vem de economia_time_round do time de referência; não mede
+intenção de compra. Economia com status_qualidade diferente de ok produz
+compra null. Lado desconhecido e tempo inválido/ausente permanecem null.
+Sem filtro correspondente, esses eventos continuam elegíveis; com filtro,
+não satisfazem a faixa/categoria/lado solicitado. Não inventar defaults.
 
-- abate_adversario verdadeiro;
-- dano final não ambiental: excluir Bomb, Fall e Crush;
-- posição válida e projetável.
+A projeção e os contadores permanecem iguais: pontos não finitos ou fora
+de [0,1] são excluídos da camada espacial e contabilizados em
+meta.pontos_excluidos. meta.eventos_elegiveis é medido após todos os
+filtros e antes da validação espacial. Sem transformação, nenhum ponto
+é projetável. Mapa inexistente retorna 404.
 
-Pontos externos, inclusive arena externa, ficam fora da camada
-espacial, preservando os totais de kills. Documentar a quantidade
-de pontos excluídos ao fechar a implementação da resposta.
-
-O frontend deve percorrer as páginas necessárias, sem apresentar
-uma página parcial como o recorte completo.
+O frontend deve percorrer as páginas necessárias, sem apresentar uma
+página parcial como o recorte completo. partida_id e round permitem
+abrir o round selecionado. Novos parâmetros participam da chave de cache.
 
 ## 7. Tools do coach — proposta para Guilherme
 
@@ -891,7 +919,7 @@ O estado atual no início deste documento substitui as indicações anteriores d
 ## Complemento — resposta do mapa de calor
 
 GET /api/stats/mapas/{mapa_id}/calor implementado para
-tipo=abate e tipo=plant, com filtros e paginação.
+tipo=abate, tipo=plant e tipo=morte, com filtros e paginação.
 
 Os itens de data mantêm x/y nas coordenadas originais do jogo.
 A projeção usa a transformação da Gold; pontos não projetáveis

@@ -1,46 +1,59 @@
+-- O sujeito é a vítima para morte e o autor para abate/plant.
+-- Morte inclui eventos ambientais e fogo amigo; não equivale ao deaths do placar.
 WITH mapa AS (
   SELECT mapa_id, transformacao
   FROM `datropa.valorant.mapas`
   WHERE mapa_id = @mapa_id
 ),
-recorte AS (
-  SELECT
-    e.partida_id,
-    e.`round`,
-    e.id AS evento_id,
-    e.posicao.x AS x,
-    e.posicao.y AS y
+eventos AS (
+  SELECT e.*,
+    IF(@tipo = 'morte', e.vitima_time_id, e.ator_time_id) AS time_filtro_id,
+    IF(@tipo = 'morte', e.vitima_id, e.ator_id) AS jogador_filtro_id
   FROM `datropa.valorant.eventos_round` e
   WHERE e.mapa_id = @mapa_id
-    AND e.tipo = @tipo
-    AND (
-      @torneio_id IS NULL
-      OR e.torneio_id = @torneio_id
-    )
-    AND (
-      @time_id IS NULL
-      OR e.ator_time_id = @time_id
-    )
-    AND (
-      @jogador_id IS NULL
-      OR e.ator_id = @jogador_id
-    )
-    AND (
-      @data_inicio IS NULL
-      OR e.data_partida_utc >= @data_inicio
-    )
-    AND (
-      @data_fim IS NULL
-      OR e.data_partida_utc <= @data_fim
-    )
+    AND e.tipo = IF(@tipo = 'morte', 'abate', @tipo)
+    AND (@torneio_id IS NULL OR e.torneio_id = @torneio_id)
+    AND (@data_inicio IS NULL OR e.data_partida_utc >= @data_inicio)
+    AND (@data_fim IS NULL OR e.data_partida_utc <= @data_fim)
+    AND ((@tempo_inicio_ms IS NULL AND @tempo_fim_ms IS NULL) OR e.tempo_ms >= 0)
+    AND (@tempo_inicio_ms IS NULL OR e.tempo_ms >= @tempo_inicio_ms)
+    AND (@tempo_fim_ms IS NULL OR e.tempo_ms < @tempo_fim_ms)
     AND (
       @tipo = 'plant'
+      OR (@tipo = 'morte' AND e.vitima_id IS NOT NULL)
       OR (
-        e.abate_adversario IS TRUE
+        @tipo = 'abate' AND e.abate_adversario IS TRUE
         AND e.dano_final_tipo IS NOT NULL
         AND e.dano_final_tipo NOT IN ('Bomb', 'Fall', 'Crush')
       )
     )
+),
+contexto AS (
+  SELECT e.partida_id, e.`round`, e.id AS evento_id,
+    e.posicao.x AS x, e.posicao.y AS y,
+    IF(e.tempo_ms >= 0, e.tempo_ms, NULL) AS tempo_ms,
+    e.time_filtro_id AS time_id,
+    e.jogador_filtro_id AS jogador_id,
+    CASE
+      WHEN r.atacante_id != r.defensor_id AND e.time_filtro_id = r.atacante_id THEN 'ataque'
+      WHEN r.atacante_id != r.defensor_id AND e.time_filtro_id = r.defensor_id THEN 'defesa'
+    END AS lado,
+    IF(ec.status_qualidade = 'ok', ec.categoria, NULL) AS compra
+  FROM eventos e
+  LEFT JOIN `datropa.valorant.rounds` r
+    ON r.partida_id = e.partida_id
+    AND r.round_indice_origem = e.round_indice
+  LEFT JOIN `datropa.valorant.economia_time_round` ec
+    ON ec.partida_id = e.partida_id
+    AND ec.round_indice_origem = e.round_indice
+    AND ec.time_id = e.time_filtro_id
+  WHERE (@time_id IS NULL OR e.time_filtro_id = @time_id)
+    AND (@jogador_id IS NULL OR e.jogador_filtro_id = @jogador_id)
+),
+recorte AS (
+  SELECT * FROM contexto
+  WHERE (@lado IS NULL OR lado = @lado)
+    AND (@compra IS NULL OR compra = @compra)
 ),
 projetados AS (
   SELECT
@@ -83,6 +96,11 @@ validos AS (
     evento_id,
     x,
     y,
+    tempo_ms,
+    time_id,
+    jogador_id,
+    lado,
+    compra,
     1 AS peso
   FROM classificados
   WHERE projetavel
