@@ -180,6 +180,9 @@ js = trocar(js, 'function deCodigo(txt) {', 'AMB.decodificar = function (t) { va
 # (somar só os rounds já abertos no Round real daria um calor enganoso)
 js = trocar(js, 'partidasR.forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(', '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) => p.rounds.forEach((r, ri) => (r.ev || []).forEach(')
 js = trocar(js, "pontosNota: calorN > 2500 ?", "pontosNota: AMB.calorVazio ? 'Os eventos do mapa de calor entram assim que a base estiver no ar.' : calorN > 2500 ?")
+# round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
+# mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
+js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
 # entrada pelo link: ?j= (jogada compartilhada) ou ?partida_id=&round= (round real)
 js = trocar(js, '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n',
             '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n    if (AMB.inicio) AMB.inicio(this);\n')
