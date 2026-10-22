@@ -136,3 +136,16 @@ Tipos, build com artes locais e teste offline dos 29 agentes nos três tamanhos
 aprovados. Teste: cd front && node scripts/testes/agentes-retratos.mjs.
 Navegador local indisponível (Chromium ausente); confirmar visualmente filtros,
 tabelas, perfil do jogador e página da partida após publicação.
+
+## Logos dos times — 22/10/2026
+
+Implementadas no componente compartilhado SeloTime, sem alterar dimensões,
+formato ou posicionamento. 46 PNGs originais do ZIP fornecido e autorizado
+pelo responsável; mapeamento explícito cobre 48 dos 68 times atuais.
+CEUB Octopus/Vulgaris, Azure Bears e demais variantes conhecidas compartilham
+a imagem apropriada. Imagens distintas permanecem separadas.
+20 times sem imagem correspondente preservam a sigla; lista em
+front/public/logos-times/README.md. Falha de imagem também preserva a sigla.
+Testes de aliases, existência dos arquivos, agentes, tipos e build aprovados.
+Sem consultas BigQuery/Gemini. Inspeção visual local indisponível: Chromium
+ausente no ambiente. Confirmar os selos no navegador após publicação.

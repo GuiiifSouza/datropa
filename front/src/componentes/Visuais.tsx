@@ -1,11 +1,12 @@
 /** Peças visuais pequenas: agente, selo de time, estados de carregamento/erro/vazio, fonte dos dados. */
-import { type ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { ErroApi } from '../api/cliente';
 import type { Meta } from '../api/tipos';
 import { nomeTime, sigla, slugAgente } from '../util/formato';
 import { useCatalogo } from './Catalogo';
 import { Link } from '../rotas';
 import { rostoAgente } from '../util/arteAgentes';
+import { logoTime } from '../util/logosTimes';
 
 // Mesma arte já publicada para a prancheta; 0 permite desligá-la explicitamente.
 const ARTE = import.meta.env.VITE_ARTE_RIOT !== '0';
@@ -26,9 +27,11 @@ export function Agente({ id, tamanho = 'm', mostrarNome }: { id: string | null |
 }
 
 export function SeloTime({ nome, lado, grande }: { nome: string | null | undefined; lado?: 'a' | 'b' | 'neutro'; grande?: boolean }) {
+  const logo = logoTime(nome);
+  const [falhou, setFalhou] = useState<string | null>(null);
   return (
     <span className={`selo-time${lado === 'b' ? ' selo-time--b' : lado === 'neutro' ? ' selo-time--neutro' : ''}${grande ? ' selo-time--g' : ''}`} aria-hidden="true">
-      {sigla(nome)}
+      {logo && falhou !== logo ? <img src={logo} alt="" loading="lazy" onError={() => setFalhou(logo)} /> : sigla(nome)}
     </span>
   );
 }
