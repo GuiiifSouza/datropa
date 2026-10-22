@@ -14,6 +14,7 @@ import { Link, useLocal } from '../rotas';
 import { nomeTime } from '../util/formato';
 import { compilar, criarBase } from '../prancheta/Motor';
 import { CHAVE_DO_MAPA, criarReais } from '../prancheta/reais';
+import { criarCalor } from '../prancheta/calor';
 import { criarPrancheta } from '../prancheta/gerado/logica';
 import molde from '../prancheta/gerado/molde.html?raw';
 import '../prancheta/gerado/prancheta.css';
@@ -39,7 +40,7 @@ export function Prancheta() {
   // a classe é montada uma vez por entrada na página; o link que trouxe a pessoa decide o começo
   const Tela = useMemo(() => {
     const amb: Record<string, unknown> = {
-      calorVazio: true,
+      calor: criarCalor(),
       baseLink: `${window.location.origin}/prancheta`,
       reais: criarReais({ nomeAgente: (id) => agenteRef.current(id), nomeTime, partidaInicial: partidaId }),
     };

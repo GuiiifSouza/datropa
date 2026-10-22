@@ -140,6 +140,20 @@ export type JogadorPartida = {
   first_deaths?: number;
   multikills?: { k3: number; k4: number; k5: number };
 };
+export type TipoCalor = 'abate' | 'plant' | 'morte';
+export type PontoCalor = {
+  partida_id: string;
+  round: number;
+  evento_id: string;
+  x: number;
+  y: number;
+  peso: number;
+  tempo_ms: number | null;
+  time_id: string | null;
+  jogador_id: string | null;
+  lado: 'ataque' | 'defesa' | null;
+  compra: 'pistol' | 'eco' | 'force' | 'full' | null;
+};
 export type PosicaoEvento = { x: number; y: number };
 export type EventoRound = {
   id: string;
