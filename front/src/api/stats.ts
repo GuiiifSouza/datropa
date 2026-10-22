@@ -5,7 +5,7 @@
  */
 import { comFallback, ErroApi, MODO } from './cliente';
 import * as S from './snapshot';
-import type { Filtros, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem } from './tipos';
+import type { Catalogos, Filtros, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem, TimeDetalhe } from './tipos';
 
 const enc = encodeURIComponent;
 type Pag = { page?: number; page_size?: number };
@@ -88,8 +88,70 @@ async function extrasPartidas(r: Lista<PartidaItem>): Promise<Lista<PartidaItem>
   return { ...r, data: r.data.map((p) => completar(p, loc.get(p.id))) };
 }
 
+// ---- nomes e ordem: o front não depende do formato exato da API ----
+
+/** Nome ausente ou igual ao próprio ID (ex.: torneio "UNIVAVA_G") não serve para exibição. */
+function nomeCru(nome: string | null | undefined, id: string): boolean {
+  const n = (nome ?? '').trim();
+  return !n || n.toLowerCase() === id.trim().toLowerCase();
+}
+
+/** Completa cada item de um catálogo da API com o do snapshot (mesmo ID): campo ausente e nome cru. */
+function juntarCatalogo<T extends { id: string; nome?: string | null }>(api: T[] | undefined, snap: T[] | undefined): T[] {
+  if (!api) return snap ?? [];
+  const loc = new Map((snap ?? []).map((x) => [x.id, x]));
+  return api.map((x) => {
+    const s = loc.get(x.id);
+    if (!s) return x;
+    const out = completar(x, s);
+    return nomeCru(x.nome, x.id) && !nomeCru(s.nome, s.id) ? { ...out, nome: s.nome } : out;
+  });
+}
+
+async function extrasCatalogos(r: Objeto<Catalogos>): Promise<Objeto<Catalogos>> {
+  let snap: Catalogos | undefined;
+  try {
+    snap = (await S.catalogos()).data;
+  } catch {
+    snap = undefined;
+  }
+  const d = r.data;
+  const data: Catalogos = {
+    ...d,
+    torneios: juntarCatalogo(d.torneios, snap?.torneios),
+    mapas: juntarCatalogo(d.mapas, snap?.mapas),
+    agentes: juntarCatalogo(d.agentes, snap?.agentes),
+    armas: juntarCatalogo(d.armas, snap?.armas),
+  };
+  // Mapas em ordem alfabética do nome, venha de onde vier (a API ordena por nome e o snapshot por ID).
+  data.mapas = [...data.mapas].sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.id.localeCompare(b.id));
+  return { ...r, data };
+}
+
+/** Mais partidas primeiro; empate por vitórias e depois pelo ID, para a ordem não depender da API. */
+function porPartidas<T extends { partidas: number; vitorias: number }>(xs: T[], id: (x: T) => string): T[] {
+  return [...xs].sort((a, b) => b.partidas - a.partidas || b.vitorias - a.vitorias || id(a).localeCompare(id(b)));
+}
+
+function ordenarJogador(r: Objeto<JogadorDetalhe>): Objeto<JogadorDetalhe> {
+  const d = r.data;
+  return { ...r, data: { ...d, agentes: porPartidas(d.agentes, (a) => a.agente_id), mapas: porPartidas(d.mapas, (m) => m.mapa_id) } };
+}
+
+function ordenarTime(r: Objeto<TimeDetalhe>): Objeto<TimeDetalhe> {
+  return { ...r, data: { ...r.data, mapas: porPartidas(r.data.mapas, (m) => m.mapa_id) } };
+}
+
+/** Placar da partida: maior ACS primeiro (sem ACS, mais abates), como no snapshot. */
+function ordenarPartida(r: Objeto<PartidaDetalhe>): Objeto<PartidaDetalhe> {
+  const jogadores = [...r.data.jogadores].sort((a, b) => (b.acs ?? -1) - (a.acs ?? -1) || b.kills - a.kills || a.jogador_id.localeCompare(b.jogador_id));
+  const rounds = [...r.data.rounds].sort((a, b) => a.round - b.round);
+  return { ...r, data: { ...r.data, jogadores, rounds } };
+}
+
 export const dados = {
-  catalogos: () => comFallback('/catalogos', undefined, () => local(S.catalogos)),
+  catalogos: () =>
+    comFallback('/catalogos', undefined, () => local(S.catalogos)).then((r) => (r.meta.fonte === 'api' ? extrasCatalogos(r) : r)),
 
   ranking: (f: FiltroRanking & Pag & { ordem?: OrdemRanking } = {}) =>
     // Ordens extras (ACS, KAST...) ainda não existem na API: vão direto ao snapshot.
@@ -126,9 +188,11 @@ export const dados = {
   },
 
   jogador: (id: string, f: Filtros & { agente_id?: string } = {}) =>
-    comFallback(`/jogadores/${enc(id)}`, f, () => local(() => S.jogador(id, f))).then((r) => comExtras(r, (x) => extrasJogador(x, id, f))),
+    comFallback(`/jogadores/${enc(id)}`, f, () => local(() => S.jogador(id, f)))
+      .then((r) => comExtras(r, (x) => extrasJogador(x, id, f)))
+      .then(ordenarJogador),
   times: (f: Filtros & Pag = {}) => comFallback('/times', f, () => local(() => S.times(f))),
-  time: (id: string, f: Filtros = {}) => comFallback(`/times/${enc(id)}`, f, () => local(() => S.time(id, f))),
+  time: (id: string, f: Filtros = {}) => comFallback(`/times/${enc(id)}`, f, () => local(() => S.time(id, f))).then(ordenarTime),
   economiaTime: (id: string, f: Filtros = {}) => comFallback(`/times/${enc(id)}/economia`, f, () => local(() => S.economiaTime(id, f))),
   posPlant: (id: string, f: Filtros = {}) => comFallback(`/times/${enc(id)}/pos-plant-retake`, f, () => local(() => S.posPlant(id, f))),
   composicoes: (f: Filtros & Pag & { time_id?: string } = {}) => comFallback('/composicoes', f, () => local(() => S.composicoes(f))),
@@ -137,7 +201,9 @@ export const dados = {
   partidas: (f: Filtros & Pag & { time_id?: string; jogador_id?: string } = {}) =>
     comFallback('/partidas', f, () => local(() => S.partidas(f))).then((r) => comExtras(r, extrasPartidas)),
   partida: (id: string) =>
-    comFallback(`/partidas/${enc(id)}`, undefined, () => local(() => S.partida(id))).then((r) => comExtras(r, (x) => extrasPartida(x, id))),
+    comFallback(`/partidas/${enc(id)}`, undefined, () => local(() => S.partida(id)))
+      .then((r) => comExtras(r, (x) => extrasPartida(x, id)))
+      .then(ordenarPartida),
   busca: (q: string, tipo?: 'time' | 'jogador' | 'mapa') => comFallback('/busca', { q, tipo }, () => local(() => S.busca(q, tipo))),
 
   // ---- só snapshot por enquanto ----
