@@ -2,7 +2,7 @@
 
 Função que desliga o billing do projeto quando o gasto do mês chega ao limite. Recebe o aviso do orçamento pelo tópico `billing-cap`.
 
-O limite fica na variável `LIMITE`, em reais. Hoje é 400, com o orçamento de 500.
+O limite fica na variável `LIMITE`, em reais. Hoje é 80, com o orçamento de 100.
 
 ## Deploy
 
@@ -13,7 +13,7 @@ gcloud functions deploy limite-custo --gen2 --project datropa --region southamer
   --service-account sa-limite-custo@datropa.iam.gserviceaccount.com \
   --trigger-service-account sa-limite-custo@datropa.iam.gserviceaccount.com \
   --build-service-account projects/datropa/serviceAccounts/sa-build@datropa.iam.gserviceaccount.com \
-  --set-env-vars PROJETO=datropa,LIMITE=400 --max-instances 1 --memory 256Mi
+  --set-env-vars PROJETO=datropa,LIMITE=80 --max-instances 1 --memory 256Mi
 ```
 
 ## Testar sem desligar nada
