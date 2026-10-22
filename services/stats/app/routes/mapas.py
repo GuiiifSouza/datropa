@@ -143,12 +143,16 @@ def listar_mapas(
 def calor_mapa(
     request: Request,
     mapa_id: str,
-    tipo: Literal["abate", "plant"],
+    tipo: Literal["abate", "plant", "morte"],
     page: int = Query(default=1, ge=1),
     page_size: int = Query(default=20, ge=1, le=100),
     torneio_id: str | None = None,
     time_id: str | None = None,
     jogador_id: str | None = None,
+    lado: Literal["ataque", "defesa"] | None = None,
+    compra: Literal["pistol", "eco", "force", "full"] | None = None,
+    tempo_inicio_ms: int | None = Query(default=None, ge=0, le=9223372036854775807),
+    tempo_fim_ms: int | None = Query(default=None, ge=0, le=9223372036854775807),
     data_inicio: str | None = None,
     data_fim: str | None = None,
 ):
@@ -156,6 +160,10 @@ def calor_mapa(
         request,
         {
             "tipo",
+            "lado",
+            "compra",
+            "tempo_inicio_ms",
+            "tempo_fim_ms",
             "page",
             "page_size",
             "torneio_id",
@@ -176,11 +184,26 @@ def calor_mapa(
     validar_identificadores(identificadores)
     inicio, fim = validar_periodo(data_inicio, data_fim)
 
+    if (
+        tempo_inicio_ms is not None
+        and tempo_fim_ms is not None
+        and tempo_inicio_ms >= tempo_fim_ms
+    ):
+        raise ApiError(
+            400, "INVALID_ARGUMENT",
+            "tempo_inicio_ms deve ser menor que tempo_fim_ms.",
+            "tempo_inicio_ms",
+        )
+
     chave_cache = (
         "gold_336_v1",
-        "mapa_calor_publico_v1",
+        "mapa_calor_publico_v2",
         mapa_id,
         tipo,
+        lado,
+        compra,
+        tempo_inicio_ms,
+        tempo_fim_ms,
         page,
         page_size,
         torneio_id,
@@ -214,6 +237,10 @@ def calor_mapa(
             bigquery.ScalarQueryParameter(
                 "tipo", "STRING", tipo
             ),
+            bigquery.ScalarQueryParameter("lado", "STRING", lado),
+            bigquery.ScalarQueryParameter("compra", "STRING", compra),
+            bigquery.ScalarQueryParameter("tempo_inicio_ms", "INT64", tempo_inicio_ms),
+            bigquery.ScalarQueryParameter("tempo_fim_ms", "INT64", tempo_fim_ms),
             bigquery.ScalarQueryParameter(
                 "data_inicio", "DATE", inicio
             ),
