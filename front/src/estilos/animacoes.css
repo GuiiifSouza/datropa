@@ -1,0 +1,263 @@
+/*
+ * Microinterações: botões, cartões, entrada das páginas e gráficos que se desenham.
+ * Tudo curto (até ~0,8 s) e começando de um estado visível no fim. O bloco
+ * prefers-reduced-motion de base.css desliga tudo para quem pede menos movimento.
+ */
+
+/* ---------- botões e pílulas ---------- */
+.botao, .botao-prancheta, .pill, .botao-redondo, .botao-quadrado, .avatar, .aba-mapa, .segmentado button, .nav a, .chip, .sugestao {
+  transition: transform .28s var(--mola), background-color .2s, border-color .2s, color .2s, box-shadow .3s, letter-spacing .3s;
+}
+.botao:hover, .botao-prancheta:hover, .pill:hover, .aba-mapa:hover, .botao-quadrado:hover { transform: translateY(-2px); }
+.botao:active, .botao-prancheta:active, .pill:active, .aba-mapa:active, .botao-redondo:active, .botao-quadrado:active,
+.avatar:active, .segmentado button:active, .nav a:active, .sugestao:active {
+  transform: translateY(0) scale(.95); transition-duration: .08s;
+}
+
+/* Brilho que atravessa o botão principal no hover. */
+.botao { position: relative; overflow: hidden; isolation: isolate; }
+.botao::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.5) 50%, transparent 70%);
+  transform: translateX(-130%); transition: transform .7s var(--suave);
+}
+.botao--linha::after { background: linear-gradient(110deg, transparent 30%, rgba(236,232,225,.14) 50%, transparent 70%); }
+.botao:hover::after { transform: translateX(130%); }
+.botao--ia:hover { box-shadow: 0 8px 24px -6px rgba(255,70,85,.65); }
+.botao:not(.botao--linha):not(.botao--ia):hover { box-shadow: 0 8px 24px -8px rgba(236,232,225,.45); }
+
+/* Prancheta: o "play" anda para a frente, e o aro menta acende. */
+.botao-prancheta svg, .banner-prancheta .botao svg { transition: transform .35s var(--mola); }
+.botao-prancheta:hover { box-shadow: 0 0 0 4px rgba(50,224,196,.12); }
+.botao-prancheta:hover svg, .banner-prancheta:hover .botao svg { transform: translateX(3px) scale(1.15); }
+
+/* Busca: a lupa gira de leve; conta: o avatar cresce. */
+.botao-redondo svg { transition: transform .4s var(--mola); }
+.botao-redondo:hover svg { transform: rotate(-14deg) scale(1.15); }
+.avatar:hover { transform: scale(1.08); box-shadow: 0 0 0 3px rgba(236,232,225,.12); }
+
+/* Pílula ou item de menu que acabou de ser escolhido dá um "estalo". */
+@keyframes estala { 0% { transform: scale(.9); } 55% { transform: scale(1.06); } 100% { transform: scale(1); } }
+.pill[aria-pressed="true"], .nav a[aria-current="page"], .segmentado button[aria-pressed="true"], .aba-mapa[aria-current="page"] { animation: estala .4s var(--mola); }
+.pill__n { transition: transform .3s var(--mola), background-color .2s; }
+.pill:hover .pill__n { transform: scale(1.1); }
+
+/* Foco por teclado com um pulso, sem esconder o contorno. */
+@keyframes pulsoFoco { from { outline-offset: 7px; } to { outline-offset: 3px; } }
+:focus-visible { animation: pulsoFoco .3s var(--suave); }
+
+/* ---------- cartões ---------- */
+.cartao--link, .serie, .destaque-jogador, .kpi, .metrica, .agente-meta, .cartao-time, .banner-prancheta, .fato, .lider, .mapa-meta {
+  transition: transform .4s var(--suave), border-color .25s, box-shadow .4s, background-color .25s;
+}
+.cartao--link:hover, .destaque-jogador:hover, .cartao-time:hover, .banner-prancheta:hover {
+  transform: translateY(-3px); box-shadow: 0 18px 34px -14px rgba(0,0,0,.6);
+}
+.serie:hover { border-color: var(--linha-forte); box-shadow: 0 14px 30px -16px rgba(0,0,0,.6); }
+.serie--destaque:hover { border-color: var(--alerta); box-shadow: 0 14px 34px -14px rgba(245,227,107,.25); }
+.kpi:hover, .metrica:hover, .fato:hover, .agente-meta:hover { transform: translateY(-2px); border-color: var(--linha-forte); }
+.serie__mapa { transition: background-color .2s, transform .25s var(--mola); }
+.serie__mapa:hover { background: var(--superficie-2); transform: translateY(-1px); }
+.mini-prancheta span { transition: transform .5s var(--mola); }
+.banner-prancheta:hover .mini-prancheta span:nth-child(3) { transform: translate(6px, -6px); }
+.banner-prancheta:hover .mini-prancheta span:nth-child(4) { transform: translate(10px, -4px); }
+.banner-prancheta:hover .mini-prancheta span:nth-child(5) { transform: translate(-8px, 6px); }
+.banner-prancheta:hover .mini-prancheta span:nth-child(6) { transform: translate(-6px, 8px); }
+.tabela tbody tr { transition: background-color .15s; }
+.ticker__item { transition: transform .25s var(--mola), color .2s; }
+.ticker__item:hover { transform: translateY(-1px); }
+
+/* ---------- entrada das páginas ---------- */
+@keyframes entra { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.pagina > *, .tropa-tela__corpo > * { animation: entra .55s var(--suave) both; }
+.pagina > *:nth-child(2) { animation-delay: .04s; }
+.pagina > *:nth-child(3) { animation-delay: .08s; }
+.pagina > *:nth-child(4) { animation-delay: .12s; }
+.pagina > *:nth-child(5) { animation-delay: .16s; }
+.pagina > *:nth-child(6) { animation-delay: .2s; }
+.pagina > *:nth-child(n+7) { animation-delay: .24s; }
+.dia > .serie { animation: entra .45s var(--suave) both; }
+.dia > .serie:nth-child(3) { animation-delay: .04s; }
+.dia > .serie:nth-child(4) { animation-delay: .08s; }
+.dia > .serie:nth-child(n+5) { animation-delay: .12s; }
+
+/* ---------- gráficos que se desenham ---------- */
+@keyframes cresceX { from { transform: scaleX(0); } }
+@keyframes cresceY { from { transform: scaleY(0); } }
+@keyframes aparece { from { opacity: 0; } }
+@keyframes pop { 0% { transform: scale(0); } 70% { transform: scale(1.15); } 100% { transform: scale(1); } }
+@keyframes traca { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes arco { from { stroke-dasharray: 0 999; } }
+
+.barras-media__barra { transform-origin: left center; animation: cresceX .9s var(--suave) both; }
+.barras-media__linha:nth-child(2) .barras-media__barra { animation-delay: .06s; }
+.barras-media__linha:nth-child(3) .barras-media__barra { animation-delay: .12s; }
+.barras-media__linha:nth-child(n+4) .barras-media__barra { animation-delay: .18s; }
+.barras-media__media { animation: aparece .4s .6s both; }
+.barras-media__linha:hover .barras-media__barra { filter: brightness(1.12); }
+
+.espelho__lado span { animation: cresceX .9s var(--suave) both; transform-origin: left center; }
+.espelho__lado--a span { transform-origin: right center; }
+.espelho__linha:hover .espelho__lado span { filter: brightness(1.15); }
+
+.colunas__trilho span { transform-origin: bottom center; animation: cresceY .9s var(--suave) both; }
+.colunas__item:nth-child(even) .colunas__trilho span { animation-delay: .07s; }
+.colunas__item:hover .colunas__trilho span { filter: brightness(1.15); }
+
+.eco-rounds__meia span { animation: cresceY .7s var(--suave) both; }
+.eco-rounds__meia--a span { transform-origin: bottom center; }
+.eco-rounds__meia--b span { transform-origin: top center; }
+.eco-rounds__col:hover span { filter: brightness(1.2); }
+
+.anel__arco { animation: arco 1.1s var(--suave) both; }
+.momentum__linha { stroke-dasharray: 1; animation: traca 1.4s var(--suave) both; }
+.momentum__area { animation: aparece .8s .5s both; }
+
+.livro__celula--a, .livro__celula--b { animation: pop .4s var(--mola) both; animation-delay: calc(var(--i, 0) * 16ms); }
+a.livro__celula { transition: transform .2s var(--mola); }
+a.livro__celula:hover { transform: scale(1.18); }
+
+.metrica__barra span, .barra > span { transform-origin: left center; animation: cresceX 1s var(--suave) both; }
+.lados-barra span { transform-origin: left center; animation: cresceX .8s var(--suave) both; }
+.lados-barra span:last-child { transform-origin: right center; }
+.resultados__item { animation: entra .5s var(--suave) both; }
+.resultados__item:nth-child(2) { animation-delay: .05s; }
+.resultados__item:nth-child(3) { animation-delay: .1s; }
+.resultados__item:nth-child(4) { animation-delay: .15s; }
+
+/* ---------- Tropa AI ---------- */
+.coach-graficos > * { animation: entra .5s var(--suave) both; }
+.coach-graficos > *:nth-child(2) { animation-delay: .1s; }
+.coach-graficos > *:nth-child(n+3) { animation-delay: .2s; }
+.compositor__enviar { transition: transform .3s var(--mola), box-shadow .3s; }
+.compositor__enviar:not(:disabled):hover { transform: translateY(-2px) rotate(-8deg); box-shadow: 0 8px 20px -6px rgba(255,70,85,.7); }
+.compositor__enviar:not(:disabled):active { transform: scale(.9); }
+
+/* ---------- fundo vivo ---------- */
+.app { position: relative; isolation: isolate; }
+.app::before {
+  content: ""; position: fixed; inset: -25%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 30% at 82% 8%, rgba(255,70,85,.13), transparent 70%),
+    radial-gradient(34% 30% at 10% 30%, rgba(249,162,59,.09), transparent 70%),
+    radial-gradient(36% 32% at 60% 90%, rgba(50,224,196,.07), transparent 70%);
+  animation: deriva 28s ease-in-out infinite alternate;
+}
+@keyframes deriva {
+  0% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(-3%, 2%, 0) rotate(4deg); }
+  100% { transform: translate3d(2%, -2%, 0) rotate(-3deg); }
+}
+
+/* ---------- header compacta ao rolar ---------- */
+.topo__barra { transition: padding .35s var(--suave), background-color .35s, box-shadow .35s, border-color .35s; }
+[data-rolou] .topo__barra { background: rgba(15,25,35,.94); border-color: rgba(236,232,225,.14); box-shadow: 0 14px 40px rgba(0,0,0,.55); }
+.logo__selo { transition: transform .5s var(--mola); }
+.logo:hover .logo__selo { transform: rotate(-16deg) scale(1.1); }
+.nav a { position: relative; }
+.nav a:not([aria-current="page"])::after {
+  content: ""; position: absolute; left: 12px; right: 12px; bottom: 6px; height: 2px; border-radius: 2px;
+  background: var(--vermelho); transform: scaleX(0); transform-origin: left; transition: transform .3s var(--suave);
+}
+.nav a:not([aria-current="page"]):hover::after { transform: scaleX(1); }
+
+/* ---------- holofote nos cartões ---------- */
+.cartao, .serie, .figura, .kpi, .metrica, .fato, .destaque-jogador, .agente-meta {
+  background-image: radial-gradient(420px circle at var(--mx, -999px) var(--my, -999px), rgba(236,232,225,.055), transparent 45%);
+}
+.sugestao { background-image: radial-gradient(260px circle at var(--mx, -999px) var(--my, -999px), rgba(255,70,85,.14), transparent 50%); }
+
+/* ---------- revelação ao rolar ---------- */
+[data-revela="0"] { opacity: 0; transform: translateY(22px) scale(.985); }
+[data-revela="1"] { opacity: 1; transform: none; transition: opacity .7s var(--suave), transform .7s var(--suave); }
+
+/* ---------- panorama ---------- */
+@keyframes vivo { 0% { box-shadow: 0 0 0 0 rgba(255,70,85,.6); } 100% { box-shadow: 0 0 0 9px rgba(255,70,85,0); } }
+.ponto-vivo { width: 8px; height: 8px; border-radius: 50%; background: var(--vermelho); display: inline-block; animation: vivo 1.6s ease-out infinite; flex: none; }
+.ticker__trilho { mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); }
+.ticker__faixa { display: flex; gap: 28px; width: max-content; animation: corre 60s linear infinite; }
+.ticker:hover .ticker__faixa, .ticker:focus-within .ticker__faixa { animation-play-state: paused; }
+@keyframes corre { to { transform: translateX(-50%); } }
+@keyframes brilhoTexto { to { background-position: 200% center; } }
+.texto-vivo {
+  background: linear-gradient(100deg, var(--vermelho) 0%, #FF8A94 25%, var(--vermelho) 50%, #FF8A94 75%, var(--vermelho) 100%);
+  background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: brilhoTexto 6s linear infinite;
+}
+
+/* ---------- menu suspenso próprio ---------- */
+.seletor { position: relative; }
+.seletor__botao {
+  width: 100%; min-height: 44px; display: flex; align-items: center; gap: 10px; padding: 4px 14px 4px 16px; border-radius: var(--r-pill);
+  border: 1px solid rgba(236,232,225,.14); background: var(--superficie); color: var(--giz); text-align: left;
+  transition: border-color .2s, background-color .2s, transform .25s var(--mola), box-shadow .3s;
+}
+.seletor__botao:hover { border-color: var(--giz-2); transform: translateY(-1px); }
+.seletor--aberto .seletor__botao { border-color: var(--vermelho); box-shadow: 0 0 0 4px rgba(255,70,85,.14); }
+.seletor__rotulo { font: 500 10px var(--f-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--apagado); }
+.seletor__valor { flex: 1; font: 600 13px var(--f-texto); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.seletor__seta { color: var(--apagado); transition: transform .35s var(--mola), color .2s; flex: none; }
+.seletor--aberto .seletor__seta { transform: rotate(180deg); color: var(--vermelho); }
+@keyframes abreMenu { from { opacity: 0; transform: translateY(-8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes abreMenuCima { from { opacity: 0; transform: translateY(8px) scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes entraOpcao { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+.seletor__lista {
+  position: absolute; z-index: 50; top: calc(100% + 8px); left: 0; min-width: 100%; max-height: 320px; overflow-y: auto; margin: 0; padding: 6px; list-style: none;
+  background: var(--superficie); border: 1px solid var(--linha-forte); border-radius: 18px; box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  transform-origin: top center; animation: abreMenu .22s var(--suave) both;
+}
+.seletor__lista--cima { top: auto; bottom: calc(100% + 8px); transform-origin: bottom center; animation-name: abreMenuCima; }
+.seletor__opcao {
+  display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 6px 12px; border-radius: 12px; cursor: pointer; font-size: 14px; white-space: nowrap;
+  animation: entraOpcao .25s var(--suave) both; transition: background-color .15s, padding-left .2s var(--suave);
+}
+.seletor__opcao span:first-child { flex: 1; }
+.seletor__opcao--ativa { background: var(--superficie-2); padding-left: 16px; }
+.seletor__opcao[aria-selected="true"] { color: var(--giz); font-weight: 600; }
+.seletor__extra { display: inline-flex; }
+.ticker__trilho { overflow: hidden; }
+/* Barras de filtro ficam acima do conteúdo que vem depois, para o menu aberto não passar por baixo dos cartões. */
+.barra-ferramentas { position: relative; z-index: 10; }
+.seletor--aberto { z-index: 60; }
+
+/* ---------- barra de rolagem da marca ---------- */
+/* Chromium e Safari: ::-webkit-scrollbar. (Não usar scrollbar-color/width aqui: no Chrome 121+ eles desligam estes estilos.) */
+::-webkit-scrollbar { width: 12px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--fundo); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #FF6170, var(--vermelho) 45%, #C42E3E);
+  border-radius: 999px; border: 3px solid var(--fundo); background-clip: padding-box; min-height: 48px;
+}
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #FF8A94, #FF5262 45%, #E0384A); border-width: 2px; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:active { background: var(--giz); background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: var(--fundo); }
+/* Barras internas (filtros, tabelas, menus, painel da IA) mais finas, sobre a superfície do cartão. */
+.pills::-webkit-scrollbar, .tabela-rolagem::-webkit-scrollbar, .livro::-webkit-scrollbar, .eco-rounds::-webkit-scrollbar { height: 6px; }
+.seletor__lista::-webkit-scrollbar, .painel-coach__corpo::-webkit-scrollbar, .busca__lista::-webkit-scrollbar { width: 8px; }
+.pills::-webkit-scrollbar-track, .tabela-rolagem::-webkit-scrollbar-track, .livro::-webkit-scrollbar-track, .eco-rounds::-webkit-scrollbar-track,
+.seletor__lista::-webkit-scrollbar-track, .painel-coach__corpo::-webkit-scrollbar-track, .busca__lista::-webkit-scrollbar-track { background: transparent; }
+.pills::-webkit-scrollbar-thumb, .tabela-rolagem::-webkit-scrollbar-thumb, .livro::-webkit-scrollbar-thumb, .eco-rounds::-webkit-scrollbar-thumb,
+.seletor__lista::-webkit-scrollbar-thumb, .painel-coach__corpo::-webkit-scrollbar-thumb, .busca__lista::-webkit-scrollbar-thumb {
+  border: 0; background: rgba(255,70,85,.55); border-radius: 999px;
+}
+.pills::-webkit-scrollbar-thumb:hover, .tabela-rolagem::-webkit-scrollbar-thumb:hover, .seletor__lista::-webkit-scrollbar-thumb:hover,
+.painel-coach__corpo::-webkit-scrollbar-thumb:hover, .busca__lista::-webkit-scrollbar-thumb:hover { background: var(--vermelho); }
+/* Firefox (sem ::-webkit-scrollbar): cor padrão do navegador trocada pela da marca. */
+@supports not selector(::-webkit-scrollbar) {
+  html { scrollbar-color: var(--vermelho) var(--fundo); }
+  .pills, .tabela-rolagem, .livro, .eco-rounds, .seletor__lista, .painel-coach__corpo, .busca__lista { scrollbar-width: thin; scrollbar-color: rgba(255,70,85,.6) transparent; }
+}
+::selection { background: rgba(255,70,85,.35); color: var(--giz); }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Progresso de leitura: um fio vermelho no topo que acompanha a rolagem (onde o navegador suporta). */
+@supports (animation-timeline: scroll()) {
+  body::after {
+    content: ""; position: fixed; z-index: 100; top: 0; left: 0; right: 0; height: 3px; pointer-events: none;
+    background: linear-gradient(90deg, var(--vermelho), #FF8A94); box-shadow: 0 0 10px rgba(255,70,85,.7);
+    transform-origin: left center; transform: scaleX(0);
+    animation: progresso linear both; animation-timeline: scroll(root);
+  }
+  @keyframes progresso { to { transform: scaleX(1); } }
+}

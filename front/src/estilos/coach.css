@@ -1,0 +1,67 @@
+/* Tropa AI: painel que desce do orbe e tela cheia limpa. Vermelho = IA. */
+@keyframes desce { from { opacity: 0; transform: translateX(-50%) translateY(-16px) scaleY(.94); } to { opacity: 1; transform: translateX(-50%); } }
+@keyframes sobe { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.coach-veu { position: fixed; inset: 0; z-index: 25; background: rgba(15,25,35,.62); backdrop-filter: blur(2px); }
+.painel-coach { position: fixed; z-index: 40; top: 96px; left: 50%; transform: translateX(-50%); width: min(720px, calc(100% - 24px)); max-height: calc(100vh - 112px);
+  display: flex; flex-direction: column; background: var(--superficie); border: 1px solid var(--vermelho); border-radius: 18px; box-shadow: 0 40px 100px rgba(0,0,0,.6);
+  animation: desce 360ms var(--suave) both; transform-origin: top center; }
+.painel-coach__seta { position: absolute; top: -9px; left: calc(50% - 55px); width: 16px; height: 16px; background: var(--superficie); border-left: 1px solid var(--vermelho); border-top: 1px solid var(--vermelho); transform: rotate(45deg); }
+.painel-coach__topo { display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; border-bottom: 1px solid var(--linha); }
+.painel-coach__marca { display: flex; align-items: center; gap: 10px; }
+.painel-coach__acoes { display: flex; gap: 6px; }
+.botao-quadrado { width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid rgba(236,232,225,.14); background: transparent; color: var(--giz); font-size: 15px; }
+.botao-quadrado:hover { border-color: var(--giz); color: var(--giz); }
+.painel-coach__corpo { padding: 20px 22px; overflow-y: auto; flex: 1; min-height: 0; }
+.painel-coach__rodape { padding: 12px 22px 16px; border-top: 1px solid var(--linha); display: flex; flex-direction: column; gap: 6px; }
+.painel-coach__aviso { font-size: 10px; color: var(--apagado); }
+@media (max-width: 1100px) { .painel-coach { top: 150px; max-height: calc(100vh - 160px); } .painel-coach__seta { display: none; } }
+
+.boas-vindas { display: flex; flex-direction: column; gap: 18px; }
+.boas-vindas > * { animation: sobe 420ms both; }
+.boas-vindas > *:nth-child(2) { animation-delay: 60ms; } .boas-vindas > *:nth-child(3) { animation-delay: 120ms; } .boas-vindas > *:nth-child(4) { animation-delay: 180ms; }
+.boas-vindas__titulo { display: flex; flex-direction: column; gap: 6px; font-size: 15px; line-height: 1.5; }
+.boas-vindas__contexto { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.boas-vindas__contexto .chip { border: 0; cursor: pointer; }
+.sugestoes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 10px; }
+.sugestao { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; padding: 14px; border-radius: 18px; border: 1px solid rgba(255,70,85,.3);
+  background: var(--superficie-2); color: var(--giz); min-height: 44px; transition: border-color .2s, transform .3s var(--mola); }
+.sugestao:hover { border-color: var(--vermelho); transform: translateY(-2px); }
+.sugestao span:last-child { font-size: 14px; line-height: 1.4; }
+.dica-prancheta { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 16px; border: 1px dashed rgba(50,224,196,.5); font-size: 14px; }
+.dica-prancheta:hover { border-style: solid; color: var(--giz); }
+.dicas-coach { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 12px; color: var(--apagado); align-items: center; }
+
+.compositor { display: flex; gap: 8px; align-items: flex-end; background: var(--fundo); border: 1px solid rgba(236,232,225,.16); border-radius: 18px; padding: 8px 8px 8px 14px; }
+.compositor:focus-within { border-color: rgba(255,70,85,.6); }
+.compositor__campo { flex: 1; display: flex; }
+.compositor textarea { flex: 1; resize: none; border: 0; background: transparent; color: var(--giz); font: 400 15px/1.5 var(--f-texto); outline: none; padding: 6px 0; max-height: 160px; }
+.compositor--grande { background: var(--superficie); border-color: rgba(236,232,225,.18); border-radius: 26px; padding: 8px 8px 8px 20px; align-items: center; }
+.compositor--grande textarea { font-size: 16px; padding: 10px 0; }
+.compositor__enviar { width: 48px; height: 48px; border-radius: 50%; border: 0; background: var(--vermelho); color: var(--fundo); display: flex; align-items: center; justify-content: center; flex: none; }
+.compositor button:disabled { opacity: .45; cursor: not-allowed; }
+.compositor--login { flex-direction: column; align-items: stretch; gap: 10px; padding: 14px; font-size: 14px; color: var(--giz-2); }
+.compositor--login .botao { align-self: flex-start; }
+
+.conversa { display: flex; flex-direction: column; gap: 22px; }
+.conversa--grande { gap: 36px; }
+.balao-usuario { align-self: flex-end; max-width: 80%; background: var(--superficie-2); border-radius: 20px 20px 6px 20px; padding: 12px 18px; font-size: 15px; line-height: 1.5; white-space: pre-wrap; animation: sobe 300ms both; }
+.resposta-coach { display: flex; flex-direction: column; gap: 14px; animation: sobe 360ms both; }
+.coach-texto { display: flex; flex-direction: column; gap: 10px; font-size: 16px; line-height: 1.55; }
+.conversa--grande .coach-texto { font-size: 19px; line-height: 1.5; }
+.coach-texto ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.coach-graficos { display: flex; flex-direction: column; gap: 12px; }
+.coach-fontes { font-size: 10px; color: var(--apagado); letter-spacing: .06em; }
+.coach-erro { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 14px; background: var(--superficie-ia); border: 1px solid rgba(255,70,85,.4); font-size: 14px; }
+.coach-pensando { display: flex; align-items: center; gap: 12px; color: var(--giz-2); font-size: 14px; }
+.coach-pensando__orbe { width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(from 0deg, var(--vermelho), var(--menta), var(--ambar), var(--vermelho)); animation: orbSpin 1.2s linear infinite;
+  -webkit-mask: radial-gradient(circle, transparent 6px, #000 7px); mask: radial-gradient(circle, transparent 6px, #000 7px); }
+.coach-prancheta { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 14px 16px; border-radius: 18px; background: var(--superficie); border: 1px solid rgba(50,224,196,.35); }
+.seguir { display: flex; gap: 8px; flex-wrap: wrap; }
+.aneis { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; }
+
+/* tela cheia */
+.tropa-tela { flex: 1; display: flex; flex-direction: column; width: 100%; max-width: 820px; margin: 0 auto; padding: 22px var(--gutter) 0; }
+.tropa-tela__barra { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.tropa-tela__corpo { flex: 1; padding: 28px 0 40px; display: flex; flex-direction: column; gap: 28px; }
+.tropa-tela__rodape { position: sticky; bottom: 0; padding: 12px 0 28px; background: linear-gradient(to top, var(--fundo) 70%, transparent); display: flex; flex-direction: column; gap: 10px; }
+.tropa-tela__nota { text-align: center; font-size: 12px; color: var(--apagado); }
