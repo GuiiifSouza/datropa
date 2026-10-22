@@ -1,6 +1,7 @@
 /**
- * Login com Google pelo Firebase Authentication. A Tropa AI exige o ID token
- * (services/coach valida o JWT); as páginas de estatística são públicas.
+ * Login pelo Firebase Authentication. A Tropa AI exige o ID token (services/coach valida o JWT);
+ * as páginas de estatística são públicas. Sem usuário, a Tropa AI entra sozinha como anônimo,
+ * para a banca usar sem tela de login. O Google fica como opção no avatar do header.
  *
  * Config: no Firebase Hosting vem de /__/firebase/init.json (automático). Fora dele, das variáveis
  * VITE_FIREBASE_* (.env.example). O SDK só é baixado quando o app precisa dele.
@@ -9,14 +10,15 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { Auth, User } from 'firebase/auth';
 import { registrarToken } from '../api/cliente';
 
-type Usuario = { nome: string; foto: string | null; iniciais: string };
+type Usuario = { nome: string; foto: string | null; iniciais: string; anonimo: boolean };
 type Ctx = {
   usuario: Usuario | null;
   pronto: boolean;
   disponivel: boolean;
   entrar: () => Promise<void>;
+  entrarAnonimo: () => Promise<void>;
   sair: () => Promise<void>;
-  token: () => Promise<string | null>;
+  token: (garantir?: boolean) => Promise<string | null>;
   erro: string | null;
 };
 const Contexto = createContext<Ctx | null>(null);
@@ -54,9 +56,23 @@ function obterAuth(): Promise<Auth | null> {
 }
 
 const paraUsuario = (u: User): Usuario => {
-  const nome = u.displayName || 'Você';
-  return { nome, foto: u.photoURL, iniciais: nome.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase() };
+  const nome = u.displayName || (u.isAnonymous ? 'Visitante' : 'Você');
+  return { nome, foto: u.photoURL, iniciais: nome.split(' ').map((p) => p[0]).join('').slice(0, 2).toUpperCase(), anonimo: u.isAnonymous };
 };
+
+/** Usuário atual (esperando o Firebase restaurar a sessão salva). Com `garantir`, entra como anônimo se não houver. */
+let anonimoPromise: Promise<User | null> | null = null;
+async function usuarioAtual(garantir: boolean): Promise<User | null> {
+  const auth = await obterAuth();
+  if (!auth) return null;
+  await auth.authStateReady();
+  if (auth.currentUser || !garantir) return auth.currentUser;
+  anonimoPromise ??= import('firebase/auth')
+    .then(({ signInAnonymously }) => signInAnonymously(auth))
+    .then((c) => c.user)
+    .finally(() => { anonimoPromise = null; });
+  return anonimoPromise;
+}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
@@ -81,9 +97,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => parar?.();
   }, []);
 
-  const token = useCallback(async () => {
-    const auth = await obterAuth();
-    return auth?.currentUser ? auth.currentUser.getIdToken() : null;
+  const token = useCallback(async (garantir = false) => {
+    const u = await usuarioAtual(garantir);
+    return u ? u.getIdToken() : null;
+  }, []);
+
+  const entrarAnonimo = useCallback(async () => {
+    try {
+      await usuarioAtual(true);
+    } catch {
+      setErro('Não deu para iniciar a sessão da Tropa AI. Recarregue a página.');
+    }
   }, []);
 
   useEffect(() => registrarToken(token), [token]);
@@ -111,7 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(auth);
   }, []);
 
-  const valor = useMemo(() => ({ usuario, pronto, disponivel, entrar, sair, token, erro }), [usuario, pronto, disponivel, entrar, sair, token, erro]);
+  const valor = useMemo(() => ({ usuario, pronto, disponivel, entrar, entrarAnonimo, sair, token, erro }), [usuario, pronto, disponivel, entrar, entrarAnonimo, sair, token, erro]);
   return <Contexto.Provider value={valor}>{children}</Contexto.Provider>;
 }
 
