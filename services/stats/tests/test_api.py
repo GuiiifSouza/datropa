@@ -71,6 +71,7 @@ class ApiTests(unittest.TestCase):
                 "/api/stats/agentes",
                 "/api/stats/busca",
                 "/api/stats/mapas/{mapa_id}/calor",
+                "/api/stats/catalogos",
             },
         )
         self.client_factory.assert_not_called()

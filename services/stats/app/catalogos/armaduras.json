@@ -1,0 +1,17 @@
+[
+  {
+    "id": "4dec83d5-4902-9ab3-bed6-a7a390761157",
+    "uuid": "4dec83d5-4902-9ab3-bed6-a7a390761157",
+    "nome": "Armadura Leve"
+  },
+  {
+    "id": "822bcab2-40a2-324e-c137-e09195ad7692",
+    "uuid": "822bcab2-40a2-324e-c137-e09195ad7692",
+    "nome": "Armadura Pesada"
+  },
+  {
+    "id": "b1b9086d-41bd-a516-5d29-e3b34a6f1644",
+    "uuid": "b1b9086d-41bd-a516-5d29-e3b34a6f1644",
+    "nome": "Escudo Regenerativo"
+  }
+]
