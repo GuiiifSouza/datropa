@@ -113,3 +113,14 @@ Pendente: revisar/publicar backend e frontend por PR e medir uma carga de Ascent
 O build local sem as artes privadas avisa caminhos ausentes; não houve inspeção
 visual desta otimização. Alteração não reduz o volume total de pontos transferidos;
 reduz páginas e repetição de consultas. Não promete 90% menos tempo ou custo.
+
+## Navegação do calor para o evento — 22/10/2026
+
+Chico confirmou carga de Ascent em aproximadamente 5 s (antes ~40 s).
+Corrigido o clique da área do calor: preserva evento_id e seleciona o evento
+correspondente após carregar o round, em vez de selecionar sempre o índice zero.
+ID preservado no adaptador de eventos; nenhuma consulta ou coordenada alterada.
+Fonte do protótipo e exportador atualizados, com lógica regenerada.
+Teste offline aprovado para round em cache, carga tardia, eventos no mesmo
+segundo e navegação manual. Tipos e build aprovados. Sem teste visual local
+com as artes privadas; validar o clique de 0:32 na interface publicada.
