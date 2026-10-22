@@ -158,11 +158,9 @@ export function Conversa({ grande }: { grande?: boolean }) {
 }
 
 function ErroConversa({ erro }: { erro: ErroCoach }) {
-  const { entrar } = useAuth();
   return (
     <div className="coach-erro" role="alert">
       <span>{erro.mensagem}</span>
-      {erro.tipo === 'login' && <button type="button" className="botao botao--ia botao--pequeno" onClick={entrar}>Entrar com Google</button>}
     </div>
   );
 }
@@ -179,10 +177,12 @@ function Seguir({ onEscolher }: { onEscolher: (q: string) => void }) {
 
 export function Compositor({ grande, autoFoco }: { grande?: boolean; autoFoco?: boolean }) {
   const { enviar, enviando } = useCoach();
-  const { usuario, pronto, entrar, disponivel, erro } = useAuth();
+  const { usuario, pronto, entrarAnonimo, disponivel, erro } = useAuth();
   const [texto, setTexto] = useState('');
   const area = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { if (autoFoco) area.current?.focus(); }, [autoFoco]);
+  // Sem login manual: abriu a Tropa AI sem usuário, entra como anônimo. O envio também garante o token.
+  useEffect(() => { if (pronto && disponivel && !usuario) entrarAnonimo(); }, [pronto, disponivel, usuario, entrarAnonimo]);
   const submeter = (e?: FormEvent) => {
     e?.preventDefault();
     if (!texto.trim()) return;
@@ -192,12 +192,17 @@ export function Compositor({ grande, autoFoco }: { grande?: boolean; autoFoco?: 
   const tecla = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submeter(); }
   };
-  if (pronto && !usuario) {
+  if (pronto && !disponivel) {
     return (
       <div className="compositor compositor--login">
-        <span>{disponivel ? 'Entre com o Google para perguntar. As páginas de estatística continuam abertas para todo mundo.' : 'Login indisponível neste ambiente (sem config do Firebase).'}</span>
-        {disponivel && <button type="button" className="botao botao--ia" onClick={entrar}>Entrar com Google</button>}
-        {erro && <span className="cor-ia">{erro}</span>}
+        <span>A Tropa AI não está disponível neste ambiente (sem config do Firebase).</span>
+      </div>
+    );
+  }
+  if (erro && !usuario) {
+    return (
+      <div className="compositor compositor--login">
+        <span className="cor-ia">{erro}</span>
       </div>
     );
   }
