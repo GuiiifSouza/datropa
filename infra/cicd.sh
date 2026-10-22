@@ -13,6 +13,7 @@ PROJETO=datropa
 REGIAO=southamerica-east1
 DATASET=valorant
 BUCKET=datropa-raw-matches
+BUCKET_ARTE=datropa-arte # arte da Riot da prancheta, fora do git; o deploy-front.yml baixa antes do build
 REPO_AR=servicos
 REPO_GH=GuiiifSouza/datropa
 REPO_GH_ID=1426256768 # id numérico do repo no GitHub; não muda se o repo for renomeado ou recriado por outro
@@ -128,6 +129,18 @@ projeto_role "serviceAccount:$(sa sa-deploy)" roles/firebasehosting.admin
 projeto_role "serviceAccount:$(sa sa-deploy)" roles/firebaserules.admin
 # O firebase-tools confere se a API do Firestore está ligada antes do deploy das regras.
 projeto_role "serviceAccount:$(sa sa-deploy)" roles/serviceusage.serviceUsageConsumer
+
+log "Bucket da arte da prancheta: privado, só a sa-deploy lê"
+# A arte vai para o ar pelo Hosting, mas não fica no repo público. Subir ou atualizar, de front/public:
+#   gcloud storage cp -r arte gs://datropa-arte/
+if gcloud storage buckets describe "gs://$BUCKET_ARTE" --project "$PROJETO" >/dev/null 2>&1; then
+  echo "$BUCKET_ARTE já existe"
+else
+  gcloud storage buckets create "gs://$BUCKET_ARTE" --project "$PROJETO" --location "$REGIAO" \
+    --uniform-bucket-level-access --public-access-prevention
+fi
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET_ARTE" \
+  --member "serviceAccount:$(sa sa-deploy)" --role roles/storage.objectViewer --format=none
 
 log "Eventarc: o agente do Cloud Storage publica os eventos do bucket"
 # `storage service-agent` só informa o e-mail; quem cria a conta é o `services identity create`.
