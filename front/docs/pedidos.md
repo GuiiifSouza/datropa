@@ -1,32 +1,22 @@
 # O que o front precisa de fora desta pasta
 
-O site funciona inteiro com o snapshot. Esta lista é o que falta para cada tela usar a API real e para o login e o deploy fecharem. Cada item diz quem faz e o que o front já está esperando.
+As telas usam a API real (`/api/stats`). O que a API ainda não manda vem do snapshot, casado pelo ID (mesmos IDs da gold), e só preenche campo ausente. Esta lista é o que falta para o snapshot sair de cena. Cada item diz quem faz e o que o front já está esperando.
 
 ## Guilherme (infra, deploy, coach)
 
 | # | Pedido | Por quê |
 |---|---|---|
-| 1 | Rodar `npm install` em `front/` e commitar o `package-lock.json` | O `deploy-front` roda `npm ci`, que exige o lockfile. Ele não foi gerado aqui porque o ambiente deste PR não tinha acesso ao registro do npm |
-| 2 | Habilitar o provedor **Google** no Firebase Authentication e conferir `devs.datropa.com` nos domínios autorizados | Login da Tropa AI (`signInWithPopup`) |
-| 3 | Atualizar o `AGENTS.md` da raiz e o `docs/plano-de-acao.md` com a troca Lhobregat ↔ RhuanK | Hoje dizem que a prancheta é do Lhobregat |
-| 4 | Confirmar o link da prancheta `/prancheta?partida_id=<id>&round=<n>` em `abrir_na_prancheta` | O front já usa esse caminho em todas as telas |
-| 5 | (Opcional) Cache longo para `/snapshot/**` no `firebase.json`, se quiser | Hoje cai no `no-cache` geral, o que está certo enquanto o snapshot muda |
-| 6 | (Opcional) Campo `grafico` na resposta do coach, com o nome da tool principal | O front já monta gráfico por tool; o campo só ajudaria a escolher qual mostrar primeiro |
+| 1 | Habilitar o provedor **Google** no Firebase Authentication e conferir `devs.datropa.com` nos domínios autorizados | Login da Tropa AI (`signInWithPopup`) |
+| 2 | Atualizar o `AGENTS.md` da raiz e o `docs/plano-de-acao.md` com a troca Lhobregat ↔ RhuanK | Hoje dizem que a prancheta é do Lhobregat |
+| 3 | Confirmar o link da prancheta `/prancheta?partida_id=<id>&round=<n>` em `abrir_na_prancheta` | O front já usa esse caminho em todas as telas |
+| 4 | (Opcional) Cache longo para `/snapshot/**` no `firebase.json`, se quiser | Hoje cai no `no-cache` geral, o que está certo enquanto o snapshot muda |
+| 5 | (Opcional) Campo `grafico` na resposta do coach, com o nome da tool principal | O front já monta gráfico por tool; o campo só ajudaria a escolher qual mostrar primeiro |
 
 ## gugu (API de stats)
 
-Rotas do contrato que o front já chama e que ainda não estão na `main`:
+Todas as rotas do contrato que o front chama já respondem em produção (conferido em 22/10): `/catalogos`, `/busca`, `/ranking`, `/times`, `/times/{id}` (e `/economia`, `/pos-plant-retake`), `/composicoes`, `/comparacoes/times`, `/partidas`, `/partidas/{id}` e `/partidas/{id}/rounds/{round}/eventos`.
 
-| Rota | Tela |
-|---|---|
-| `GET /catalogos` | nomes de mapa, agente e torneio em todo o site |
-| `GET /busca` | busca global do header |
-| `GET /times/{id}/pos-plant-retake` | página do time |
-| `GET /composicoes` | página do time e meta |
-| `GET /comparacoes/times` | (pronto no front, usado pela Tropa AI no futuro) |
-| `GET /partidas/{id}/rounds/{round}/eventos` | prancheta (Rhuan) |
-
-Campos que o front mostra e que o contrato ainda não tem (o snapshot já entrega; sem eles, a tela mostra "—"):
+Campos que o front mostra e que o contrato ainda não tem (hoje vêm do snapshot pelo ID; quando a API mandar, o valor dela vale):
 
 | Onde | Campo | Regra |
 |---|---|---|
