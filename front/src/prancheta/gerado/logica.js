@@ -837,7 +837,7 @@ class Component extends DCLogic {
       // linha do tiro: de quem matou até a vítima
       if (ev.raw[0] === 'k') {
         const k = ev.j.find((p) => p[7] === ev.raw[2]);
-        if (k) { tracer = 'M' + k[2] + ' ' + k[3] + 'L' + ev.raw[4] + ' ' + ev.raw[5]; tracerCor = k[0] === 'a' ? '#FBBF6E' : '#7EEBD9'; }
+        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = 'M' + k[2] + ' ' + k[3] + 'L' + ev.raw[4] + ' ' + ev.raw[5]; tracerCor = k[0] === 'a' ? '#FBBF6E' : '#7EEBD9'; }
       }
       const iEv = EVR.indexOf(ev), porIdx = {};
       ev.j.forEach((p, k) => { porIdx[p[7]] = { peca: pecas[k], p: p }; });

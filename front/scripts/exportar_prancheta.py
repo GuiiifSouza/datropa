@@ -220,6 +220,9 @@ js = trocar(js, '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>', """if (A
 js = trocar(js, "pontosNota: AMB.calorVazio ?", "pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ?")
 js = trocar(js, "      pontosNota: AMB.calor &&", "      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),\n      pontosNota: AMB.calor &&")
 js = trocar(js, "    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(", "    if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());\n    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(")
+# round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
+# mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
+js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
 # entrada pelo link: ?j= (jogada compartilhada) ou ?partida_id=&round= (round real)
 js = trocar(js, '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n',
             '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n    if (AMB.inicio) AMB.inicio(this);\n')
