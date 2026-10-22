@@ -174,6 +174,7 @@ def resumo_partida(partida_id: str | None = None, time_id: str | None = None,
     return {
         "partida_id": p["partida_id"],
         "torneio_id": p["torneio_id"],
+        "torneio": catalogos.nome_torneio(p["torneio_id"]),
         "mapa": catalogos.nome_mapa(p["mapa_id"]),
         "data": p["data_partida_utc"],
         "duracao_min": round(p["duracao_ms"] / 60000, 1) if p["duracao_ms"] else None,

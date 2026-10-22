@@ -301,7 +301,7 @@ def test_abrir_na_prancheta(bq):
     assert bq.chamadas[0][1] == {"partida_id": "p1", "round": 3}
     assert r["prancheta"]["url"] == "/prancheta?partida_id=p1&round=3"
     assert r["prancheta"]["url_completa"].endswith("/prancheta?partida_id=p1&round=3")
-    assert "a confirmar" in r["prancheta"]["contrato"]
+    assert r["prancheta"]["url_completa"].startswith("https://datropa.web.app/")
     assert r["ataque"] == "Time B" and r["defesa"] == "Time A" and r["vencedor"] == "Time A"
     assert r["transformacao_mapa"]["u_y"] == 0.000072  # sem o arredondamento de bq._limpar
     lados = {j["jogador"]: j["lado"] for j in r["jogadores"]}
@@ -431,3 +431,66 @@ def test_jogador_id_corrigido(bq):
     puuid = "f8hEkQ9pP_KxFUebzJa_Z4o18k0SKRQu7Embzd91LoCU4VnpDdYd0TEcEK3zC4N18eQ8xmNTFHLruQ"
     bq.respostas["ids.jogadores"] = [{"id": puuid}]
     assert resolver_jogador(puuid.replace("Ebz", "Ebx")) == puuid
+
+
+def _jog(i, acs):
+    return {"jogador_id": f"j{i}", "identidade": {"nome": f"J{i}", "tag": "BR" if i == 1 else None,
+                                                  "time_nome": "Time A"},
+            "partidas": 4, "vitorias": 2, "rounds": 80, "kills": 70, "deaths": 60, "assists": 20,
+            "acs": acs, "kd": 1.17, "adr": 150.0, "hs_pct": 25.0, "first_bloods": 9, "first_deaths": 7,
+            "jogadores_no_recorte": 12}
+
+
+def test_ranking_jogadores(bq):
+    bq.respostas["ranking.jogadores"] = [_jog(1, 251.27), _jog(2, 240.0)]
+    r = executar("ranking_jogadores", ordenar_por="acs", torneio="UNIVAVA_G", classe="Duelista", limite=50)
+    nome, valores = bq.chamadas[-1]
+    assert nome == "ranking.jogadores"
+    assert valores["torneio_re"] == "^UNIVAVA_G$" and valores["ordem"] == "acs"
+    assert valores["limite"] == 10 and valores["min_partidas"] == 3
+    assert JETT in valores["agentes"].split(",") and OMEN not in valores["agentes"].split(",")
+    assert r["filtros"]["torneio"] == "Univavá: Fase de Grupos"
+    assert r["jogadores_no_recorte"] == 12
+    esperado = {k: v for k, v in _jog(1, 251.3).items() if k not in ("identidade", "jogadores_no_recorte")}
+    assert r["ranking"][0] == {**esperado, "posicao": 1, "jogador": "J1#BR", "time": "Time A"}
+    assert r["ranking"][1]["jogador"] == "J2"
+
+
+def test_ranking_jogadores_agente_e_classe(bq):
+    assert "erro" in executar("ranking_jogadores", ordenar_por="acs", agente="Omen", classe="Duelista")
+    executar("ranking_jogadores", ordenar_por="kd", agente="Jett", classe="Duelista")
+    assert bq.chamadas[-1][1]["agentes"] == JETT
+
+
+@pytest.mark.parametrize("args", [
+    {"ordenar_por": "mvp"},
+    {"ordenar_por": "acs", "torneio": "VCT"},
+    {"ordenar_por": "acs", "mapa": "Dust2"},
+    {"ordenar_por": "acs", "classe": "Suporte"},
+])
+def test_ranking_jogadores_erros(bq, args):
+    assert "erro" in executar("ranking_jogadores", **args)
+    assert not [c for c in bq.chamadas if c[0] == "ranking.jogadores"]
+
+
+def test_ranking_vazio(bq):
+    assert "min_partidas" in executar("ranking_jogadores", ordenar_por="acs")["erro"]
+    assert "min_partidas" in executar("ranking_times", ordenar_por="retake")["erro"]
+
+
+def test_ranking_times(bq):
+    bq.respostas["ranking.times"] = [{
+        "time_id": "t", "nome": "Time A", "partidas": 9, "vitorias": 9, "rounds_jogados": 158,
+        "rounds_ganhos": 117, "rounds_ataque": 68, "vitorias_ataque": 56, "rounds_defesa": 90,
+        "vitorias_defesa": 61, "pos_plant_oportunidades": 53, "pos_plant_vitorias": 49,
+        "retake_oportunidades": 41, "retake_vitorias": 15, "taxa_vitoria_pct": 100.0,
+        "taxa_rounds_pct": 74.05, "taxa_ataque_pct": 82.35, "taxa_defesa_pct": 67.78,
+        "pos_plant_taxa_sucesso_pct": 92.45, "retake_taxa_sucesso_pct": 36.59, "times_no_recorte": 58}]
+    r = executar("ranking_times", ordenar_por="pos_plant", torneio="UNIVAVA", mapa="Lotus")
+    assert bq.chamadas[-1] == ("ranking.times", {
+        "torneio_re": "^UNIVAVA_", "mapa_id": "jam", "min_partidas": 3, "min_oportunidades": 10,
+        "ordem": "pos_plant", "limite": 5})
+    assert r["times_no_recorte"] == 58 and r["filtros"]["min_oportunidades_plant"] == 10
+    assert r["ranking"][0]["pos_plant"] == {"oportunidades": 53, "vitorias": 49, "taxa_sucesso_pct": 92.45}
+    assert r["ranking"][0]["posicao"] == 1 and r["ranking"][0]["time"] == "Time A"
+    assert "erro" in executar("ranking_times", ordenar_por="kd")
