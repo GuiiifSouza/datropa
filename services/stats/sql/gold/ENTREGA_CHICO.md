@@ -124,3 +124,15 @@ Fonte do protótipo e exportador atualizados, com lógica regenerada.
 Teste offline aprovado para round em cache, carga tardia, eventos no mesmo
 segundo e navegação manual. Tipos e build aprovados. Sem teste visual local
 com as artes privadas; validar o clique de 0:32 na interface publicada.
+
+## Retratos dos agentes no restante do site — 22/10/2026
+
+O componente Agente buscava arquivos individuais inexistentes. Agora usa o
+sprite já publicado em /arte/prancheta/agentes.png, com os 29 retratos do ZIP.
+Preservados tamanhos p/m/g, formato circular, bordas por classe e nomes acessíveis.
+Artes não adicionadas ao Git; publicação reaproveita o bucket existente.
+VITE_ARTE_RIOT habilitado por padrão; 0 continua permitindo desativação explícita.
+Tipos, build com artes locais e teste offline dos 29 agentes nos três tamanhos
+aprovados. Teste: cd front && node scripts/testes/agentes-retratos.mjs.
+Navegador local indisponível (Chromium ausente); confirmar visualmente filtros,
+tabelas, perfil do jogador e página da partida após publicação.

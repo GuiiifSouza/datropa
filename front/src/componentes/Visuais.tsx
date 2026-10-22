@@ -1,23 +1,24 @@
 /** Peças visuais pequenas: agente, selo de time, estados de carregamento/erro/vazio, fonte dos dados. */
-import { useState, type ReactNode } from 'react';
+import { type ReactNode } from 'react';
 import { ErroApi } from '../api/cliente';
 import type { Meta } from '../api/tipos';
 import { nomeTime, sigla, slugAgente } from '../util/formato';
 import { useCatalogo } from './Catalogo';
 import { Link } from '../rotas';
+import { rostoAgente } from '../util/arteAgentes';
 
-// Arte da Riot só com o OK da organização (front/AGENTS.md). Desligada, mostra a inicial.
-const ARTE = import.meta.env.VITE_ARTE_RIOT === '1';
+// Mesma arte já publicada para a prancheta; 0 permite desligá-la explicitamente.
+const ARTE = import.meta.env.VITE_ARTE_RIOT !== '0';
 const COR_CLASSE: Record<string, string> = { Duelista: '#FF4655', Iniciador: '#F9A23B', Controlador: '#9AA6B2', Sentinela: '#32E0C4' };
 
 export function Agente({ id, tamanho = 'm', mostrarNome }: { id: string | null | undefined; tamanho?: 'p' | 'm' | 'g'; mostrarNome?: boolean }) {
   const { agente, classe } = useCatalogo();
   const nome = agente(id);
-  const [falhou, setFalhou] = useState(false);
+  const rosto = ARTE ? rostoAgente(slugAgente(nome)) : null;
   const cor = COR_CLASSE[classe(id) ?? ''] ?? 'var(--linha-forte)';
   const bolinha = (
-    <span className={`agente agente--${tamanho}`} style={{ borderColor: cor }} title={nome} aria-label={mostrarNome ? undefined : nome} role={mostrarNome ? undefined : 'img'}>
-      {ARTE && !falhou ? <img src={`/arte/agentes/rosto/${slugAgente(nome)}.webp`} alt="" loading="lazy" onError={() => setFalhou(true)} /> : nome.slice(0, 2).toUpperCase()}
+    <span className={`agente agente--${tamanho}`} style={{ borderColor: cor, ...rosto }} title={nome} aria-label={mostrarNome ? undefined : nome} role={mostrarNome ? undefined : 'img'}>
+      {!rosto && nome.slice(0, 2).toUpperCase()}
     </span>
   );
   if (!mostrarNome) return bolinha;
