@@ -20,6 +20,10 @@ export function Meta() {
   const f = { torneio_id: torneio ?? undefined, mapa_id: mapaSel ?? undefined };
   const m = useDados(`meta:${torneio ?? ''}:${mapaSel ?? ''}`, () => dados.metaCena(f));
   const d = m.dados;
+  // Pills de mapa na ordem dos cards (mais jogado primeiro no torneio), sem depender da ordem do catálogo.
+  const semMapa = useDados(`meta:${torneio ?? ''}:`, () => dados.metaCena({ torneio_id: torneio ?? undefined }));
+  const jogados = new Map(semMapa.dados?.mapas.map((x) => [x.mapa_id, x.partidas]));
+  const pillsMapa = [...(cat?.mapas ?? [])].sort((a, b) => (jogados.get(b.id) ?? 0) - (jogados.get(a.id) ?? 0) || a.nome.localeCompare(b.nome, 'pt-BR'));
   const totalAparicoes = d?.agentes.reduce((s, a) => s + a.aparicoes, 0) ?? 0;
 
   return (
@@ -33,7 +37,7 @@ export function Meta() {
           opcoes={[{ valor: '', rotulo: 'Todos os torneios' }, ...(cat?.torneios ?? []).map((t) => ({ valor: t.id, rotulo: t.nome }))]} />
         <div className="pills" role="toolbar" aria-label="Filtrar por mapa" style={{ flex: 1 }}>
           <button type="button" className="pill" aria-pressed={!mapaSel} onClick={() => setMapa(null)}>Todos os mapas</button>
-          {cat?.mapas.map((x) => <button key={x.id} type="button" className="pill" aria-pressed={mapaSel === x.id} onClick={() => setMapa(x.id)}>{x.nome}</button>)}
+          {pillsMapa.map((x) => <button key={x.id} type="button" className="pill" aria-pressed={mapaSel === x.id} onClick={() => setMapa(x.id)}>{x.nome}</button>)}
         </div>
       </div>
 
