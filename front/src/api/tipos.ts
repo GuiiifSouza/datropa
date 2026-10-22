@@ -1,6 +1,6 @@
 /**
  * Tipos do contrato de docs/api.md (v0.2). Campos marcados "extra" ainda não estão no contrato:
- * o snapshot já entrega, e a API pode passar a entregar (pedidos em front/docs/pedidos-api.md).
+ * o snapshot já entrega, e a API pode passar a entregar (pedidos em front/docs/pedidos.md).
  * Quando a API real não manda um extra, a tela mostra "—".
  */
 

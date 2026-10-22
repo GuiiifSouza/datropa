@@ -46,7 +46,8 @@ export function querystring(params: Params = {}): string {
   return s ? `?${s}` : '';
 }
 
-const TIMEOUT_MS = 8000;
+// O Cloud Run pode levar alguns segundos no cold start; timeout curto jogaria a sessão inteira no snapshot.
+const TIMEOUT_MS = 15000;
 
 async function lerErro(res: Response): Promise<ErroApi> {
   let code = 'INTERNAL';
@@ -79,6 +80,7 @@ export async function getStats<T>(rota: string, params?: Params): Promise<T> {
     return (await res.json()) as T;
   } catch (e) {
     if (e instanceof ErroApi) throw e;
+    if (ctrl.signal.aborted) throw new ErroApi(0, 'TIMEOUT', 'A API demorou para responder.');
     throw new ErroApi(0, 'SEM_API', 'Não deu para falar com a API.');
   } finally {
     window.clearTimeout(timer);
@@ -99,7 +101,8 @@ export async function comFallback<T extends { meta?: Meta }>(rota: string, param
     return marcar(await getStats<T>(rota, params), 'api');
   } catch (e) {
     if (MODO === 'auto' && e instanceof ErroApi && (e.semApi || e.status === 400)) {
-      if (e.semApi) rotasFora.add(chaveRota(rota));
+      // Timeout é passageiro (cold start): tenta a API de novo na próxima tela.
+      if (e.semApi && e.code !== 'TIMEOUT') rotasFora.add(chaveRota(rota));
       if (import.meta.env.DEV) console.info(`[dados] ${rota}: usando o snapshot (${e.code}).`);
       return marcar(await local(), 'snapshot');
     }
