@@ -66,9 +66,7 @@ jobs:
       - name: Build do front (ou página provisória)
         run: |
           if [ -f front/package.json ]; then
-            cd front
-            npm ci
-            npm run build
+            (cd front && npm ci && npm run build)
           else
             echo "::notice::front/package.json não existe. Publicando infra/hosting-placeholder."
             mkdir -p front/dist
