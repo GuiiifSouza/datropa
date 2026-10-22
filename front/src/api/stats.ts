@@ -3,9 +3,9 @@
  * tenta /api/stats e, no modo auto, cai no snapshot quando a rota ainda não está no ar.
  * As funções marcadas "só snapshot" ainda não têm rota no contrato (pedidos em front/docs/pedidos.md).
  */
-import { comFallback, ErroApi, MODO } from './cliente';
+import { comFallback, ErroApi, getStats, MODO } from './cliente';
 import * as S from './snapshot';
-import type { Catalogos, Filtros, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem, TimeDetalhe } from './tipos';
+import type { Catalogos, EventosRound, Filtros, JogadorDetalhe, Lista, Meta, Objeto, OrdemRanking, PartidaDetalhe, PartidaItem, RankingItem, TimeDetalhe } from './tipos';
 
 const enc = encodeURIComponent;
 type Pag = { page?: number; page_size?: number };
@@ -204,6 +204,8 @@ export const dados = {
     comFallback(`/partidas/${enc(id)}`, undefined, () => local(() => S.partida(id)))
       .then((r) => comExtras(r, (x) => extrasPartida(x, id)))
       .then(ordenarPartida),
+  // Eventos de um round (docs/api.md, seção 6). Só API: o snapshot não tem eventos com posição.
+  eventosRound: (id: string, round: number) => getStats<Objeto<EventosRound>>(`/partidas/${enc(id)}/rounds/${round}/eventos`),
   busca: (q: string, tipo?: 'time' | 'jogador' | 'mapa') => comFallback('/busca', { q, tipo }, () => local(() => S.busca(q, tipo))),
 
   // ---- só snapshot por enquanto ----

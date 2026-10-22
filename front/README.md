@@ -37,7 +37,7 @@ Variáveis opcionais em `.env.local` (modelo em [.env.example](.env.example)):
 | `/estatisticas` | Líderes, tabela de jogadores com filtro e ordenação, tabela de times, glossário | `/ranking`, `/times` |
 | `/meta` | Agentes, mapas e sites, economia, armas, composições | snapshot |
 | `/tropa-ai` | Tropa AI em tela cheia (também abre como painel pelo orbe do header ou Ctrl K) | `POST /api/coach/perguntar` |
-| `/prancheta?partida_id=&round=` | Ponto de entrada da prancheta. **O Rhuan troca o conteúdo** mantendo a rota | — |
+| `/prancheta` | Prancheta tática: planejar em etapas, apresentar, salvar e compartilhar por link. Com `?partida_id=&round=` abre o round real; com `?j=` abre uma jogada compartilhada (`&modo=ver` = só visualização) | `/partidas`, `/partidas/{id}`, `/partidas/{id}/rounds/{n}/eventos` |
 
 Todas as telas que mostram partida ou round levam para a prancheta com o link combinado.
 
@@ -51,10 +51,12 @@ src/
   componentes/ header, orbes, busca, cartões de série, selos, estados, links da prancheta
   graficos/   gráficos próprios em SVG (sem biblioteca)
   paginas/    uma tela por arquivo
+  prancheta/  motor que roda a prancheta exportada do protótipo, round real pela API e o código gerado
   estilos/    tokens.css (identidade) e o CSS de cada parte
   rotas.tsx   roteador mínimo sobre a History API
 public/snapshot/  dados gerados dos JSONs oficiais (ver docs/dados.md)
 scripts/gerar_snapshot.py
+scripts/exportar_prancheta.py
 ```
 
 Mais detalhes:
@@ -78,4 +80,20 @@ Só biblioteca padrão do Python. Saída em `front/public/snapshot/`.
 
 Pronto: todas as telas acima com dados reais, Tropa AI com login anônimo automático, erros (401, 429, 503) e gráficos, busca global (atalho `/`), versão mobile.
 
-Falta, fora desta pasta: rotas da API que ainda não existem, Google habilitado no Firebase Auth e a prancheta do Rhuan. Lista completa em [docs/pedidos.md](docs/pedidos.md).
+Falta, fora desta pasta: rotas da API que ainda não existem e Google habilitado no Firebase Auth. Lista completa em [docs/pedidos.md](docs/pedidos.md).
+
+## Prancheta
+
+A prancheta é desenhada e testada num protótipo (Claude Design) e exportada para cá. O protótipo é a fonte: `src/prancheta/fonte/Main.dc.html`.
+
+```bash
+python3 scripts/exportar_prancheta.py   # regera src/prancheta/gerado/ (molde, CSS com escopo e lógica)
+```
+
+- `src/prancheta/Motor.tsx` monta a tela no React a partir do molde (`{{buracos}}`, `sc-for`, `sc-if`) e da lógica.
+- `src/prancheta/reais.ts` busca partidas e eventos de round pela API e converte as posições para o desenho do mapa.
+- Arte (mapas, splash, ícones de agente e habilidade) fica em `public/arte/prancheta/`, fora do git como manda o AGENTS.md. Sem ela a prancheta abre sem mapa e sem rostos. No deploy, o `deploy-front.yml` baixa a pasta do bucket privado `gs://datropa-arte` (ver `infra/README.md`); se o bucket estiver vazio, o deploy segue com um aviso e a prancheta sobe sem arte; para atualizar a arte do site, suba de novo com `gcloud storage cp -r arte gs://datropa-arte/` a partir de `front/public`.
+- Mapas com desenho: Lotus, Haven, Ascent, Breeze e Fracture. Os outros abrem no Planejar.
+- Mapa de calor: a aba está no ar, mas fica vazia até a API trazer os eventos do mapa inteiro (`AMB.calorVazio` em `paginas/Prancheta.tsx`).
+- Jogadas salvas ficam no navegador (localStorage). Firestore fica para depois.
+- Link de compartilhar (`?j=`): código `DT2.` (JSON comprimido com `CompressionStream('deflate-raw')`, em base64url); links antigos `DT1.` (base64 sem compressão) continuam abrindo. Acima de 8.000 caracteres a tela de compartilhar avisa, porque o Hosting devolve 414. Link estragado abre a prancheta vazia com aviso.
