@@ -23,6 +23,7 @@ _METRICAS = """
     COUNT(DISTINCT partida_id) AS partidas,
     COUNTIF(venceu) AS vitorias,
     SUM(rounds) AS rounds, SUM(kills) AS kills, SUM(deaths) AS deaths, SUM(assists) AS assists,
+    ROUND(SAFE_DIVIDE(SUM(score), SUM(rounds)), 1) AS acs,
     SAFE_DIVIDE(SUM(kills), SUM(deaths)) AS kd,
     IF(COUNTIF(status_qualidade != 'ok') = 0, SAFE_DIVIDE(SUM(dano_total), SUM(rounds)), NULL) AS adr,
     IF(COUNTIF(status_qualidade != 'ok') = 0,
@@ -76,7 +77,7 @@ ORDER BY partidas DESC, mapa_id
 @tool(
     nome="stats_jogador",
     descricao=(
-        "Estatísticas de um jogador na base oficial: partidas, vitórias, K/D/A, K/D, ADR, HS%, "
+        "Estatísticas de um jogador na base oficial: partidas, vitórias, K/D/A, ACS, K/D, ADR, HS%, "
         "first bloods e first deaths, mais a quebra por agente e por mapa. Filtros opcionais "
         "de mapa e agente. Precisa do jogador_id devolvido por buscar_entidade."
     ),
@@ -120,6 +121,6 @@ def stats_jogador(jogador_id: str, mapa: str | None = None, agente: str | None =
         "resumo": resumo,
         "agentes_mais_usados": agentes,
         "por_mapa": mapas,
-        "notas": "kd = kills/deaths. adr = dano a adversários por round. hs_pct = % de tiros na cabeça "
-                 "entre os acertos (não % de abates). null = indisponível.",
+        "notas": "acs = score / rounds. kd = kills/deaths. adr = dano a adversários por round. "
+                 "hs_pct = % de tiros na cabeça entre os acertos (não % de abates). null = indisponível.",
     }
