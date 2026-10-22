@@ -82,6 +82,7 @@ from . import (  # noqa: E402,F401
     composicoes,
     economia_time,
     pos_plant_retake,
+    ranking,
     resumo_partida,
     scouting_time,
     stats_jogador,

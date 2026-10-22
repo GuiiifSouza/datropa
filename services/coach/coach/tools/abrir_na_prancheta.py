@@ -4,10 +4,10 @@ Lê eventos_round (abates, plant e defuse, com o snapshot de posição dos jogad
 em cada evento), rounds, partidas e mapas (transformação de coordenada). Round
 público começa em 1, como na gold.
 
-O link segue o contrato PROPOSTO em docs/api.md, seção 6:
+O link segue o contrato de docs/api.md, seção 6, que o front adotou
+(front/src/App.tsx, rota /prancheta):
     /prancheta?partida_id=<id>&round=<n>
-Ainda precisa ser confirmado pelo front (Lhobregat). A base do link absoluto vem
-de COACH_FRONT_URL.
+A base do link absoluto vem de COACH_FRONT_URL.
 """
 
 from __future__ import annotations
@@ -59,7 +59,7 @@ _AMBIENTE = {"Bomb": "morte pela spike", "Fall": "morte por queda"}
 def link_prancheta(partida_id: str, round_: int) -> dict:
     caminho = "/prancheta?" + urlencode({"partida_id": partida_id, "round": round_})
     return {"url": caminho, "url_completa": f"{config.FRONT_URL}{caminho}",
-            "contrato": "proposto (docs/api.md, seção 6); a confirmar com o front"}
+            "contrato": "/prancheta?partida_id=&round= (docs/api.md, seção 6), rota do front"}
 
 
 def _tempo(ms: int | None) -> str | None:

@@ -79,3 +79,37 @@ def agente_id(texto: str | None) -> str | None:
         if normalizar(a["nome"]).replace("/", "") == n.replace("/", ""):
             return uuid
     return None
+
+
+# Torneios da base (prefixo do nome do arquivo, docs/dados.md) e grupos de torneios.
+# chave -> (nome público, regex sobre torneio_id). O modelo escolhe a chave por enum;
+# a regex sai daqui, nunca do modelo.
+TORNEIOS: dict[str, tuple[str, str]] = {
+    "UNIVAVA": ("Univavá (todas as fases)", r"^UNIVAVA_"),
+    "UNIVAVA_G": ("Univavá: Fase de Grupos", r"^UNIVAVA_G$"),
+    "UNIVAVA_C1": ("Univavá: Classificatória 1", r"^UNIVAVA_C1$"),
+    "UNIVAVA_C2": ("Univavá: Classificatória 2", r"^UNIVAVA_C2$"),
+    "UNIVAVA_C3": ("Univavá: Classificatória 3", r"^UNIVAVA_C3$"),
+    "UNIVAVA_C4": ("Univavá: Classificatória 4", r"^UNIVAVA_C4$"),
+    "RUSH": ("Rush Series (todas)", r"^RUSH"),
+    "RUSHE": ("Rush Series Esquenta", r"^RUSHE$"),
+    "RUSH2": ("Rush Series Esquenta 2", r"^RUSH2$"),
+    "RUSH_INCLUSIVO": ("Rush Series Inclusivo", r"^RUSH_INCLUSIVO$"),
+}
+
+
+def nome_torneio(torneio_id: str | None) -> str | None:
+    if torneio_id is None:
+        return None
+    return TORNEIOS.get(torneio_id, (torneio_id, ""))[0]
+
+
+CLASSES = ("Duelista", "Iniciador", "Controlador", "Sentinela")
+
+
+def agentes_da_classe(classe: str | None) -> list[str]:
+    """UUIDs dos agentes de uma classe (Duelista, Iniciador, Controlador, Sentinela)."""
+    if not classe:
+        return []
+    n = normalizar(classe)
+    return sorted(u for u, a in _agentes().items() if normalizar(a.get("classe") or "") == n)

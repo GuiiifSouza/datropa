@@ -14,6 +14,7 @@ def test_tools_ligadas():
         "buscar_entidade", "stats_jogador", "stats_time",
         "comparar_times", "economia_time", "pos_plant_retake", "composicoes",
         "resumo_partida", "scouting_time", "abrir_na_prancheta",
+        "ranking_jogadores", "ranking_times",
     }
     assert "consulta_livre" not in REGISTRO
 
