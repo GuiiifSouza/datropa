@@ -15,9 +15,11 @@ import { nomeTime } from '../util/formato';
 import { compilar, criarBase } from '../prancheta/Motor';
 import { CHAVE_DO_MAPA, criarReais } from '../prancheta/reais';
 import { criarCalor } from '../prancheta/calor';
+import { ligarDeslize } from '../prancheta/deslize';
 import { criarPrancheta } from '../prancheta/gerado/logica';
 import molde from '../prancheta/gerado/molde.html?raw';
 import '../prancheta/gerado/prancheta.css';
+import '../prancheta/pagina.css';
 
 type Logica = {
   trocarMapa: (chave: string) => void;
@@ -78,16 +80,33 @@ export function Prancheta() {
     return () => m.removeEventListener('change', mudar);
   }, []);
 
-  // a prancheta ocupa a altura que sobra abaixo do topo do site
+  // a prancheta ocupa a altura que sobra entre o topo e o rodapé do site, que aqui fica numa linha fina
+  // (pagina.css): a página inteira cabe na tela, sem rolagem
   useEffect(() => {
     const topo = document.querySelector<HTMLElement>('.topo');
+    const rodape = document.querySelector<HTMLElement>('.rodape');
     const el = raiz.current;
     if (!topo || !el) return;
-    const medir = () => el.style.setProperty('--altura-topo-site', `${topo.getBoundingClientRect().height}px`);
+    document.documentElement.classList.add('na-prancheta');
+    const medir = () => {
+      el.style.setProperty('--altura-topo-site', `${topo.getBoundingClientRect().height}px`);
+      el.style.setProperty('--altura-rodape-site', `${rodape ? rodape.getBoundingClientRect().height : 0}px`);
+    };
     medir();
     const ro = new ResizeObserver(medir);
     ro.observe(topo);
-    return () => ro.disconnect();
+    if (rodape) ro.observe(rodape);
+    return () => {
+      ro.disconnect();
+      document.documentElement.classList.remove('na-prancheta');
+    };
+  }, [estreito, abrirMesmoAssim]);
+
+  // pílula vermelha que desliza entre os botões dos grupos segmentados (prancheta/deslize.ts)
+  useEffect(() => {
+    const el = raiz.current;
+    if (!el) return;
+    return ligarDeslize(el);
   }, [estreito, abrirMesmoAssim]);
 
   if (estreito && !abrirMesmoAssim) {

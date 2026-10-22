@@ -389,6 +389,9 @@ class Component extends DCLogic {
     const r = (m || e.currentTarget).getBoundingClientRect();
     return daVista((e.clientX - r.left) / r.width * VW, (e.clientY - r.top) / r.height * VH);
   }
+  segTempo(t) { const m = String(t || '').trim().match(/^(\d+):(\d{1,2})$/); const s = m ? Number(m[1]) * 60 + Number(m[2]) : parseInt(t, 10); return Math.min(300, Math.max(0, isNaN(s) ? 0 : s)); }
+  fmtTempo(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  passoTempo(d) { const et = this.state.etapas[this.state.etapa]; const n = this.fmtTempo(Math.min(300, Math.max(0, Math.round((this.segTempo(et.tempo) + d) / 5) * 5))); this.editar((e2) => { e2.tempo = n; }, false); }
   zoomPara(z2, cx, cy, vista) {
     const s = this.state;
     z2 = Math.min(5, Math.max(1, z2));
@@ -1136,7 +1139,10 @@ class Component extends DCLogic {
         titulo: e[0] === 'p' ? 'Plantou' + (e[7] ? ' no ' + e[7] : '') : 'Desarmou a spike' };
     });
     const listaP = partidasR.map((p, i) => ({ titulo: p.a + ' ' + p.pa + ' x ' + p.pb + ' ' + p.b, sub: p.torneio + ' · ' + p.data,
-      cls: 'item' + (i === Math.min(s.partida, partidasR.length - 1) ? ' on' : ''), pick: () => this.setState({ partida: i, round: 1, evento: 0, fantasma: null, listaPartidas: false }) }));
+      cls: 'item' + (i === Math.min(s.partida, partidasR.length - 1) ? ' on' : ''), pick: () => this.setState({ partida: i, round: 1, evento: 0, fantasma: null, listaPartidas: false, buscaP: '' }) }));
+    const semAcento = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const termosP = semAcento(s.buscaP).split(/\s+/).filter(Boolean);
+    const listaPF = termosP.length ? listaP.filter((x) => { const t = semAcento(x.titulo + ' ' + x.sub); return termosP.every((w) => t.includes(w)); }) : listaP;
     // mapa de calor real: abates (posição da vítima, filtrando pelo time de quem matou) ou plants (filtrando pelo time que plantou)
     const timesSet = {};
     partidasR.forEach((p) => { timesSet[p.a] = 1; timesSet[p.b] = 1; });
@@ -1299,7 +1305,8 @@ class Component extends DCLogic {
       listaPartidas: s.listaPartidas, toggleListaPartidas: () => this.setState({ listaPartidas: !s.listaPartidas }),
       partidaTitulo: part ? part.a + ' ' + part.pa + ' x ' + part.pb + ' ' + part.b : (dadosMapa ? 'Sem partidas neste mapa' : 'Carregando partidas…'),
       partidaSub: part ? info.nome + ' · ' + part.torneio + ' · ' + part.data : info.nome,
-      nomeA: part ? part.a : 'Time A', nomeB: part ? part.b : 'Time B', nPartidas: partidasR.length, listaP,
+      nomeA: part ? part.a : 'Time A', nomeB: part ? part.b : 'Time B', nPartidas: partidasR.length, listaP: listaPF, nListaP: listaPF.length, semListaP: !listaPF.length,
+      buscaP: s.buscaP || '', mudarBuscaP: (e) => this.setState({ buscaP: e.target.value }),
       listaTimes: s.listaTimes, toggleListaTimes: () => this.setState({ listaTimes: !s.listaTimes }), timesCalor, calorN,
       calorTimeNome: s.calorTime || 'Todos',
       modoIdx: Math.max(0, ['planejar', 'round', 'calor'].indexOf(s.modo)), timeIdx: s.time === 'al' ? 0 : 1,
@@ -1371,6 +1378,9 @@ class Component extends DCLogic {
       etNome: et.nome, etTempo: et.tempo || '',
       mudarNome: (e) => { const v = e.target.value; this.editar((e2) => { e2.nome = v; }, false); },
       mudarTempo: (e) => { const v = e.target.value; this.editar((e2) => { e2.tempo = v; }, false); },
+      tempoMenos: () => this.passoTempo(-5), tempoMais: () => this.passoTempo(5),
+      normalizarTempo: () => { const t = et.tempo || ''; if (!t.trim()) return; const n = this.fmtTempo(this.segTempo(t)); if (n !== t) this.editar((e2) => { e2.tempo = n; }, false); },
+      teclaTempo: (e) => { if (e.key === 'ArrowUp' || e.key === 'ArrowDown') { e.preventDefault(); this.passoTempo(e.key === 'ArrowUp' ? 5 : -5); } },
       miniTitulo, miniAviso, miniAvisoCor: miniAviso.indexOf('Fora') === 0 ? '#FF7A7A' : '#9AA6B2',
       hg, formas, anel, anelCor, temPontas, paX, paY, pbX, pbY, temCurva, pcX, pcY,
       pcDown: (e) => { e.stopPropagation(); this.setState({ drag: { kind: 'pc', id: s.sel, hist: true } }); },
