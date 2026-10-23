@@ -400,6 +400,12 @@ MAPAS_NOVOS = (_mapa_novo('abyss', 'Abyss', '#252A3D', 996.18, 961.88, 0.000081,
                + _mapa_novo('pearl', 'Pearl', '#2E5A78', 1015.72, 948.9, 0.000078, [('A', 919.8, 328.7), ('B', 201.5, 324.2)])
                + _mapa_novo('sunset', 'Sunset', '#9A5A28', 948.49, 1002.26, 0.000078, [('A', 787.5, 368.5), ('B', 36.4, 405.9)]))
 js = trocar(js, '\n};\nvar W = MAPA_INFO.lotus.w', MAPAS_NOVOS + '\n};\nvar W = MAPA_INFO.lotus.w')
+# o mapa de calor só aparece no piso: a máscara é o próprio SVG do mapa (os vãos entre corredores ficam de fora),
+# como as .mascara-<mapa>-<lado> que o protótipo já tem para os outros mapas
+for _k in ('abyss', 'pearl', 'sunset'):
+    for _lado in ('ataque', 'defesa'):
+        _u = f'/arte/prancheta/mapas/{_k}-{_lado}.svg'
+        css += f'{ESCOPO} .mascara-{_k}-{_lado}{{-webkit-mask-image:url({_u});mask-image:url({_u})}}\n'
 # round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
 # mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
 js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
