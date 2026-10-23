@@ -1,17 +1,20 @@
 /** 05 · Jogador: números com a posição na cena, agentes, mapas, multikills e partidas recentes. */
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { StoryJogador, type DadosStory } from '../componentes/Story';
 import { dados } from '../api/stats';
 import { useDados } from '../api/useDados';
 import type { RankingItem } from '../api/tipos';
 import { useCatalogo } from '../componentes/Catalogo';
 import { BotaoPrancheta } from '../componentes/Prancheta';
-import { Agente, Carregando, ErroDados, FonteDados, LinkTime } from '../componentes/Visuais';
+import { Agente, Carregando, CorpoAgente, ErroDados, FonteDados, LinkTime } from '../componentes/Visuais';
+import { COR_AGENTE } from '../util/arteAgentes';
+import type { CSSProperties } from 'react';
 import { Colunas } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach, useContextoCoach } from '../coach/Coach';
 import { Contador } from '../componentes/Vida';
 import { Link, useParametro } from '../rotas';
-import { dec, diaBrasilia, diaNumerico, nomeTime, pct } from '../util/formato';
+import { dec, diaBrasilia, diaNumerico, nomeTime, pct, slugAgente } from '../util/formato';
 
 const MIN_MAPAS = 8;
 type Metrica = { chave: keyof RankingItem; rotulo: string; formato: (v: number | null) => string; ajuda: string };
@@ -64,6 +67,24 @@ export function Jogador({ id }: { id: string }) {
     return m;
   }, [rank.dados]);
 
+  const [story, setStory] = useState(false);
+  const fecharStory = useCallback(() => setStory(false), []);
+  const dadosStory = useMemo<DadosStory | null>(() => {
+    const dd = base.dados?.data;
+    if (!dd) return null;
+    const pos = (k: string) => { const x = posicoes.get(k); return x ? `${x.pos}º de ${x.de}` : undefined; };
+    const rr = dd.resumo;
+    return {
+      nome: dd.nome, time: dd.times[0] ? nomeTime(dd.times[0].nome) : null, agente: dd.agentes[0] ? agente(dd.agentes[0].agente_id) : null,
+      mapas: rr.partidas, vitoriaPct: rr.taxa_vitoria_pct ?? null,
+      numeros: [
+        { v: dec(rr.acs ?? null, 0), l: 'ACS', pos: pos('acs') },
+        { v: dec(rr.kd, 2), l: 'K/D', pos: pos('kd') },
+        { v: String(rr.first_bloods), l: 'First bloods', pos: pos('first_bloods') },
+      ],
+    };
+  }, [base.dados, posicoes, agente]);
+
   if (j.erro) return <main className="pagina"><ErroDados erro={j.erro} recarregar={j.recarregar} /></main>;
   if (!d) return <main className="pagina"><Carregando altura={200} /><Carregando altura={200} linhas={2} /></main>;
   const r = d.resumo;
@@ -73,12 +94,17 @@ export function Jogador({ id }: { id: string }) {
   return (
     <main className="pagina">
       <Link para="/estatisticas" className="voltar mono">← ESTATÍSTICAS</Link>
-      <section className="perfil">
+      <section className="perfil perfil--jogador" style={{ '--cor-agente': COR_AGENTE[slugAgente(agente(principal))] ?? 'var(--trilho)' } as CSSProperties}>
+        <CorpoAgente id={principal} className="perfil__corpo" />
         <Agente id={principal} tamanho="g" />
         <div className="cabeca" style={{ flex: '1 1 320px' }}>
-          <span className="rotulo rotulo--ambar">{d.times.map((t) => nomeTime(t.nome)).join(' · ').toUpperCase()}</span>
+          <span className="rotulo rotulo--ambar">{d.times.map((t) => nomeTime(t.nome)).join(' · ').toUpperCase()}{principal ? ` · MAIS JOGA DE ${agente(principal).toUpperCase()}` : ''}</span>
           <h1 className="titulo-xl" style={{ fontSize: 'clamp(48px, 7vw, 84px)' }}>{d.nome}{d.tag && <span className="apagado" style={{ fontSize: '0.4em', marginLeft: 8 }}>#{d.tag}</span>}</h1>
           <span style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>{d.times.map((t, i) => <LinkTime key={t.id} id={t.id} nome={t.nome} lado={i === 0 ? 'a' : 'b'} />)}</span>
+          <span className="perfil__acoes">
+            <Link para={`/comparar?a=${encodeURIComponent(id)}`} className="botao botao--linha botao--pequeno">⇄ Comparar</Link>
+            <button type="button" className="botao botao--ia botao--pequeno" onClick={() => setStory(true)} disabled={!dadosStory}>Compartilhar</button>
+          </span>
         </div>
         <div className="perfil__numeros">
           <div><b className="num">{r.partidas}</b><span className="rotulo">MAPAS</span></div>
@@ -168,6 +194,7 @@ export function Jogador({ id }: { id: string }) {
           </button>
         </aside>
       </div>
+      {story && dadosStory && <StoryJogador dados={dadosStory} fechar={fecharStory} />}
       <FonteDados meta={j.dados?.meta} />
     </main>
   );

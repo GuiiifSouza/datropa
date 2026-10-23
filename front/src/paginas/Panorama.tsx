@@ -84,7 +84,7 @@ export function Panorama() {
           </Figura>
           <div className="grade grade-2 fatos">
             <div className="fato"><b className="num"><Contador valor={p.fb_conversao_pct} formato={(v) => pct(v)} /></b><span>dos rounds ficam com quem abriu o round (first blood).</span></div>
-            <div className="fato"><b className="num"><Contador valor={p.ataque_pct} formato={(v) => pct(v)} /></b><span>dos rounds vão para o ataque. A cena é quase equilibrada entre os lados.</span></div>
+            <div className="fato"><b className="num"><Contador valor={p.ataque_pct} formato={(v) => pct(v)} /></b><span>dos rounds vão para o ataque. Os lados estão quase equilibrados.</span></div>
             <div className="fato"><b className="num"><Contador valor={p.plant_pct} formato={(v) => pct(v)} /></b><span>dos rounds têm a spike plantada.</span></div>
             <div className="fato"><b className="num">{dec(p.duracao_media_min, 0)} min</b><span>é a duração média de um mapa. {num(p.prorrogacoes)} foram para a prorrogação.</span></div>
             <div className="fato fato--largo">

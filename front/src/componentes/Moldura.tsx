@@ -8,9 +8,22 @@ import { dados } from '../api/stats';
 import { nomeTime } from '../util/formato';
 import { useDados } from '../api/useDados';
 
+// Ícones da navegação: aparecem só na barra inferior do celular.
+const ICONE_NAV: Record<string, JSX.Element> = {
+  '/partidas': <><rect x="3" y="5" width="18" height="14" rx="3" /><path d="M12 5v14M3 12h4M17 12h4" /></>,
+  '/times': <><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" /></>,
+  '/estatisticas': <><path d="M5 20V10M12 20V4M19 20v-7" /></>,
+  '/meta': <><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 2v4M12 18v4M2 12h4M18 12h4" /></>,
+};
+
 function ItemNav({ para, children }: { para: string; children: string }) {
   const ativo = useAtivo(para);
-  return <Link para={para} aria-current={ativo ? 'page' : undefined}>{children}</Link>;
+  return (
+    <Link para={para} aria-current={ativo ? 'page' : undefined}>
+      <svg className="nav__icone" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{ICONE_NAV[para]}</svg>
+      <span>{children}</span>
+    </Link>
+  );
 }
 
 export function Header() {
@@ -48,6 +61,18 @@ export function Header() {
       </div>
       {busca && <Busca fechar={() => setBusca(false)} />}
     </header>
+  );
+}
+
+/** Barra de navegação fixa embaixo, só no celular (o header fica só com logo, orbes, busca e conta). */
+export function NavInferior() {
+  return (
+    <nav className="nav-inferior" aria-label="Principal (celular)">
+      <ItemNav para="/partidas">Partidas</ItemNav>
+      <ItemNav para="/times">Times</ItemNav>
+      <ItemNav para="/estatisticas">Estatísticas</ItemNav>
+      <ItemNav para="/meta">Meta</ItemNav>
+    </nav>
   );
 }
 

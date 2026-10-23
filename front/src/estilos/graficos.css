@@ -47,8 +47,8 @@
 .livro__celulas { display: flex; gap: 4px; }
 .livro__slot { display: inline-flex; }
 .livro__celula, .livro__n { width: 26px; height: 26px; border-radius: 7px; display: inline-flex; align-items: center; justify-content: center; flex: none; background: var(--superficie-2); color: var(--fundo); }
-.livro__celula--a { background: var(--ambar); }
-.livro__celula--b { background: var(--menta); }
+.livro__celula--a { background: var(--time-a); }
+.livro__celula--b { background: var(--time-b); }
 a.livro__celula:hover { outline: 2px solid var(--giz); outline-offset: 1px; color: var(--fundo); }
 .livro__celula--corte { margin-left: 10px; }
 .livro__n { background: transparent; color: var(--apagado); font-size: 10px; height: 16px; }

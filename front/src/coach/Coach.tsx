@@ -3,16 +3,16 @@
  * Ctrl/Cmd+K abre e fecha, Esc fecha. A tela atual pode passar contexto (partida, time, jogador),
  * que vai junto da pergunta com os IDs, para o coach chamar as tools certas.
  */
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type FormEvent, type KeyboardEvent, type ReactNode, type WheelEvent } from 'react';
 import { useAuth } from '../auth/Auth';
 import { dados } from '../api/stats';
 import { useDados } from '../api/useDados';
 import { Link, navegar, useLocal } from '../rotas';
 import { LIMITE_PERGUNTA, perguntar, type ErroCoach, type ToolChamada } from './cliente';
 import { GraficosDasTools } from './Graficos';
-import { linkPrancheta } from '../componentes/Prancheta';
+import { linkPrancheta, MiniMesa } from '../componentes/Prancheta';
 
-export type ContextoCoach = { tipo: 'partida' | 'time' | 'jogador'; id: string; rotulo: string; sugestoes?: { t: string; q: string }[] };
+export type ContextoCoach = { tipo: 'partida' | 'time' | 'jogador' | 'mapa'; id: string; rotulo: string; sugestoes?: { t: string; q: string }[] };
 export type Mensagem = { id: string; papel: 'usuario' | 'coach'; texto: string; tools?: ToolChamada[]; erro?: ErroCoach; pendente?: boolean };
 
 type Ctx = {
@@ -246,7 +246,7 @@ export function BoasVindas() {
         ))}
       </div>
       <Link para={linkPrancheta()} className="dica-prancheta">
-        <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--menta)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 5h16v14H4z" /><path d="M10 9l5 3-5 3z" /></svg>
+        <MiniMesa dica={0} />
         <span>Peça “abre o round 29 na prancheta” e eu levo você direto para o replay 2D.</span>
       </Link>
       <div className="dicas-coach">
@@ -259,11 +259,27 @@ export function BoasVindas() {
 export function PainelCoach() {
   const { aberto, fechar, mensagens, novaConversa } = useCoach();
   const painel = useRef<HTMLElement>(null);
+  const corpo = useRef<HTMLDivElement>(null);
+  // Com o painel aberto a página de trás não rola: a rolagem fica toda no painel.
+  useEffect(() => {
+    if (!aberto) return;
+    const html = document.documentElement;
+    html.classList.add('rolagem-presa');
+    return () => html.classList.remove('rolagem-presa');
+  }, [aberto]);
   if (!aberto) return null;
+  // Roda do mouse no topo, no rodapé ou no véu também rola a conversa, nunca a página.
+  const rolarCorpo = (e: WheelEvent) => {
+    const c = corpo.current;
+    if (!c || c.contains(e.target as Node)) return;
+    const alvo = e.target as HTMLElement;
+    if (alvo.closest('textarea') && alvo.scrollHeight > alvo.clientHeight) return;
+    c.scrollTop += e.deltaY;
+  };
   return (
     <>
-      <div className="coach-veu" onClick={fechar} aria-hidden="true" />
-      <section id="painel-coach" ref={painel} role="dialog" aria-modal="false" aria-label="Tropa AI" className="painel-coach">
+      <div className="coach-veu" onClick={fechar} onWheel={rolarCorpo} aria-hidden="true" />
+      <section id="painel-coach" ref={painel} role="dialog" aria-modal="false" aria-label="Tropa AI" className="painel-coach" onWheel={rolarCorpo}>
         <span className="painel-coach__seta" aria-hidden="true" />
         <div className="painel-coach__topo">
           <span className="painel-coach__marca"><span className="logo__selo" style={{ width: 28, height: 28, fontSize: 12 }}>DT</span><b>Tropa AI</b><span className="rotulo">COACH</span></span>
@@ -273,7 +289,7 @@ export function PainelCoach() {
             <button type="button" className="botao-quadrado" onClick={fechar} aria-label="Fechar">✕</button>
           </span>
         </div>
-        <div className="painel-coach__corpo">
+        <div className="painel-coach__corpo" ref={corpo}>
           {mensagens.length === 0 ? <BoasVindas /> : <Conversa />}
         </div>
         <div className="painel-coach__rodape">

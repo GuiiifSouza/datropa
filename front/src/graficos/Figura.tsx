@@ -32,8 +32,8 @@ export function Figura({ titulo, legenda, tabela, fonte, acao, children, compact
       </figcaption>
       {modo === 'grafico' || !tabela ? children : (
         <div className="tabela-rolagem">
-          <table className="tabela">
-            <thead><tr>{tabela.colunas.map((c) => <th key={c}>{c}</th>)}</tr></thead>
+          <table className="tabela tabela--figura">
+            <thead><tr>{tabela.colunas.map((c, j) => <th key={c} className={j > 0 ? 'n' : undefined}>{c}</th>)}</tr></thead>
             <tbody>{tabela.linhas.map((l, i) => <tr key={i}>{l.map((v, j) => <td key={j} className={j > 0 ? 'n' : undefined}>{v}</td>)}</tr>)}</tbody>
           </table>
         </div>

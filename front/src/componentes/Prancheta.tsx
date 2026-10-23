@@ -12,16 +12,32 @@ export function linkPrancheta(partidaId?: string | null, round?: number | null):
   return `/prancheta${s ? `?${s}` : ''}`;
 }
 
-const Icone = () => (
-  <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--menta)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M4 5h16v14H4z" /><path d="M10 9l5 3-5 3z" />
-  </svg>
-);
+/**
+ * Mini prancheta animada, a mesma linguagem do orbe do header: mesa quadriculada girando,
+ * jogadores dos dois times se mexendo e, no hover, o radar varre, o lápis rabisca e sobe um balão.
+ */
+const DICAS = ['bora rever!', 'smoke no B!', 'retake 2×1', 'entra junto!'];
+export function MiniMesa({ dica = 0 }: { dica?: number }) {
+  return (
+    <>
+      <span className="mini-mesa" aria-hidden="true">
+        <span className="mini-mesa__grade" />
+        <span className="mini-mesa__radar" />
+        <i className="mm-pt mm-a1" /><i className="mm-pt mm-a2" /><i className="mm-pt mm-b1" /><i className="mm-pt mm-b2" />
+        <svg className="mini-mesa__lapis" viewBox="0 0 14 60" aria-hidden="true">
+          <path d="M3 4l4-4 4 4v6H3z" fill="#FF8FA3" /><rect x="3" y="10" width="8" height="4" fill="#C5CBD3" />
+          <rect x="3" y="14" width="8" height="34" fill="#F9A23B" /><path d="M3 48h8l-4 10z" fill="#ECD3A8" /><path d="M6 55h2l-1 3z" fill="#0F1923" />
+        </svg>
+      </span>
+      <span className="mini-dica" aria-hidden="true">{DICAS[dica % DICAS.length]}</span>
+    </>
+  );
+}
 
 export function BotaoPrancheta({ partidaId, round, texto = 'Prancheta', rotulo }: { partidaId?: string | null; round?: number | null; texto?: string; rotulo?: string }) {
   return (
     <Link para={linkPrancheta(partidaId, round)} className="botao-prancheta" aria-label={rotulo ?? (round ? `Ver o round ${round} na prancheta` : 'Rever na prancheta')}>
-      <Icone />{texto}
+      <MiniMesa dica={round ?? 0} />{texto}
     </Link>
   );
 }
@@ -34,7 +50,7 @@ export function BannerPrancheta({ partidaId, round, titulo = 'Viu um round que i
       <span aria-hidden="true" className="mini-prancheta">
         <span style={{ left: 14, top: 14, width: 40, height: 30, border: '1px solid rgba(236,232,225,.25)', borderRadius: 6 }} />
         <span style={{ left: 80, top: 40, width: 38, height: 34, border: '1px solid rgba(236,232,225,.25)', borderRadius: 6 }} />
-        {[[24, 58, 'var(--ambar)'], [44, 66, 'var(--ambar)'], [92, 18, 'var(--menta)'], [66, 22, 'var(--menta)']].map(([l, t, c], i) => (
+        {[[24, 58, 'var(--time-a)'], [44, 66, 'var(--time-a)'], [92, 18, 'var(--time-b)'], [66, 22, 'var(--time-b)']].map(([l, t, c], i) => (
           <span key={i} style={{ left: l as number, top: t as number, width: 11, height: 11, borderRadius: '50%', background: c as string }} />
         ))}
         <span style={{ left: 30, top: 28, fontSize: 14, color: 'var(--vermelho)', fontWeight: 700 }}>✕</span>
@@ -44,7 +60,7 @@ export function BannerPrancheta({ partidaId, round, titulo = 'Viu um round que i
         <b className="titulo-m" style={{ fontSize: 28 }}>{titulo}</b>
         <span className="giz2" style={{ fontSize: 14 }}>{texto}</span>
       </span>
-      <span className="botao"><Icone />Abrir</span>
+      <span className="botao botao--mesa"><MiniMesa dica={1} />Abrir</span>
     </Link>
   );
 }

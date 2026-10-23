@@ -221,7 +221,7 @@ a.livro__celula:hover { transform: scale(1.18); }
 .seletor--aberto { z-index: 60; }
 
 /* ---------- barra de rolagem da marca ---------- */
-/* Chromium e Safari: ::-webkit-scrollbar. (Não usar scrollbar-color/width aqui: no Chrome 121+ eles desligam estes estilos.) */
+/* Safari e Chromium antigo: ::-webkit-scrollbar. */
 ::-webkit-scrollbar { width: 12px; height: 10px; }
 ::-webkit-scrollbar-track { background: var(--fundo); }
 ::-webkit-scrollbar-thumb {
@@ -242,10 +242,15 @@ a.livro__celula:hover { transform: scale(1.18); }
 }
 .pills::-webkit-scrollbar-thumb:hover, .tabela-rolagem::-webkit-scrollbar-thumb:hover, .seletor__lista::-webkit-scrollbar-thumb:hover,
 .painel-coach__corpo::-webkit-scrollbar-thumb:hover, .busca__lista::-webkit-scrollbar-thumb:hover { background: var(--vermelho); }
-/* Firefox (sem ::-webkit-scrollbar): cor padrão do navegador trocada pela da marca. */
-@supports not selector(::-webkit-scrollbar) {
+/* Padrão (Chrome/Brave/Edge 121+ e Firefox): no Windows o Chromium usa a barra "Fluent" e ignora o
+   ::-webkit-scrollbar acima, então a cor vem por scrollbar-color. O Safari, que não tem a propriedade, fica
+   com o estilo webkit. */
+@supports (scrollbar-color: red red) {
   html { scrollbar-color: var(--vermelho) var(--fundo); }
-  .pills, .tabela-rolagem, .livro, .eco-rounds, .seletor__lista, .painel-coach__corpo, .busca__lista { scrollbar-width: thin; scrollbar-color: rgba(255,70,85,.6) transparent; }
+  .pills, .tabela-rolagem, .livro, .eco-rounds, .seletor__lista, .painel-coach__corpo, .busca__lista {
+    scrollbar-width: thin; scrollbar-color: rgba(255,70,85,.75) transparent;
+  }
+  .nav, .ticker__trilho { scrollbar-width: none; }
 }
 ::selection { background: rgba(255,70,85,.35); color: var(--giz); }
 html { scroll-behavior: smooth; }

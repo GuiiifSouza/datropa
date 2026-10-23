@@ -2,13 +2,15 @@
 import { dados } from '../api/stats';
 import { useDados } from '../api/useDados';
 import { useCatalogo } from '../componentes/Catalogo';
-import { Agente, Carregando, ErroDados } from '../componentes/Visuais';
+import { Agente, Carregando, CorpoAgente, ErroDados } from '../componentes/Visuais';
+import { COR_AGENTE } from '../util/arteAgentes';
+import type { CSSProperties } from 'react';
 import { BarrasMedia } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach } from '../coach/Coach';
-import { useParametro } from '../rotas';
+import { Link, useParametro } from '../rotas';
 import { Seletor } from '../componentes/Seletor';
-import { COMPRAS, dec, num, pct } from '../util/formato';
+import { COMPRAS, dec, num, pct, slugAgente } from '../util/formato';
 
 const CLASSES = ['Duelista', 'Iniciador', 'Controlador', 'Sentinela'];
 
@@ -29,7 +31,7 @@ export function Meta() {
   return (
     <main className="pagina">
       <div className="cabeca">
-        <span className="rotulo rotulo--vermelho">O QUE A CENA ESTÁ JOGANDO</span>
+        <span className="rotulo rotulo--vermelho">O QUE A GALERA ESTÁ JOGANDO</span>
         <h1 className="titulo-xl">Meta</h1>
       </div>
       <div className="barra-ferramentas">
@@ -43,6 +45,23 @@ export function Meta() {
 
       {m.erro ? <ErroDados erro={m.erro} recarregar={m.recarregar} /> : !d ? <Carregando altura={220} linhas={3} /> : (
         <>
+          <section className="podio" aria-label="Agentes mais escolhidos">
+            {[...d.agentes].sort((a, b) => b.aparicoes - a.aparicoes).slice(0, 3).map((a, i) => (
+              <div key={a.agente_id} className={`podio__agente podio__agente--${i + 1}`} style={{ '--cor-agente': COR_AGENTE[slugAgente(agente(a.agente_id))] ?? 'var(--trilho)' } as CSSProperties}>
+                <CorpoAgente id={a.agente_id} className="podio__corpo" />
+                <span className="podio__texto">
+                  <span className="rotulo">{i === 0 ? 'MAIS ESCOLHIDO' : `${i + 1}º MAIS ESCOLHIDO`} · {(classe(a.agente_id) ?? '').toUpperCase()}</span>
+                  <b className="titulo-l">{agente(a.agente_id)}</b>
+                  <span className="podio__numeros">
+                    <span><b className="num">{pct(a.pick_pct, 0)}</b><span className="rotulo">PICK</span></span>
+                    <span><b className="num">{pct(a.taxa_vitoria_pct, 0)}</b><span className="rotulo">VITÓRIA</span></span>
+                    <span><b className="num">{dec(a.acs, 0)}</b><span className="rotulo">ACS</span></span>
+                  </span>
+                </span>
+              </div>
+            ))}
+          </section>
+
           <section className="cartao">
             <div className="secao-topo">
               <span className="titulo-s">Agentes</span>
@@ -56,7 +75,8 @@ export function Meta() {
             </div>
             <div className="grade-agentes">
               {d.agentes.map((a) => (
-                <div key={a.agente_id} className="agente-meta" title={`${agente(a.agente_id)}: ${a.aparicoes} aparições`}>
+                <div key={a.agente_id} className="agente-meta" title={`${agente(a.agente_id)}: ${a.aparicoes} aparições`} style={{ '--cor-agente': COR_AGENTE[slugAgente(agente(a.agente_id))] ?? 'var(--trilho)' } as CSSProperties}>
+                  <CorpoAgente id={a.agente_id} className="agente-meta__corpo" />
                   <Agente id={a.agente_id} tamanho="g" />
                   <b>{agente(a.agente_id)}</b>
                   <span className="agente-meta__linha"><span className="rotulo">PICK</span><b className="num">{pct(a.pick_pct, 0)}</b></span>
@@ -74,10 +94,10 @@ export function Meta() {
               const totalPlants = sites.reduce((s, [, n]) => s + n, 0);
               return (
                 <div key={x.mapa_id} className="cartao mapa-meta">
-                  <div className="secao-topo"><span className="titulo-m">{mapa(x.mapa_id)}</span><span className="mono apagado" style={{ fontSize: 11 }}>{x.partidas} MAPAS · {x.prorrogacoes} PRORR.</span></div>
+                  <div className="secao-topo"><Link para={`/mapas/${encodeURIComponent(x.mapa_id)}`} className="titulo-m link-mapa">{mapa(x.mapa_id)} ↗</Link><span className="mono apagado" style={{ fontSize: 11 }}>{x.partidas} MAPAS · {x.prorrogacoes} PRORR.</span></div>
                   <div className="lados-barra" title={`Ataque vence ${pct(x.ataque_pct)} dos rounds`}>
-                    <span style={{ width: `${x.ataque_pct ?? 50}%`, background: 'var(--ambar)' }}><b>ATK {pct(x.ataque_pct, 0)}</b></span>
-                    <span style={{ flex: 1, background: 'var(--menta)' }}><b>DEF {pct(x.ataque_pct === null ? null : 100 - x.ataque_pct, 0)}</b></span>
+                    <span style={{ width: `${x.ataque_pct ?? 50}%`, background: 'var(--time-a)' }}><b>ATK {pct(x.ataque_pct, 0)}</b></span>
+                    <span style={{ flex: 1, background: 'var(--time-b)' }}><b>DEF {pct(x.ataque_pct === null ? null : 100 - x.ataque_pct, 0)}</b></span>
                   </div>
                   {totalPlants > 0 && (
                     <div className="sites">
