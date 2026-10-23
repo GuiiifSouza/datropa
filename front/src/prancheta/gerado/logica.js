@@ -80,7 +80,13 @@ var MAPA_INFO = {
   breeze: { nome: 'Breeze', cor: '#2B747A', w: 960.09, h: 941.87, coef: 0.00007, lados: { ataque: { img: '/arte/prancheta/mapas/breeze-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 960.09, h: 941.87 }, defesa: { img: '/arte/prancheta/mapas/breeze-defesa.svg', T: [-1, 0, 0, -1, 960.09, 941.87], w: 960.09, h: 941.87 } },
     sitios: [{ t: 'A', x: 818.7, y: 415.8 }, { t: 'B', x: 87.9, y: 238.7 }] },
   fracture: { nome: 'Fracture', cor: '#665636', w: 1024, h: 1024, coef: 0.000078, lados: { ataque: { img: '/arte/prancheta/mapas/fracture-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 1024, h: 1024 }, defesa: { img: '/arte/prancheta/mapas/fracture-defesa.svg', T: [-1, 0, 0, -1, 1024, 1024], w: 1024, h: 1024 } },
-    sitios: [{ t: 'A', x: 868.9, y: 469.7 }, { t: 'B', x: 89.8, y: 493.2 }] }
+    sitios: [{ t: 'A', x: 868.9, y: 469.7 }, { t: 'B', x: 89.8, y: 493.2 }] },
+  abyss: { nome: 'Abyss', cor: '#252A3D', w: 996.18, h: 961.88, coef: 8.1e-05, lados: { ataque: { img: '/arte/prancheta/mapas/abyss-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 996.18, h: 961.88 }, defesa: { img: '/arte/prancheta/mapas/abyss-defesa.svg', T: [-1, 0, 0, -1, 996.18, 961.88], w: 996.18, h: 961.88 } },
+    sitios: [{ t: 'A', x: 962.4, y: 387.5 }, { t: 'B', x: 93.4, y: 353.4 }] },
+  pearl: { nome: 'Pearl', cor: '#2E5A78', w: 1015.72, h: 948.9, coef: 7.8e-05, lados: { ataque: { img: '/arte/prancheta/mapas/pearl-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 1015.72, h: 948.9 }, defesa: { img: '/arte/prancheta/mapas/pearl-defesa.svg', T: [-1, 0, 0, -1, 1015.72, 948.9], w: 1015.72, h: 948.9 } },
+    sitios: [{ t: 'A', x: 919.8, y: 328.7 }, { t: 'B', x: 201.5, y: 324.2 }] },
+  sunset: { nome: 'Sunset', cor: '#9A5A28', w: 948.49, h: 1002.26, coef: 7.8e-05, lados: { ataque: { img: '/arte/prancheta/mapas/sunset-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 948.49, h: 1002.26 }, defesa: { img: '/arte/prancheta/mapas/sunset-defesa.svg', T: [-1, 0, 0, -1, 948.49, 1002.26], w: 948.49, h: 1002.26 } },
+    sitios: [{ t: 'A', x: 787.5, y: 368.5 }, { t: 'B', x: 36.4, y: 405.9 }] }
 };
 var W = MAPA_INFO.lotus.w, H = MAPA_INFO.lotus.h;
 // vista (lado escolhido): VT leva do espaço canônico para o desenho do lado; VW/VH são as medidas desse desenho
