@@ -149,3 +149,12 @@ front/public/logos-times/README.md. Falha de imagem também preserva a sigla.
 Testes de aliases, existência dos arquivos, agentes, tipos e build aprovados.
 Sem consultas BigQuery/Gemini. Inspeção visual local indisponível: Chromium
 ausente no ambiente. Confirmar os selos no navegador após publicação.
+
+## Correção da publicação das artes — 22/10/2026
+
+Deploy anterior concluiu com aviso de bucket vazio e publicou sem as artes.
+Incluídos os 26 arquivos originais do ZIP enviado e autorizado pelo responsável
+em front/public/arte/prancheta, nos caminhos já usados pelo site.
+Build passa a verificar todos os arquivos obrigatórios antes de gerar o front,
+evita nova publicação sem mapas, agentes, habilidades, banners ou paredes.
+Nenhuma coordenada, posição, dimensão ou filtro alterado.

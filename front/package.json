@@ -9,7 +9,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "tipos": "tsc --noEmit",
-    "snapshot": "python3 scripts/gerar_snapshot.py --dados ../data/raw"
+    "snapshot": "python3 scripts/gerar_snapshot.py --dados ../data/raw",
+    "prebuild": "node scripts/verificar-artes.mjs"
   },
   "dependencies": {
     "firebase": "^10.14.1",
