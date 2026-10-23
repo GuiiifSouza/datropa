@@ -73,11 +73,16 @@ export function criarReais(op: Opcoes) {
     op.aoMudar?.();
   };
 
+  // um pedido de lista por mapa por vez: a lógica chama listar() mais de uma vez enquanto a página abre, e uma
+  // lista que chegasse depois do detalhe da partida apagava os rounds já carregados (o Round real abria vazio)
+  const listando = new Set<string>();
+
   async function listar(chave: string, cb: (d: DadosMapa) => void) {
     avisos[chave] = cb;
     if (porMapa[chave]) { cb(porMapa[chave]); return; }
     const mapaId = MAPA_ID[chave];
-    if (!mapaId) return;
+    if (!mapaId || listando.has(chave)) return; // quem chegou junto recebe pelo aviso quando a lista sair
+    listando.add(chave);
     const itens: PartidaItem[] = [];
     try {
       for (let page = 1; page <= 10; page++) {
@@ -86,6 +91,8 @@ export function criarReais(op: Opcoes) {
         if (!r.pagination || page * r.pagination.page_size >= r.pagination.total) break;
       }
     } catch { /* sem lista: a prancheta mostra o round vazio */ }
+    listando.delete(chave);
+    if (porMapa[chave]) return;
     if (op.partidaInicial) {
       const i = itens.findIndex((p) => p.id === op.partidaInicial);
       if (i > 0) itens.unshift(...itens.splice(i, 1));

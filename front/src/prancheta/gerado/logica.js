@@ -311,7 +311,7 @@ var AG_ROUND = { A1: 'jett', A2: 'sova', A3: 'omen', A4: 'breach', A5: 'killjoy'
 class Component extends DCLogic {
   constructor(props) {
     super(props);
-    this.state = { modo: 'planejar', lado: 'ataque', time: 'al', agSel: 'omen', funcao: 'Todos', etapa: 0, etapas: etapasIniciais(), hist: [], sel: null, ferramenta: 'mover', drag: null,
+    this.state = { modo: 'planejar', lado: 'ataque', time: 'al', agSel: 'omen', funcao: 'Todos', etapa: 0, etapas: etapaVazia(), hist: [], sel: null, ferramenta: 'mover', drag: null,
       round: 7, evento: 0, tipoCalor: 'abates', tocando: false, visao: false, mapa: 'lotus', paredes: null, reais: {}, partida: 0, listaPartidas: false, listaTimes: false, calorTime: '', futuro: [], ajuda: false, sels: [], mini: false, mira: null, fantasma: null, abaEsq: 'agentes', abaDir: 'etapas', apres: false, z: 1, ox: 0, oy: 0, mapaAberto: false, segs: null, seq: 1 };
     this.timer = null;
   }

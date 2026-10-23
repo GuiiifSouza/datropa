@@ -11,6 +11,10 @@ export const CORES_LOGO: Record<string, string[]> = {
   "azure_bears": [
     "#2691FC"
   ],
+  "brutal_esports": [
+    "#DB2138",
+    "#DBDB79"
+  ],
   "caap_hellhounds": [
     "#DB9854",
     "#DB2121"
@@ -27,6 +31,10 @@ export const CORES_LOGO: Record<string, string[]> = {
     "#7979DB",
     "#79DBDB"
   ],
+  "fatec_pg": [
+    "#DB492C",
+    "#DB2C84"
+  ],
   "fei_darkowls": [
     "#FCBC26",
     "#DB7979"
@@ -35,9 +43,28 @@ export const CORES_LOGO: Record<string, string[]> = {
     "#E4B424",
     "#DB7979"
   ],
+  "gambiarra_ufg": [
+    "#49ABDB",
+    "#7979DB"
+  ],
+  "gdu_ufpb": [
+    "#7DC2E4",
+    "#7979DB"
+  ],
   "green_owls": [
     "#219DDB",
     "#21DB9D"
+  ],
+  "homem_passaro": [
+    "#FCE726",
+    "#E4A07D"
+  ],
+  "ibmec_sharks": [
+    "#842CDB",
+    "#5A8EDB"
+  ],
+  "ime_wolves_red": [
+    "#FC2651"
   ],
   "inatel_legacy": [
     "#2C2CDB",
@@ -45,6 +72,10 @@ export const CORES_LOGO: Record<string, string[]> = {
   ],
   "incinera": [
     "#FC7B26",
+    "#DBDB79"
+  ],
+  "liga_vulkanica": [
+    "#E46C24",
     "#DBDB79"
   ],
   "macklogic_rainbow": [
@@ -58,9 +89,17 @@ export const CORES_LOGO: Record<string, string[]> = {
     "#842CDB",
     "#7979DB"
   ],
+  "nox_unievangelica": [
+    "#DB2C2C",
+    "#DB9D5E"
+  ],
   "octacore": [
     "#E42424",
     "#21DBB6"
+  ],
+  "panterao_gaming": [
+    "#7979DB",
+    "#79DBDB"
   ],
   "poli_plague": [
     "#DBBA33",
@@ -77,6 +116,22 @@ export const CORES_LOGO: Record<string, string[]> = {
   "rahnag": [
     "#8E27DB",
     "#21DB21"
+  ],
+  "sheriff_iff": [
+    "#FCBC26",
+    "#DB7979"
+  ],
+  "sistematica_academy": [
+    "#2156DB",
+    "#DB7698"
+  ],
+  "sistematica_unievangelica": [
+    "#842CDB",
+    "#2C2CDB"
+  ],
+  "tigre_branco": [
+    "#E4CC3C",
+    "#DB7979"
   ],
   "tirana": [
     "#E46C3C",
@@ -110,6 +165,10 @@ export const CORES_LOGO: Record<string, string[]> = {
     "#DB2741",
     "#7979DB"
   ],
+  "ufmg_fenix_b": [
+    "#DB2121",
+    "#FCA626"
+  ],
   "ufmt_turuna": [
     "#E45424",
     "#DB79DB"
@@ -139,6 +198,10 @@ export const CORES_LOGO: Record<string, string[]> = {
   ],
   "unifacens_fodens": [
     "#79AADB"
+  ],
+  "unifesp_erex": [
+    "#2CDB2C",
+    "#8CDB3C"
   ],
   "uninassau_griffins": [
     "#217EDB",

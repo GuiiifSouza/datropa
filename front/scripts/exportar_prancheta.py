@@ -432,6 +432,9 @@ js = trocar(js, '  zoomPara(z2, cx, cy, vista) {',
             "  fmtTempo(s) { return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }\n"
             "  passoTempo(d) { const et = this.state.etapas[this.state.etapa]; const n = this.fmtTempo(Math.min(300, Math.max(0, Math.round((this.segTempo(et.tempo) + d) / 5) * 5))); this.editar((e2) => { e2.tempo = n; }, false); }\n"
             '  zoomPara(z2, cx, cy, vista) {')
+# planejar: a primeira abertura começava com a jogada de exemplo do protótipo (3 etapas no Lotus, agentes dos dois
+# lados) e a pessoa tinha de apagar tudo. Agora começa vazia, igual ao "Nova estratégia".
+js = trocar(js, 'etapas: etapasIniciais(),', 'etapas: etapaVazia(),')
 # entrada pelo link: ?j= (jogada compartilhada) ou ?partida_id=&round= (round real)
 js = trocar(js, '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n',
             '    if (ini && (ini.modo === \'round\' || ini.modo === \'planejar\')) this.setState({ modo: ini.modo });\n    if (AMB.inicio) AMB.inicio(this);\n')
