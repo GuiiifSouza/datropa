@@ -86,7 +86,13 @@ var MAPA_INFO = {
   pearl: { nome: 'Pearl', cor: '#2E5A78', w: 1015.72, h: 948.9, coef: 7.8e-05, lados: { ataque: { img: '/arte/prancheta/mapas/pearl-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 1015.72, h: 948.9 }, defesa: { img: '/arte/prancheta/mapas/pearl-defesa.svg', T: [-1, 0, 0, -1, 1015.72, 948.9], w: 1015.72, h: 948.9 } },
     sitios: [{ t: 'A', x: 919.8, y: 328.7 }, { t: 'B', x: 201.5, y: 324.2 }] },
   sunset: { nome: 'Sunset', cor: '#9A5A28', w: 948.49, h: 1002.26, coef: 7.8e-05, lados: { ataque: { img: '/arte/prancheta/mapas/sunset-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 948.49, h: 1002.26 }, defesa: { img: '/arte/prancheta/mapas/sunset-defesa.svg', T: [-1, 0, 0, -1, 948.49, 1002.26], w: 948.49, h: 1002.26 } },
-    sitios: [{ t: 'A', x: 787.5, y: 368.5 }, { t: 'B', x: 36.4, y: 405.9 }] }
+    sitios: [{ t: 'A', x: 787.5, y: 368.5 }, { t: 'B', x: 36.4, y: 405.9 }] },
+  split: { nome: 'Split', cor: '#56636E', w: 951.18, h: 894.24, coef: 7.8e-05, lados: { ataque: { img: '/arte/prancheta/mapas/split-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 951.18, h: 894.24 }, defesa: { img: '/arte/prancheta/mapas/split-defesa.svg', T: [-1, 0, 0, -1, 951.18, 894.24], w: 951.18, h: 894.24 } },
+    sitios: [{ t: 'A', x: 912.6, y: 255.4 }, { t: 'B', x: 157.1, y: 271.1 }] },
+  summit: { nome: 'Summit', cor: '#7E6048', w: 981.29, h: 988.12, coef: 7.5e-05, lados: { ataque: { img: '/arte/prancheta/mapas/summit-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 981.29, h: 988.12 }, defesa: { img: '/arte/prancheta/mapas/summit-defesa.svg', T: [-1, 0, 0, -1, 981.29, 988.12], w: 981.29, h: 988.12 } },
+    sitios: [{ t: 'A', x: 901.5, y: 434.9 }, { t: 'B', x: 98.8, y: 282.6 }] },
+  corrode: { nome: 'Corrode', cor: '#5A4A40', w: 1098.88, h: 976.12, coef: 7e-05, lados: { ataque: { img: '/arte/prancheta/mapas/corrode-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: 1098.88, h: 976.12 }, defesa: { img: '/arte/prancheta/mapas/corrode-defesa.svg', T: [-1, 0, 0, -1, 1098.88, 976.12], w: 1098.88, h: 976.12 } },
+    sitios: [{ t: 'A', x: 746.1, y: 379.2 }, { t: 'B', x: 152.1, y: 374.4 }] }
 };
 var W = MAPA_INFO.lotus.w, H = MAPA_INFO.lotus.h;
 // vista (lado escolhido): VT leva do espaço canônico para o desenho do lado; VW/VH são as medidas desse desenho

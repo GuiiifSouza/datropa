@@ -398,11 +398,16 @@ def _mapa_novo(k, nome, cor, w, h, coef, sitios):
     return f",\n  {k}: {{ nome: '{nome}', cor: '{cor}', w: {w}, h: {h}, coef: {coef}, lados: {{ {lados} }},\n    sitios: [{sit}] }}"
 MAPAS_NOVOS = (_mapa_novo('abyss', 'Abyss', '#252A3D', 996.18, 961.88, 0.000081, [('A', 962.4, 387.5), ('B', 93.4, 353.4)])
                + _mapa_novo('pearl', 'Pearl', '#2E5A78', 1015.72, 948.9, 0.000078, [('A', 919.8, 328.7), ('B', 201.5, 324.2)])
-               + _mapa_novo('sunset', 'Sunset', '#9A5A28', 948.49, 1002.26, 0.000078, [('A', 787.5, 368.5), ('B', 36.4, 405.9)]))
+               + _mapa_novo('sunset', 'Sunset', '#9A5A28', 948.49, 1002.26, 0.000078, [('A', 787.5, 368.5), ('B', 36.4, 405.9)])
+               + _mapa_novo('split', 'Split', '#56636E', 951.18, 894.24, 0.000078, [('A', 912.6, 255.4), ('B', 157.1, 271.1)])
+               + _mapa_novo('summit', 'Summit', '#7E6048', 981.29, 988.12, 0.000075, [('A', 901.5, 434.9), ('B', 98.8, 282.6)])
+               + _mapa_novo('corrode', 'Corrode', '#5A4A40', 1098.88, 976.12, 0.00007, [('A', 746.1, 379.2), ('B', 152.1, 374.4)]))
 js = trocar(js, '\n};\nvar W = MAPA_INFO.lotus.w', MAPAS_NOVOS + '\n};\nvar W = MAPA_INFO.lotus.w')
+# a frase do seletor de mapas listava só os mapas do protótipo
+molde = trocar(molde, 'Com vetor: Lotus, Haven, Ascent, Breeze e Fracture.', 'Só Bind e Icebox ainda estão sem desenho.')
 # o mapa de calor só aparece no piso: a máscara é o próprio SVG do mapa (os vãos entre corredores ficam de fora),
 # como as .mascara-<mapa>-<lado> que o protótipo já tem para os outros mapas
-for _k in ('abyss', 'pearl', 'sunset'):
+for _k in ('abyss', 'pearl', 'sunset', 'split', 'summit', 'corrode'):
     for _lado in ('ataque', 'defesa'):
         _u = f'/arte/prancheta/mapas/{_k}-{_lado}.svg'
         css += f'{ESCOPO} .mascara-{_k}-{_lado}{{-webkit-mask-image:url({_u});mask-image:url({_u})}}\n'
