@@ -82,7 +82,12 @@ html.na-prancheta .pagina, html.na-prancheta main { scroll-margin-top: 0; }
 /* Painel da Tropa AI aberto: a página de trás fica parada e a rolagem nunca vaza para ela. */
 html.rolagem-presa, html.rolagem-presa body { overflow: hidden; }
 html.rolagem-presa { scrollbar-gutter: stable; }
-.painel-coach__corpo, .busca__lista, .seletor__lista, .tabela-rolagem, .pills, .livro, .eco-rounds { overscroll-behavior: contain; }
+.painel-coach__corpo, .busca__lista, .seletor__lista { overscroll-behavior: contain; }
+/* Tabelas largas, pills, livro de rounds e economia só rolam na horizontal. Com overflow-x auto o navegador também os
+   trata como roláveis na vertical, e com o "contain" nos dois eixos a roda do mouse em cima deles às vezes não
+   rolava a página (quando o hover deixava 1–2px de sobra vertical). Aqui a vertical fica fora: a roda sempre passa
+   para a página, e só o eixo horizontal segura o gesto (evita o "voltar página" do touchpad). */
+.tabela-rolagem, .pills, .livro, .eco-rounds { overflow-y: hidden; overscroll-behavior-x: contain; overscroll-behavior-y: auto; }
 .coach-veu { overscroll-behavior: contain; touch-action: none; }
 @media (max-width: 1100px) { .painel-coach { top: 88px; max-height: calc(100dvh - 100px); } }
 @media (max-width: 640px) {
@@ -459,6 +464,15 @@ a:hover .agente--busto.agente--p img, tr:hover .agente--busto.agente--p img, a:h
    (mesma linguagem do orbe: mesa girando, jogadores andando, radar, lápis e balão no hover)
    ===================================================================== */
 .botao-prancheta, .botao--mesa, .dica-prancheta { position: relative; overflow: visible; }
+/* O brilho do .botao (animacoes.css) corre por transform e fica escondido pelo overflow hidden; aqui o overflow é
+   visível para o balão sair do botão, e a faixa aparecia parada ao lado do "Abrir" e cruzava por fora dele no
+   hover. Neste botão o brilho corre por background-position, dentro do próprio formato. */
+.botao--mesa::after { transform: none; border-radius: inherit; background-size: 300% 100%; background-position: 100% 0; background-repeat: no-repeat;
+  transition: background-position .7s var(--suave); }
+.botao--mesa:hover::after { transform: none; background-position: 0 0; }
+/* No banner o balão subia acima do botão e passava da borda do card: aqui ele sai pela esquerda, na altura do botão */
+.botao--mesa .mini-dica { left: auto; right: calc(100% + 12px); bottom: auto; top: 50%; margin-top: -14px; transform-origin: 100% 50%; border-radius: 12px 4px 12px 12px; }
+.botao--mesa .mini-dica::after { left: auto; right: -4px; bottom: auto; top: 10px; }
 .mini-mesa { position: relative; flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-block; perspective: 120px;
   box-shadow: 0 0 0 1.5px rgba(50,224,196,.55), 0 0 12px -2px rgba(50,224,196,.5); background: #0F1923; overflow: visible; }
 .mini-mesa__grade { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
