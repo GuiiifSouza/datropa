@@ -89,7 +89,11 @@ export function Prancheta() {
     if (!topo || !el) return;
     document.documentElement.classList.add('na-prancheta');
     const medir = () => {
-      el.style.setProperty('--altura-topo-site', `${topo.getBoundingClientRect().height}px`);
+      // o respiro em cima da prancheta (padding do .prancheta-dc, para os orbes do topo não encostarem nas abas)
+      // entra junto com o topo, senão sobrava esse tanto e a página ganhava uma rolagem
+      const dc = el.querySelector<HTMLElement>('.prancheta-dc');
+      const respiro = dc ? parseFloat(getComputedStyle(dc).paddingTop) || 0 : 0;
+      el.style.setProperty('--altura-topo-site', `${topo.getBoundingClientRect().height + respiro}px`);
       el.style.setProperty('--altura-rodape-site', `${rodape ? rodape.getBoundingClientRect().height : 0}px`);
     };
     medir();
