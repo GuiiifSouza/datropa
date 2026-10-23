@@ -19,7 +19,7 @@ export type DadosMapa = { mapa: string; partidas: Partida[] };
 
 // chave da prancheta -> id do mapa na base (codinome interno)
 export const MAPA_ID: Record<string, string> = {
-  lotus: 'jam', haven: 'triad', ascent: 'ascent', breeze: 'foxtrot', fracture: 'canyon', abyss: 'infinity', pearl: 'pitt', sunset: 'juliett',
+  lotus: 'jam', haven: 'triad', ascent: 'ascent', breeze: 'foxtrot', fracture: 'canyon', abyss: 'infinity', pearl: 'pitt', sunset: 'juliett', split: 'bonsai', summit: 'plummet',
 };
 export const CHAVE_DO_MAPA: Record<string, string> = Object.fromEntries(Object.entries(MAPA_ID).map(([k, v]) => [v, k]));
 
@@ -36,6 +36,8 @@ const CALIBRACAO: Record<string, { coef: number[]; mat: number[] }> = {
   abyss: { coef: [8.1e-05, -8.1e-05, 0.5, 0.5], mat: [0.0, -1012.0, 1003.389, 1012.0, 0.0, -27.311] },
   pearl: { coef: [7.8e-05, -7.8e-05, 0.480469, 0.916016], mat: [1020.0, 0.0, -2.7779, 0.0, 1020.0, -38.0321] },
   sunset: { coef: [7.8e-05, -7.8e-05, 0.5, 0.515625], mat: [1016.0, 0.0, -42.173, 0.0, 1016.0, -8.087] },
+  split: { coef: [7.8e-05, -7.8e-05, 0.842188, 0.697578], mat: [0.0, -1025.0, 998.553, 1025.0, 0.0, -53.836] },
+  summit: { coef: [7.5e-05, -7.5e-05, 0.047401, 0.978891], mat: [1027.0, 0.0, -39.358, 0.0, 1027.0, -18.758] },
 };
 
 export function paraMapa(chave: string, x: number, y: number): [number, number] | null {
