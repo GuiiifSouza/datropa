@@ -6,5 +6,4 @@ dist/
 *.log
 .DS_Store
 
-# Arte da Riot (mapas, splash, ícones): fora do git até o OK da organização (AGENTS.md)
-public/arte/
+# As artes aprovadas da prancheta são versionadas para garantir o deploy.
