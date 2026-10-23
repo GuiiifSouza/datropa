@@ -4,7 +4,8 @@ import { dados } from '../api/stats';
 import { useDados } from '../api/useDados';
 import type { RankingItem, TimeItem } from '../api/tipos';
 import { useCatalogo } from '../componentes/Catalogo';
-import { Agente, Carregando, ErroDados, FonteDados, LinkTime, Vazio } from '../componentes/Visuais';
+import { Agente, Carregando, CorpoAgente, ErroDados, FonteDados, LinkTime, useCorAgente, Vazio } from '../componentes/Visuais';
+import type { CSSProperties } from 'react';
 import { Link, useParametro } from '../rotas';
 import { Seletor } from '../componentes/Seletor';
 import { dec, nomeTime, pct } from '../util/formato';
@@ -33,10 +34,13 @@ export function Estatisticas() {
   const [torneio, setTorneio] = useParametro('torneio');
   const [mapa, setMapa] = useParametro('mapa');
   const [agente, setAgente] = useParametro('agente');
-  const [minimo, setMinimo] = useState(8);
+  const [minimo, setMinimo] = useState(1);
   const [ordem, setOrdem] = useState<{ k: Col['k']; desc: boolean }>({ k: 'acs', desc: true });
   const [mostrar, setMostrar] = useState(50);
   const [q, setQ] = useState('');
+  // até dois jogadores marcados na tabela viram o atalho para o comparador
+  const [marcados, setMarcados] = useState<string[]>([]);
+  const marcar = (jid: string) => setMarcados((m) => (m.includes(jid) ? m.filter((x) => x !== jid) : [...m, jid].slice(-2)));
   const { cat } = useCatalogo();
   const f = { torneio_id: torneio ?? undefined, mapa_id: mapa ?? undefined, agente_id: agente ?? undefined };
   const rank = useDados(`ranking:completo:${torneio ?? ''}:${mapa ?? ''}:${agente ?? ''}`, () => dados.rankingCompleto(f));
@@ -44,6 +48,12 @@ export function Estatisticas() {
   const nomesTime = useMemo(() => new Map((tms.dados?.data ?? []).map((t) => [t.id, t.nome])), [tms.dados]);
 
   const pool = useMemo(() => (rank.dados?.data ?? []).filter((r) => r.partidas >= minimo), [rank.dados, minimo]);
+  // Líderes pedem uma amostra mínima: com "Todos", quem jogou 1 mapa não vira líder de ACS.
+  const minLider = Math.max(minimo, agente ? 3 : 5);
+  const poolLider = useMemo(() => {
+    const xs = pool.filter((r) => r.partidas >= minLider);
+    return xs.length ? xs : pool;
+  }, [pool, minLider]);
   const linhas = useMemo(() => {
     const col = COLS.find((c) => c.k === ordem.k) ?? COLS[1];
     const t = q.trim().toLowerCase();
@@ -77,9 +87,11 @@ export function Estatisticas() {
 
       {rank.erro ? <ErroDados erro={rank.erro} recarregar={rank.recarregar} /> : !rank.dados ? <Carregando altura={150} linhas={2} /> : (
         <>
+          {agente && <BannerAgente id={agente} jogadores={pool.length} />}
+          <div className="secao-topo"><span className="titulo-m">Líderes</span><span className="apagado mono" style={{ fontSize: 11 }}>{minLider}+ MAPAS NO RECORTE</span></div>
           <section className="grade grade-lideres">
             {LIDERES.map(([k, rot, fmt]) => {
-              const top = [...pool].filter((r) => r[k] != null).sort((a, b) => (b[k] as number) - (a[k] as number)).slice(0, 5);
+              const top = [...poolLider].filter((r) => r[k] != null).sort((a, b) => (b[k] as number) - (a[k] as number)).slice(0, 5);
               if (!top.length) return null;
               const [p1, ...resto] = top;
               return (
@@ -103,6 +115,7 @@ export function Estatisticas() {
           <section className="cartao">
             <div className="secao-topo">
               <span className="titulo-s">Jogadores</span>
+              <span className="apagado" style={{ fontSize: 12 }}>Marque dois na coluna # para comparar.</span>
               <label className="campo-busca campo-busca--pequeno"><span className="so-leitor">Buscar jogador</span><input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar jogador" /></label>
             </div>
             {linhas.length === 0 ? <Vazio titulo="Ninguém nesse recorte">Diminua o mínimo de mapas ou tire um filtro.</Vazio> : (
@@ -118,13 +131,20 @@ export function Estatisticas() {
                   </tr></thead>
                   <tbody>{linhas.slice(0, mostrar).map((r, i) => (
                     <tr key={r.jogador_id}>
-                      <td className="mono apagado">{i + 1}</td>
+                      <td className="mono apagado"><label className="marcar" title="Marcar para comparar"><input type="checkbox" checked={marcados.includes(r.jogador_id)} onChange={() => marcar(r.jogador_id)} aria-label={`Marcar ${r.nome} para comparar`} /><span>{i + 1}</span></label></td>
                       <td><Link para={`/jogadores/${encodeURIComponent(r.jogador_id)}`} className="tabela-jogador"><Agente id={r.agentes_top?.[0]} tamanho="p" /><b>{r.nome}</b></Link></td>
                       <td>{r.time_id ? <Link para={`/times/${encodeURIComponent(r.time_id)}`} className="giz2">{nomeTime(nomesTime.get(r.time_id) ?? '…')}</Link> : <span className="apagado">vários</span>}</td>
                       {COLS.map((c) => <td key={c.k} className="n">{ordem.k === c.k ? <b>{c.f(r)}</b> : c.f(r)}</td>)}
                     </tr>
                   ))}</tbody>
                 </table>
+              </div>
+            )}
+            {marcados.length > 0 && (
+              <div className="barra-comparar" role="status">
+                <span>{marcados.length === 1 ? 'Marque mais um jogador para comparar' : 'Dois jogadores marcados'}</span>
+                <button type="button" className="botao botao--linha botao--pequeno" onClick={() => setMarcados([])}>Limpar</button>
+                <Link para={`/comparar?a=${encodeURIComponent(marcados[0])}${marcados[1] ? `&b=${encodeURIComponent(marcados[1])}` : ''}`} className="botao botao--ia botao--pequeno">⇄ Comparar {marcados.length}/2</Link>
               </div>
             )}
             {mostrar < linhas.length && <button type="button" className="botao botao--linha botao--pequeno" style={{ alignSelf: 'center' }} onClick={() => setMostrar((m) => m + 50)}>Mostrar mais ({linhas.length - mostrar})</button>}
@@ -177,6 +197,22 @@ function TabelaTimes({ itens }: { itens?: TimeItem[] }) {
         </table>
       </div>
       <span className="apagado" style={{ fontSize: 12 }}>Times com 3 mapas ou mais no recorte.</span>
+    </section>
+  );
+}
+
+/** Faixa do agente filtrado, com o retrato de corpo inteiro. */
+function BannerAgente({ id, jogadores }: { id: string; jogadores: number }) {
+  const { agente, classe } = useCatalogo();
+  const cor = useCorAgente(id);
+  return (
+    <section className="banner-agente" style={{ '--cor-agente': cor ?? 'var(--vermelho)' } as CSSProperties}>
+      <div className="banner-agente__texto">
+        <span className="rotulo">{(classe(id) ?? 'AGENTE').toUpperCase()}</span>
+        <b className="titulo-l">{agente(id)}</b>
+        <span className="giz2">{jogadores} {jogadores === 1 ? 'jogador usou' : 'jogadores usaram'} no recorte.</span>
+      </div>
+      <CorpoAgente id={id} className="banner-agente__corpo" />
     </section>
   );
 }

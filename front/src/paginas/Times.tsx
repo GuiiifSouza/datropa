@@ -3,7 +3,7 @@ import { useMemo, useState } from 'react';
 import { dados } from '../api/stats';
 import { useDados } from '../api/useDados';
 import { useCatalogo } from '../componentes/Catalogo';
-import { Carregando, ErroDados, FonteDados, SeloTime, Vazio } from '../componentes/Visuais';
+import { Carregando, ErroDados, estiloTime, FonteDados, SeloTime, Vazio } from '../componentes/Visuais';
 import { Link, useParametro } from '../rotas';
 import { nomeTime, pct } from '../util/formato';
 
@@ -45,15 +45,17 @@ export function Times() {
       {r.erro ? <ErroDados erro={r.erro} recarregar={r.recarregar} /> : !r.dados ? <Carregando altura={120} linhas={3} /> : lista.length === 0 ? <Vazio titulo="Nenhum time encontrado" /> : (
         <div className="grade grade-4">
           {lista.map((t) => (
-            <Link key={t.id} para={`/times/${encodeURIComponent(t.id)}`} className="cartao cartao--link cartao-time">
-              <div className="cartao-time__topo"><SeloTime nome={t.nome} /><b>{nomeTime(t.nome)}</b></div>
+            <Link key={t.id} para={`/times/${encodeURIComponent(t.id)}`} className="cartao cartao--link cartao-time" style={estiloTime(t.nome)}>
+              <div className="cartao-time__topo">
+                <SeloTime nome={t.nome} tamanho="g" />
+                <span className="cartao-time__nome"><b>{nomeTime(t.nome)}</b><span className="apagado mono">{t.partidas} MAPAS</span></span>
+              </div>
               <div className="cartao-time__numeros">
                 <span><b className="num">{t.vitorias}</b><span className="rotulo">V</span></span>
                 <span><b className="num">{t.derrotas}</b><span className="rotulo">D</span></span>
-                <span><b className="num cor-a">{pct(t.taxa_vitoria_pct, 0)}</b><span className="rotulo">VITÓRIAS</span></span>
+                <span><b className="num cor-time">{pct(t.taxa_vitoria_pct, 0)}</b><span className="rotulo">VITÓRIAS</span></span>
               </div>
-              <span className="barra"><span style={{ width: `${t.taxa_vitoria_pct ?? 0}%` }} /></span>
-              <span className="apagado mono" style={{ fontSize: 11 }}>{t.partidas} MAPAS</span>
+              <span className="barra barra--time"><span style={{ width: `${t.taxa_vitoria_pct ?? 0}%` }} /></span>
             </Link>
           ))}
         </div>

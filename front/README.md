@@ -31,11 +31,13 @@ Variáveis opcionais em `.env.local` (modelo em [.env.example](.env.example)):
 |---|---|---|
 | `/` | Panorama: números da base, série em destaque, top 5 em ACS, times em forma, torneios | snapshot + `/ranking`, `/times` |
 | `/partidas` | Séries por dia, filtro por torneio e time, resumo do recorte | snapshot (agrupamento em série) |
-| `/partidas/:partida_id` | Série e mapa: momentum, livro de rounds, placar dos jogadores, economia | `/partidas/{id}` |
+| `/partidas/:partida_id` | Série e mapa: momentum, livro de rounds, placar dos jogadores, economia e histórico do confronto entre os dois times (ou "primeiro encontro" com as campanhas lado a lado) | `/partidas/{id}`, `/times/{id}` |
 | `/times`, `/times/:time_id` | Campanha, lados, pós-plant, economia contra a cena, mapas, elenco, composições, últimas séries | `/times`, `/times/{id}`, `/economia`, `/pos-plant-retake`, `/ranking?time_id`, `/composicoes` |
-| `/jogadores/:jogador_id` | Métricas com a posição na cena, agentes, mapas, multikills, partidas | `/jogadores/{id}`, `/ranking` |
+| `/jogadores/:jogador_id` | Métricas com a posição na cena, agentes, mapas, multikills, partidas; botões Comparar e Compartilhar (cartão de story 1080×1920 gerado no navegador) | `/jogadores/{id}`, `/ranking` |
+| `/comparar?a=&b=` | Comparador de dois jogadores: duelo com a arte do agente, métricas espelhadas com a média, agentes e mapas. Também se chega marcando dois jogadores em Estatísticas | `/jogadores/{id}`, `/ranking` |
 | `/estatisticas` | Líderes, tabela de jogadores com filtro e ordenação, tabela de times, glossário | `/ranking`, `/times` |
 | `/meta` | Agentes, mapas e sites, economia, armas, composições | snapshot |
+| `/mapas/:mapa_id` | Página do mapa: banner com a arte, lado forte, plants por site, agentes e composições que mais vencem, times que mandam no mapa, economia | snapshot (meta por mapa), `/times?mapa_id` |
 | `/tropa-ai` | Tropa AI em tela cheia (também abre como painel pelo orbe do header ou Ctrl K) | `POST /api/coach/perguntar` |
 | `/prancheta` | Prancheta tática: planejar em etapas, apresentar, salvar e compartilhar por link. Com `?partida_id=&round=` abre o round real; com `?j=` abre uma jogada compartilhada (`&modo=ver` = só visualização) | `/partidas`, `/partidas/{id}`, `/partidas/{id}/rounds/{n}/eventos` |
 

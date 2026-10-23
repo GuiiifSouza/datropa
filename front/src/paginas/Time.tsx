@@ -4,7 +4,9 @@ import { useDados } from '../api/useDados';
 import { useCatalogo } from '../componentes/Catalogo';
 import { BannerPrancheta } from '../componentes/Prancheta';
 import { CartaoSerie } from '../componentes/Series';
-import { Agente, Carregando, ErroDados, FonteDados, SeloTime } from '../componentes/Visuais';
+import { Agente, Carregando, CorpoAgente, ErroDados, estiloTime, FonteDados, SeloTime, useCorAgente } from '../componentes/Visuais';
+import type { CSSProperties } from 'react';
+import type { RankingItem, Serie } from '../api/tipos';
 import { Anel, BarrasMedia, Colunas } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach, useContextoCoach } from '../coach/Coach';
@@ -48,20 +50,33 @@ export function Time({ id }: { id: string }) {
   const jogadores = [...(elenco.dados?.data ?? [])].sort((a, b) => b.partidas - a.partidas || (b.acs ?? 0) - (a.acs ?? 0));
 
   return (
-    <main className="pagina">
+    <main className="pagina pagina--time" style={estiloTime(d.nome)}>
       <Link para="/times" className="voltar mono">← TIMES</Link>
-      <section className="perfil">
-        <SeloTime nome={d.nome} grande />
-        <div className="cabeca" style={{ flex: '1 1 320px' }}>
-          <span className="rotulo rotulo--ambar">{torneios.map((x) => torneio(x)).join(' · ').toUpperCase() || 'TIME'}</span>
-          <h1 className="titulo-xl" style={{ fontSize: 'clamp(48px, 7vw, 84px)' }}>{nome}</h1>
+      <section className="time-heroi">
+        <div className="time-heroi__logo"><SeloTime nome={d.nome} tamanho="xg" /></div>
+        <div className="time-heroi__info">
+          <span className="rotulo time-heroi__torneios">{torneios.map((x) => torneio(x)).join(' · ').toUpperCase() || 'TIME'}</span>
+          <h1 className="titulo-xl time-heroi__nome">{nome}</h1>
+          {series.length > 0 && <Forma series={series} id={id} />}
         </div>
-        <div className="perfil__numeros">
+        <div className="perfil__numeros time-heroi__numeros">
           <div><b className="num">{d.resumo.vitorias}<span className="apagado-2">–</span>{d.resumo.derrotas}</b><span className="rotulo">CAMPANHA</span></div>
-          <div><b className="num cor-a">{pct(d.resumo.taxa_vitoria_pct, 0)}</b><span className="rotulo">MAPAS VENCIDOS</span></div>
+          <div><b className="num cor-time">{pct(d.resumo.taxa_vitoria_pct, 0)}</b><span className="rotulo">MAPAS VENCIDOS</span></div>
           <div><b className="num">{pct(taxa(d.resumo.rounds_ganhos, d.resumo.rounds_jogados), 0)}</b><span className="rotulo">ROUNDS VENCIDOS</span></div>
         </div>
       </section>
+
+      {elenco.dados && jogadores.length > 0 && (
+        <section className="elenco">
+          <div className="secao-topo">
+            <span className="titulo-m">Jogadores</span>
+            <span className="apagado" style={{ fontSize: 12 }}>Quem jogou pelo time{mapaSel ? ` em ${mapa(mapaSel)}` : ''}, do que mais jogou ao que menos jogou.</span>
+          </div>
+          <div className="elenco__grade">
+            {jogadores.slice(0, 10).map((j) => <CartaoJogador key={j.jogador_id} j={j} total={d.resumo.partidas} />)}
+          </div>
+        </section>
+      )}
 
       <div className="pills" role="toolbar" aria-label="Filtrar por mapa">
         <button type="button" className="pill" aria-pressed={!mapaSel} onClick={() => setMapa(null)}>Todos os mapas<span className="pill__n">{geral.dados?.data.resumo.partidas ?? d.resumo.partidas}</span></button>
@@ -73,7 +88,7 @@ export function Time({ id }: { id: string }) {
           tabela={{ colunas: ['Lado', 'Vitória', 'Rounds'], linhas: d.lados.map((l) => [l.lado, pct(l.taxa_vitoria_pct), `${l.rounds_ganhos} de ${l.rounds_jogados}`]) }}>
           <div className="aneis">
             <Anel valor={atk?.taxa_vitoria_pct ?? null} rotulo={`Ataque · ${atk?.rounds_ganhos ?? 0} de ${atk?.rounds_jogados ?? 0}`} />
-            <Anel valor={def?.taxa_vitoria_pct ?? null} rotulo={`Defesa · ${def?.rounds_ganhos ?? 0} de ${def?.rounds_jogados ?? 0}`} cor="var(--menta)" />
+            <Anel valor={def?.taxa_vitoria_pct ?? null} rotulo={`Defesa · ${def?.rounds_ganhos ?? 0} de ${def?.rounds_jogados ?? 0}`} cor="var(--time-b)" />
           </div>
         </Figura>
         <Figura titulo="Depois do plant" fonte="MEDE O RESULTADO DEPOIS DO PLANT; NÃO PROVA TENTATIVA DE RETAKE"
@@ -81,14 +96,14 @@ export function Time({ id }: { id: string }) {
           {pp.dados ? (
             <div className="aneis">
               <Anel valor={pp.dados.data.pos_plant.taxa_sucesso_pct} rotulo={`Pós-plant · ${pp.dados.data.pos_plant.vitorias} de ${pp.dados.data.pos_plant.oportunidades}`} />
-              <Anel valor={pp.dados.data.retake.taxa_sucesso_pct} rotulo={`Defesa após plant · ${pp.dados.data.retake.vitorias} de ${pp.dados.data.retake.oportunidades}`} cor="var(--menta)" />
+              <Anel valor={pp.dados.data.retake.taxa_sucesso_pct} rotulo={`Defesa após plant · ${pp.dados.data.retake.vitorias} de ${pp.dados.data.retake.oportunidades}`} cor="var(--time-b)" />
             </div>
           ) : pp.erro ? <ErroDados erro={pp.erro} /> : <Carregando altura={120} />}
         </Figura>
-        <Figura titulo="Vitória por tipo de compra" legenda={[{ cor: 'var(--ambar)', rotulo: nome }, { cor: 'var(--giz)', rotulo: 'média da cena', forma: 'traco' }]}
+        <Figura titulo="Vitória por tipo de compra" legenda={[{ cor: 'var(--cor-time)', rotulo: nome }, { cor: 'var(--giz)', rotulo: 'média geral', forma: 'traco' }]}
           fonte={eco.dados ? `REGRA ${eco.dados.data.classificacao_versao.toUpperCase()}` : undefined}
-          tabela={eco.dados ? { colunas: ['Compra', 'Vitória', 'Cena', 'Rounds'], linhas: eco.dados.data.categorias.map((c) => [COMPRAS[c.tipo], pct(c.taxa_vitoria_pct), pct(mediaCena.get(c.tipo)), `${c.vitorias} de ${c.rounds}`]) } : undefined}>
-          {eco.dados ? <BarrasMedia linhas={eco.dados.data.categorias.map((c) => ({ rotulo: COMPRAS[c.tipo], valor: c.taxa_vitoria_pct, media: mediaCena.get(c.tipo) ?? null, detalhe: `${c.vitorias} de ${c.rounds} rounds` }))} />
+          tabela={eco.dados ? { colunas: ['Compra', 'Vitória', 'Geral', 'Rounds'], linhas: eco.dados.data.categorias.map((c) => [COMPRAS[c.tipo], pct(c.taxa_vitoria_pct), pct(mediaCena.get(c.tipo)), `${c.vitorias} de ${c.rounds}`]) } : undefined}>
+          {eco.dados ? <BarrasMedia cor="var(--cor-time)" linhas={eco.dados.data.categorias.map((c) => ({ rotulo: COMPRAS[c.tipo], valor: c.taxa_vitoria_pct, media: mediaCena.get(c.tipo) ?? null, detalhe: `${c.vitorias} de ${c.rounds} rounds` }))} />
             : eco.erro ? <ErroDados erro={eco.erro} /> : <Carregando altura={120} />}
         </Figura>
       </section>
@@ -99,7 +114,7 @@ export function Time({ id }: { id: string }) {
             <Colunas itens={mapasGeral.map((m) => ({ rotulo: mapa(m.mapa_id), valor: m.taxa_vitoria_pct, detalhe: `${m.vitorias} de ${m.partidas} mapas`, cor: mapaSel === m.mapa_id ? 'var(--vermelho)' : undefined }))} linhaRef={50} rotuloRef="50%" />
           </Figura>
           <section className="cartao">
-            <div className="secao-topo"><span className="titulo-s">Elenco no recorte</span><span className="apagado" style={{ fontSize: 12 }}>Quem jogou pelo time, não necessariamente o elenco atual.</span></div>
+            <div className="secao-topo"><span className="titulo-s">Números do elenco</span><span className="apagado" style={{ fontSize: 12 }}>Quem jogou pelo time, não necessariamente o elenco atual.</span></div>
             {elenco.erro ? <ErroDados erro={elenco.erro} /> : !elenco.dados ? <Carregando altura={40} linhas={5} /> : (
               <div className="tabela-rolagem">
                 <table className="tabela">
@@ -141,5 +156,46 @@ export function Time({ id }: { id: string }) {
       </div>
       <FonteDados meta={t.dados?.meta} />
     </main>
+  );
+}
+
+/** Últimas séries como V/D, da mais antiga para a mais recente. */
+function Forma({ series, id }: { series: Serie[]; id: string }) {
+  const ult = series.slice(0, 5).reverse();
+  return (
+    <span className="forma" aria-label="Últimas séries">
+      <span className="rotulo">ÚLTIMAS SÉRIES</span>
+      {ult.map((s) => {
+        const souA = s.time_a.id === id;
+        const meu = souA ? s.vitorias_a : s.vitorias_b, deles = souA ? s.vitorias_b : s.vitorias_a;
+        const adv = nomeTime(souA ? s.time_b.nome : s.time_a.nome);
+        const r = meu > deles ? 'v' : meu < deles ? 'd' : 'e';
+        return <span key={s.id} className={`forma__item forma__item--${r}`} title={`${meu}–${deles} contra ${adv}`}>{r === 'v' ? 'V' : r === 'd' ? 'D' : 'E'}</span>;
+      })}
+    </span>
+  );
+}
+
+/** Cartão do jogador com o retrato do agente que ele mais usa. */
+function CartaoJogador({ j, total }: { j: RankingItem; total: number }) {
+  const principal = j.agentes_top?.[0];
+  const cor = useCorAgente(principal);
+  const { agente } = useCatalogo();
+  return (
+    <Link para={`/jogadores/${encodeURIComponent(j.jogador_id)}`} className="jogador-cartao" style={{ '--cor-agente': cor ?? 'var(--trilho)' } as CSSProperties}>
+      <span className="jogador-cartao__marca" aria-hidden="true">{principal ? agente(principal) : ''}</span>
+      <span className="jogador-cartao__arte" aria-hidden="true"><CorpoAgente id={principal} /></span>
+      {total > 0 && j.partidas / total >= 0.5 && <span className="jogador-cartao__selo mono">TITULAR</span>}
+      <span className="jogador-cartao__info">
+        <b className="jogador-cartao__nome">{j.nome}</b>
+        <span className="mono jogador-cartao__agente">{principal ? agente(principal).toUpperCase() : 'SEM AGENTE'}</span>
+        <span className="jogador-cartao__numeros">
+          <span><b className="num">{dec(j.acs ?? null, 0)}</b><span className="rotulo">ACS</span></span>
+          <span><b className="num">{dec(j.kd, 2)}</b><span className="rotulo">K/D</span></span>
+          <span><b className="num">{j.partidas}</b><span className="rotulo">{total ? `DE ${total}` : 'MAPAS'}</span></span>
+        </span>
+        <span className="jogador-cartao__agentes">{(j.agentes_top ?? []).slice(0, 4).map((a) => <Agente key={a} id={a} tamanho="p" />)}</span>
+      </span>
+    </Link>
   );
 }

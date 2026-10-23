@@ -47,15 +47,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .botao-redondo:hover { border-color: var(--giz); color: var(--giz); }
 .avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--superficie-2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; border: 0; overflow: hidden; }
 .avatar img { width: 100%; height: 100%; object-fit: cover; }
-@media (max-width: 1100px) {
-  .topo { position: relative; }
-  .topo__barra { flex-wrap: wrap; align-items: flex-start; padding: 8px 8px 8px 16px; }
-  .topo__esq { flex: 1 1 0; flex-wrap: wrap; row-gap: 6px; }
-  .topo__esq .nav { flex: 1 1 100%; order: 2; }
-  .topo__dir { flex: none; order: 2; }
-  .topo .dt-hubs { order: 3; flex: 1 1 100%; justify-content: center; margin: 2px auto 10px; }
-}
-@media (max-width: 520px) { .logo__nome { display: none; } }
+
 
 /* ---------- busca ---------- */
 .busca { position: fixed; inset: 0; z-index: 60; background: rgba(15,25,35,.72); display: flex; justify-content: center; padding: 90px 16px; }
@@ -76,7 +68,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .num { font-family: var(--f-display); font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
 .mono { font-family: var(--f-mono); }
 .apagado { color: var(--apagado); } .giz2 { color: var(--giz-2); }
-.cor-a { color: var(--ambar); } .cor-b { color: var(--menta); } .cor-ia { color: var(--vermelho); }
+.cor-a { color: var(--time-a); } .cor-b { color: var(--time-b); } .cor-ia { color: var(--vermelho); }
 .cabeca { display: flex; flex-direction: column; gap: 10px; }
 .secao-topo { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
 
@@ -97,7 +89,7 @@ h1, h2, h3, h4, p { margin: 0; }
 .dupla__lateral { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 
 /* ---------- pílulas e botões ---------- */
-.pills { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; scrollbar-width: thin; }
+.pills { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 6px; }
 .pill { flex: none; height: 40px; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 0 16px; border-radius: var(--r-pill);
   border: 1px solid rgba(236,232,225,.14); background: var(--superficie); color: var(--giz); font: 500 13px var(--f-texto); }
 .pill:hover { border-color: var(--giz-2); color: var(--giz); }
@@ -125,11 +117,14 @@ h1, h2, h3, h4, p { margin: 0; }
 .select { height: 40px; border-radius: var(--r-pill); border: 1px solid rgba(236,232,225,.14); background: var(--superficie); color: var(--giz); padding: 0 14px; font: 500 13px var(--f-texto); }
 
 /* ---------- selos ---------- */
-.selo-time { width: 34px; height: 34px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; flex: none;
-  font: 700 9px var(--f-mono); color: var(--fundo); background: var(--ambar); letter-spacing: .02em; }
-.selo-time--b { background: var(--menta); }
-.selo-time--neutro { background: var(--superficie-2); color: var(--giz-2); }
-.selo-time--g { width: 64px; height: 64px; border-radius: 18px; font-size: 14px; }
+/* Logo sem moldura: a arte do time aparece inteira, com sombra e brilho na cor do time (--cor-time vem de estiloTime). */
+.selo-time { --t: 46px; width: var(--t); height: var(--t); flex: none; display: inline-flex; align-items: center; justify-content: center; position: relative; }
+.selo-time--p { --t: 30px; } .selo-time--g { --t: 84px; } .selo-time--xg { --t: clamp(132px, 17vw, 196px); }
+.selo-time--logo img { width: 100%; height: 100%; object-fit: contain; display: block;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,.55)) drop-shadow(0 0 calc(var(--t) * .22) color-mix(in srgb, var(--cor-time, #fff) 32%, transparent)); }
+.selo-time--sigla { border-radius: 30%; font: 700 calc(var(--t) * .3) var(--f-mono); letter-spacing: .02em; color: var(--cor-time, var(--giz-2));
+  background: color-mix(in srgb, var(--cor-time, #9AA6B2) 16%, var(--superficie-2)); border: 1px solid color-mix(in srgb, var(--cor-time, #9AA6B2) 45%, transparent); }
+.selo-time--p.selo-time--sigla { font-size: 9px; }
 .agente { position: relative; width: 36px; height: 36px; border-radius: 50%; flex: none; overflow: hidden; display: inline-flex; align-items: center; justify-content: center;
   background: var(--superficie-2); font: 700 11px var(--f-mono); color: var(--giz); border: 1px solid var(--linha-forte); }
 .agente img { width: 100%; height: 100%; object-fit: cover; }
@@ -172,6 +167,3 @@ h1, h2, h3, h4, p { margin: 0; }
 /* ---------- rodapé ---------- */
 .rodape { border-top: 1px solid var(--linha); }
 .rodape__dentro { max-width: var(--largura); margin: 0 auto; padding: 28px var(--gutter) 40px; display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: space-between; align-items: center; font-size: 13px; color: var(--apagado); }
-
-/* A logo ocupa o selo existente sem mudar seu tamanho, forma ou posição. */
-.selo-time img { display: block; width: 100%; height: 100%; object-fit: contain; border-radius: inherit; }

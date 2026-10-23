@@ -10,8 +10,10 @@ Tokens em `src/estilos/tokens.css`. Não use cor, fonte ou raio fora deles.
 | `--superficie`, `--superficie-2` | #16212C, #1C2A36 | cartões e cartões internos |
 | `--superficie-ia` | #1F1219 | blocos da Tropa AI |
 | `--vermelho` | #FF4655 | Tropa AI, item ativo, ação principal |
-| `--ambar` | #F9A23B | time A, ataque |
-| `--menta` | #32E0C4 | time B, defesa, prancheta |
+| `--time-a` | #FF4655 | time A e ataque nos dados (placares, gráficos), como no VALORANT |
+| `--time-b` | #3FA9F5 | time B e defesa nos dados |
+| `--ambar` | #F9A23B | destaque de rótulos e líderes |
+| `--menta` | #32E0C4 | prancheta |
 | `--alerta` | #F5E36B | prorrogação e destaque |
 | `--giz`, `--giz-2`, `--apagado` | #ECE8E1, #C5CBD3, #9AA6B2 | texto principal, secundário e rótulos |
 | `--trilho` | #263442 | fundo de barra |
@@ -35,6 +37,19 @@ Pílulas (`999px`) para botões e filtros; cartões com raio 22 a 40. Bordas de 
 - **Figura**: moldura de gráfico com título, legenda, Gráfico/Tabela e fonte.
 - **Estados**: esqueleto ao carregar, erro com "tentar de novo", vazio com dica do que mudar.
 
+## Times e agentes
+
+- **Logo do time sem moldura** (`<SeloTime>`): a arte aparece inteira, com sombra e brilho na cor do próprio time. Nada de quadrado âmbar ou menta atrás. Tamanhos `p` 30, `m` 46, `g` 84 e `xg` até 196 px.
+- **Cor do time** vem da logo: `scripts/cores_logos.py` gera `src/util/coresTimes.ts` (rode de novo ao trocar ou incluir logos). Time sem logo ganha um tom fixo derivado do nome. Use `estiloTime(nome)`, que define `--cor-time` e `--cor-time-2`; a página do time, o cartão da lista e o confronto da partida se pintam com elas.
+- Vermelho e azul (`--time-a`, `--time-b`) continuam sendo **time A e time B dos dados** (placares, gráficos de série). A cor da logo é identidade, não substitui essa regra.
+- **Arte de corpo inteiro** (`<CorpoAgente>`, `public/arte/agentes/corpo`): pódio do Meta, cartões de agente, topo do jogador, elenco do time e faixa do agente filtrado em Estatísticas. A cor de fundo atrás do retrato é a do agente (`COR_AGENTE`).
+
+## Responsivo
+
+- Acima de 1180 px o header é uma linha com os orbes no centro; até 899 px vira duas linhas com a navegação centralizada; até 640 px a navegação vai para uma barra fixa embaixo (`<NavInferior>`).
+- Teste sempre em 390, 768/820 e 1024 px, sem rolagem horizontal.
+- Faixas roláveis (pílulas, elenco e pódio no celular) não cortam o hover e não passam a rolagem para a página.
+
 ## Movimento
 
 Tudo em `src/estilos/animacoes.css` e `src/componentes/Vida.tsx`, desligado para quem pede menos movimento no sistema.
@@ -46,12 +61,13 @@ Tudo em `src/estilos/animacoes.css` e `src/componentes/Vida.tsx`, desligado para
 - Os gráficos se desenham: barras crescem, a linha do momentum é traçada, os anéis enchem e as células do livro de rounds estalam em sequência.
 - Números grandes contam até o valor (`<Contador>`).
 - O fundo tem três manchas de luz que derivam devagar, e o ticker de resultados corre sozinho (para no hover).
+- Com o painel da Tropa AI aberto, a página de trás não rola (`html.rolagem-presa`).
 - Menus suspensos são nossos (`<Seletor>`), nunca o `<select>` do navegador: abrem com animação e funcionam no teclado.
 
 ## Não fazer
 
 - Texto na cor da série nos gráficos (o número fica em `--giz`; a cor fica na marca).
-- Vermelho para algo que não seja IA, ativo ou ação.
+- Vermelho para algo que não seja IA, ativo, ação ou o time A/ataque nos dados.
 - Arte da Riot antes do OK da organização.
 - Zero no lugar de valor desconhecido.
 - `<select>` nativo: use `<Seletor>`.

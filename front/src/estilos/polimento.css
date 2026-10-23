@@ -1,0 +1,496 @@
+/* Polimento: header responsivo, barra inferior no celular, logos e cores dos times, arte dos agentes,
+   correções de rolagem, pílulas e tabelas. Carregado por último (depois de animacoes.css). */
+
+/* =====================================================================
+   Header
+   - acima de 1180px: uma linha (logo + nav | orbes com nome | busca + conta)
+   - 900 a 1180px: uma linha, orbes sem o nome
+   - 641 a 899px (tablet em pé): duas linhas, nav centralizada embaixo
+   - até 640px (celular): uma linha só com logo, orbes e ações; a nav vai para a barra inferior
+   ===================================================================== */
+.nav__icone { display: none; }
+.nav a { gap: 8px; }
+.topo__barra { min-height: 64px; }
+
+@media (max-width: 1180px) {
+  .topo .hub-nome { display: none; }
+  .topo .dt-hubs { gap: 22px; }
+  .logo__nome { font-size: 20px; }
+  .nav a { padding: 0 11px; }
+}
+
+@media (max-width: 899px) {
+  .topo { padding: 10px 12px 0; }
+  .topo__barra {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-areas: "logo orbes acoes" "nav nav nav";
+    align-items: center; row-gap: 8px; column-gap: 12px; padding: 8px 8px 8px 14px; border-radius: 28px;
+  }
+  .topo__esq { display: contents; }
+  .topo .logo { grid-area: logo; justify-self: start; }
+  .topo .dt-hubs { grid-area: orbes; justify-self: center; }
+  .topo__dir { grid-area: acoes; justify-self: end; }
+  .topo .nav { grid-area: nav; justify-self: stretch; justify-content: center; gap: 4px; padding: 4px; margin: 0 -2px; border-radius: var(--r-pill); background: rgba(15,25,35,.6); }
+  .topo .nav a { flex: 1 1 0; justify-content: center; min-height: 40px; }
+  /* Os orbes não descem para fora da barra quando há uma segunda linha embaixo. */
+  .topo .dt-hub { margin: -2px 0; }
+  .topo .dt-link:hover .dt-hub, .topo .dt-link:focus-visible .dt-hub { transform: scale(1.08); }
+}
+
+@media (max-width: 640px) {
+  .topo { padding: 8px 10px 0; }
+  .topo__barra { grid-template-areas: "logo orbes acoes"; padding: 6px 6px 6px 10px; min-height: 0; }
+  .topo .nav { display: none; }
+  .logo__nome { display: none; }
+  .topo .dt-hubs { gap: 14px; }
+  .topo .dt-hub { width: 52px; height: 52px; margin: 0; }
+  .topo .ai-globo { inset: 6px; width: 40px; height: 40px; }
+  .topo .pr-lapis { left: 26px; top: -8px; height: 50px; transform-origin: 7px 50px; }
+  .topo .pr-dica { display: none; }
+  .topo__dir { gap: 6px; }
+  .topo .botao-redondo, .topo .avatar { width: 40px; height: 40px; }
+}
+@media (max-width: 360px) { .topo .dt-hubs { gap: 8px; } .topo .dt-hub { width: 46px; height: 46px; } }
+
+/* Barra de navegação inferior (celular). */
+.nav-inferior { display: none; }
+@media (max-width: 640px) {
+  .nav-inferior {
+    position: fixed; z-index: 35; left: 10px; right: 10px; bottom: calc(10px + env(safe-area-inset-bottom));
+    display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 6px;
+    background: rgba(22,33,44,.94); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--linha-forte); border-radius: 24px; box-shadow: 0 -10px 40px rgba(0,0,0,.45);
+  }
+  .nav-inferior a { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; min-height: 52px; border-radius: 18px;
+    font: 600 11px var(--f-texto); color: var(--apagado); transition: background-color .2s, color .2s; }
+  .nav-inferior .nav__icone { display: block; transition: transform .35s var(--mola); }
+  .nav-inferior a[aria-current="page"] { background: var(--vermelho); color: var(--fundo); }
+  .nav-inferior a[aria-current="page"] .nav__icone { transform: translateY(-1px) scale(1.08); }
+  .nav-inferior a:active { transform: scale(.94); }
+  /* Espaço para a barra não cobrir o fim da página. */
+  .app { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+  html.na-prancheta .nav-inferior { display: none; }
+  html.na-prancheta .app { padding-bottom: 0; }
+}
+
+/* Abaixo do header, os orbes (que descem para fora da barra no desktop) nunca encostam no conteúdo. */
+html.na-prancheta .pagina, html.na-prancheta main { scroll-margin-top: 0; }
+
+/* =====================================================================
+   Rolagem
+   ===================================================================== */
+/* Painel da Tropa AI aberto: a página de trás fica parada e a rolagem nunca vaza para ela. */
+html.rolagem-presa, html.rolagem-presa body { overflow: hidden; }
+html.rolagem-presa { scrollbar-gutter: stable; }
+.painel-coach__corpo, .busca__lista, .seletor__lista, .tabela-rolagem, .pills, .livro, .eco-rounds { overscroll-behavior: contain; }
+.coach-veu { overscroll-behavior: contain; touch-action: none; }
+@media (max-width: 1100px) { .painel-coach { top: 88px; max-height: calc(100dvh - 100px); } }
+@media (max-width: 640px) {
+  .painel-coach { top: 72px; width: calc(100% - 16px); max-height: calc(100dvh - 84px); border-radius: 20px; }
+  .painel-coach__corpo { padding: 16px; }
+  .painel-coach__rodape { padding: 10px 12px 12px; }
+  .painel-coach__aviso { display: none; }
+}
+
+/* =====================================================================
+   Pílulas: o hover (sobe 2px) e o estalo não são mais cortados pela faixa rolável.
+   ===================================================================== */
+.pills { padding: 6px 4px 10px; margin: -6px -4px -4px; scroll-padding-inline: 4px; }
+.pill:hover { transform: translateY(-1px); }
+.segmentado { flex-wrap: wrap; }
+
+/* =====================================================================
+   Tabelas: título e número na mesma coluna e no mesmo alinhamento.
+   ===================================================================== */
+.tabela th.n { text-align: right; }
+.tabela th.n button { justify-content: flex-end; }
+.tabela--figura { table-layout: auto; }
+.tabela--figura th:first-child, .tabela--figura td:first-child { width: 100%; }
+.tabela--figura th.n, .tabela--figura td.n { padding-left: 28px; }
+.tabela--figura td:first-child { text-transform: none; }
+.tabela--figura td:first-child::first-letter { text-transform: uppercase; }
+
+/* =====================================================================
+   Cores do time (vêm da logo; --cor-time e --cor-time-2 são definidas por estiloTime)
+   ===================================================================== */
+.cor-time { color: color-mix(in srgb, var(--cor-time, var(--ambar)) 72%, #fff); }
+.barra--time > span { background: linear-gradient(90deg, var(--cor-time-2, var(--ambar)), var(--cor-time, var(--ambar))); }
+
+/* Cartão da lista de times: logo grande, brilho e borda na cor do time. */
+.cartao-time { position: relative; overflow: hidden; isolation: isolate; gap: 16px; }
+.cartao-time::before { content: ""; position: absolute; z-index: -1; inset: -40% 30% 40% -40%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--cor-time) 26%, transparent), transparent); opacity: .7; transition: opacity .3s, transform .5s var(--suave); }
+.cartao-time:hover::before { opacity: 1; transform: scale(1.15); }
+.cartao-time:hover { border-color: color-mix(in srgb, var(--cor-time) 55%, transparent); box-shadow: 0 18px 40px -20px color-mix(in srgb, var(--cor-time) 60%, transparent); }
+.cartao-time .selo-time { --t: 68px; transition: transform .45s var(--mola); }
+.cartao-time:hover .selo-time { transform: scale(1.08) rotate(-3deg); }
+.cartao-time__topo { gap: 14px; }
+.cartao-time__nome { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.cartao-time__nome b { font-size: 16px; line-height: 1.2; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; }
+.cartao-time__nome .mono { font-size: 10px; letter-spacing: .1em; }
+
+/* Página do time: a cor da logo pinta o topo da página. */
+.pagina--time { position: relative; isolation: isolate; }
+.pagina--time::before { content: ""; position: absolute; z-index: -1; left: 50%; top: -140px; width: 100vw; height: 760px; transform: translateX(-50%); pointer-events: none;
+  background:
+    radial-gradient(620px 380px at 18% 30%, color-mix(in srgb, var(--cor-time) 30%, transparent), transparent 70%),
+    radial-gradient(520px 340px at 82% 10%, color-mix(in srgb, var(--cor-time-2) 22%, transparent), transparent 70%);
+  -webkit-mask: linear-gradient(#000 55%, transparent); mask: linear-gradient(#000 55%, transparent); }
+.time-heroi { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 28px 36px; align-items: center; padding: 28px 32px; border-radius: var(--r-4);
+  background: linear-gradient(120deg, color-mix(in srgb, var(--cor-time) 14%, var(--superficie)) 0%, rgba(22,33,44,.82) 55%);
+  border: 1px solid color-mix(in srgb, var(--cor-time) 35%, transparent); position: relative; overflow: hidden; }
+.time-heroi::after { content: ""; position: absolute; inset: 0; pointer-events: none;
+  background-image: linear-gradient(rgba(236,232,225,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(236,232,225,.04) 1px, transparent 1px); background-size: 28px 28px;
+  -webkit-mask: radial-gradient(circle at 12% 50%, #000, transparent 60%); mask: radial-gradient(circle at 12% 50%, #000, transparent 60%); }
+.time-heroi__logo { position: relative; display: grid; place-items: center; }
+.time-heroi__logo::before { content: ""; position: absolute; inset: -18%; border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--cor-time) 45%, transparent), transparent); animation: aura-time 5s ease-in-out infinite; }
+.time-heroi__logo .selo-time { animation: flutua 6s ease-in-out infinite; }
+@keyframes aura-time { 0%, 100% { transform: scale(.92); opacity: .75; } 50% { transform: scale(1.06); opacity: 1; } }
+@keyframes flutua { 0%, 100% { translate: 0 0; } 50% { translate: 0 -6px; } }
+.time-heroi__info { display: flex; flex-direction: column; gap: 12px; min-width: 0; position: relative; z-index: 1; }
+.time-heroi__torneios { color: var(--cor-time); }
+.time-heroi__nome { font-size: clamp(44px, 6.4vw, 92px) !important; overflow-wrap: anywhere; }
+.time-heroi__numeros { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, auto); }
+.time-heroi__numeros > div { background: rgba(15,25,35,.55); backdrop-filter: blur(6px); }
+.forma { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.forma .rotulo { margin-right: 4px; }
+.forma__item { width: 28px; height: 28px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; font: 700 12px var(--f-mono); }
+.forma__item--v { background: color-mix(in srgb, var(--menta) 22%, transparent); color: var(--menta); border: 1px solid color-mix(in srgb, var(--menta) 45%, transparent); }
+.forma__item--d { background: color-mix(in srgb, var(--vermelho) 16%, transparent); color: #ff7a85; border: 1px solid color-mix(in srgb, var(--vermelho) 40%, transparent); }
+.forma__item--e { background: var(--superficie-2); color: var(--giz-2); }
+@media (max-width: 1100px) {
+  .time-heroi { grid-template-columns: auto minmax(0, 1fr); padding: 24px; }
+  .time-heroi__numeros { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .time-heroi { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 24px 16px; gap: 18px; }
+  .time-heroi__info { align-items: center; }
+  .time-heroi__numeros > div { min-width: 0; padding: 12px; }
+  .time-heroi__numeros .num { font-size: 30px; }
+  .forma { justify-content: center; }
+}
+
+/* Elenco: cartões com o agente principal de cada jogador. */
+.elenco { display: flex; flex-direction: column; gap: 14px; }
+.elenco__grade { display: grid; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); gap: 12px; }
+.jogador-cartao { position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; justify-content: flex-end; min-height: 280px; padding: 16px;
+  border-radius: var(--r-3); border: 1px solid var(--linha); color: var(--giz);
+  background: radial-gradient(120% 80% at 50% 0%, color-mix(in srgb, var(--cor-agente) 40%, transparent), transparent 70%), var(--superficie);
+  transition: transform .35s var(--mola), border-color .25s, box-shadow .35s; }
+.jogador-cartao:hover { color: var(--giz); transform: translateY(-4px); border-color: color-mix(in srgb, var(--cor-agente) 70%, transparent);
+  box-shadow: 0 22px 44px -22px color-mix(in srgb, var(--cor-agente) 80%, transparent); }
+.jogador-cartao__arte { position: absolute; z-index: -1; inset: 0; display: flex; justify-content: center; }
+.jogador-cartao__arte .corpo-agente { width: 150%; max-width: none; height: auto; margin-top: -8%; align-self: flex-start;
+  -webkit-mask: linear-gradient(#000 38%, transparent 72%); mask: linear-gradient(#000 38%, transparent 72%); transition: transform .6s var(--suave); }
+.jogador-cartao:hover .corpo-agente { transform: scale(1.05) translateY(-2%); }
+.jogador-cartao__info { display: flex; flex-direction: column; gap: 8px; }
+.jogador-cartao__nome { font: 900 26px/1 var(--f-display); text-transform: uppercase; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.jogador-cartao__agente { font-size: 10px; letter-spacing: .14em; color: color-mix(in srgb, var(--cor-agente) 50%, var(--giz)); }
+.jogador-cartao__numeros { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 10px 0 2px; border-top: 1px solid var(--linha); }
+.jogador-cartao__numeros > span { display: flex; flex-direction: column; gap: 2px; }
+.jogador-cartao__numeros .num { font-size: 22px; }
+.jogador-cartao__numeros .rotulo { font-size: 9px; }
+.jogador-cartao__agentes { display: flex; gap: 4px; }
+@media (max-width: 640px) {
+  .elenco__grade { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 72%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; overscroll-behavior-x: contain; }
+  .jogador-cartao { scroll-snap-align: start; min-height: 300px; }
+}
+
+/* Confronto da partida: fundo com as cores das duas logos. */
+.confronto { background: linear-gradient(110deg, color-mix(in srgb, var(--c-a, var(--time-a)) 22%, var(--superficie)), var(--superficie) 40%, var(--superficie) 60%, color-mix(in srgb, var(--c-b, var(--time-b)) 20%, var(--superficie))); }
+.confronto .selo-time { --t: 96px; }
+@media (max-width: 720px) { .confronto .selo-time { --t: 72px; } }
+
+/* Séries: logos maiores e visíveis também no celular. */
+.serie__time { gap: 12px; }
+.serie__time .selo-time { --t: 48px; transition: transform .4s var(--mola); }
+.serie:hover .serie__time .selo-time { transform: scale(1.06); }
+
+/* =====================================================================
+   Arte de corpo inteiro dos agentes
+   ===================================================================== */
+.corpo-agente { display: block; pointer-events: none; user-select: none; }
+
+/* Perfil do jogador: o agente principal entra pela direita do topo. */
+.perfil--jogador { position: relative; isolation: isolate; min-height: 260px; padding: 24px 28px; border-radius: var(--r-4); overflow: hidden;
+  background: radial-gradient(70% 120% at 100% 30%, color-mix(in srgb, var(--cor-agente) 42%, transparent), transparent 70%), rgba(22,33,44,.7);
+  border: 1px solid color-mix(in srgb, var(--cor-agente) 30%, var(--linha)); }
+.perfil__corpo { position: absolute; z-index: -1; right: -2%; top: -12%; width: min(520px, 52%); height: auto; opacity: .95;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 30%), linear-gradient(#000 60%, transparent); mask: linear-gradient(90deg, transparent, #000 30%); animation: entra-corpo .8s var(--suave) both; }
+.perfil--jogador .perfil__numeros > div { background: rgba(15,25,35,.62); backdrop-filter: blur(6px); }
+.perfil--jogador > .agente { display: none; }
+@keyframes entra-corpo { from { opacity: 0; transform: translateX(40px); } }
+@media (max-width: 900px) {
+  .perfil--jogador { padding: 22px; min-height: 0; }
+  .perfil__corpo { width: 72%; right: -18%; bottom: auto; top: -8%; opacity: .42; }
+}
+
+/* Estatísticas com agente filtrado. */
+.banner-agente { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; min-height: 190px; padding: 24px 28px; border-radius: var(--r-4);
+  background: radial-gradient(60% 140% at 85% 50%, color-mix(in srgb, var(--cor-agente) 50%, transparent), transparent 70%), var(--superficie);
+  border: 1px solid color-mix(in srgb, var(--cor-agente) 40%, transparent); }
+.banner-agente__texto { display: flex; flex-direction: column; gap: 8px; position: relative; z-index: 1; }
+.banner-agente__texto .rotulo { color: color-mix(in srgb, var(--cor-agente) 45%, var(--giz)); }
+.banner-agente__corpo { position: absolute; z-index: -1; right: 4%; top: -18%; width: min(440px, 52%); height: auto; animation: entra-corpo .7s var(--suave) both; }
+@media (max-width: 640px) { .banner-agente { min-height: 160px; padding: 20px; } .banner-agente__corpo { right: -16%; width: 70%; opacity: .55; } }
+
+/* Meta: pódio dos três agentes mais escolhidos. */
+.podio { display: grid; grid-template-columns: 1.25fr 1fr 1fr; gap: 14px; }
+.podio__agente { position: relative; isolation: isolate; overflow: hidden; min-height: 300px; display: flex; align-items: flex-end; padding: 22px; border-radius: var(--r-4);
+  background: radial-gradient(90% 90% at 70% 20%, color-mix(in srgb, var(--cor-agente) 52%, transparent), transparent 72%), var(--superficie);
+  border: 1px solid color-mix(in srgb, var(--cor-agente) 35%, transparent); transition: transform .4s var(--mola), box-shadow .4s; }
+.podio__agente:hover { transform: translateY(-4px); box-shadow: 0 26px 50px -26px color-mix(in srgb, var(--cor-agente) 90%, transparent); }
+.podio__corpo { position: absolute; z-index: -1; right: -12%; top: -6%; width: 92%; height: auto;
+  -webkit-mask: linear-gradient(#000 50%, transparent 92%); mask: linear-gradient(#000 50%, transparent 92%); transition: transform .7s var(--suave); }
+.podio__agente:hover .podio__corpo { transform: scale(1.04) translateX(-2%); }
+.podio__agente--1 { min-height: 340px; }
+.podio__agente--1 .titulo-l { font-size: clamp(44px, 5vw, 64px); }
+.podio__texto { display: flex; flex-direction: column; gap: 8px; position: relative; }
+.podio__texto .rotulo { color: color-mix(in srgb, var(--cor-agente) 45%, var(--giz)); }
+.podio__numeros { display: flex; gap: 8px; flex-wrap: wrap; }
+.podio__numeros > span { display: flex; flex-direction: column; gap: 2px; padding: 8px 12px; border-radius: 14px; background: rgba(15,25,35,.66); backdrop-filter: blur(6px); }
+.podio__numeros .num { font-size: 24px; }
+.podio__numeros .rotulo { font-size: 9px; }
+@media (max-width: 1100px) { .podio { grid-template-columns: 1fr 1fr; } .podio__agente--1 { grid-column: 1 / -1; } }
+@media (max-width: 640px) {
+  .podio { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 82%; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 6px; }
+  .podio__agente { scroll-snap-align: start; min-height: 300px; }
+  .podio__agente--1 { grid-column: auto; }
+}
+
+/* Meta: cartões de agente com o retrato saindo pelo canto. */
+.agente-meta { position: relative; overflow: hidden; isolation: isolate;
+  background: radial-gradient(120% 70% at 100% 0%, color-mix(in srgb, var(--cor-agente) 30%, transparent), transparent 70%), var(--superficie-2); }
+.agente-meta__corpo { position: absolute; z-index: -1; right: -38%; top: -10%; width: 105%; height: auto; opacity: .55;
+  -webkit-mask: linear-gradient(#000 35%, transparent 70%); mask: linear-gradient(#000 35%, transparent 70%); transition: opacity .3s, transform .5s var(--suave); }
+.agente-meta:hover .agente-meta__corpo { opacity: .85; transform: translateX(-6%); }
+.agente-meta > .agente { display: none; }
+.agente-meta > b { font: 900 22px/1 var(--f-display); text-transform: uppercase; margin-top: 44px; }
+
+/* =====================================================================
+   Responsivo geral (varredura em 390, 768, 820 e 1024)
+   ===================================================================== */
+@media (max-width: 1100px) {
+  .pagina { padding-top: 32px; gap: 24px; }
+  .perfil__numeros > div { min-width: 0; }
+}
+@media (max-width: 899px) {
+  .barra-ferramentas { align-items: stretch; }
+  .barra-ferramentas .campo-busca { flex: 1 1 260px; }
+  .grade-lideres { grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); }
+}
+@media (max-width: 640px) {
+  .pagina { padding-top: 22px; padding-bottom: 40px; gap: 20px; }
+  .titulo-xl { font-size: clamp(40px, 13vw, 64px); }
+  .cartao { padding: 18px; border-radius: var(--r-2); }
+  .perfil__numeros { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .perfil__numeros > div { padding: 12px; }
+  .perfil__numeros .num { font-size: 28px; }
+  .barra-ferramentas > * { flex: 1 1 100%; }
+  .barra-ferramentas .segmentado { justify-content: space-between; }
+  .barra-ferramentas .segmentado button { flex: 1; }
+  .serie { padding: 14px; }
+  .serie__linha { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; }
+  .serie__time { flex-direction: column; gap: 6px; text-align: center; }
+  .serie__time--a { flex-direction: column-reverse; justify-content: center; text-align: center; }
+  .serie__time .selo-time { display: inline-flex; --t: 44px; }
+  .serie__time b { font-size: 14px; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .serie__placar { font-size: 34px; }
+  .kpi .num, .fato .num { font-size: 32px; }
+  .heroi__acoes .botao { flex: 1 1 auto; }
+  .glossario dl { grid-template-columns: 1fr; gap: 2px; }
+  .glossario dd { margin-bottom: 10px; }
+  .rodape__dentro { padding-bottom: 24px; }
+}
+
+/* ---------- ajustes da varredura (2ª passada) ---------- */
+/* 900–1180px: logo e nav à esquerda, orbes centralizados no espaço que sobra, ações à direita. */
+@media (min-width: 900px) and (max-width: 1180px) {
+  .topo__barra { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto; column-gap: 12px; }
+  .topo__esq { display: contents; }
+  .topo .dt-hubs { justify-self: center; }
+  .topo .nav a { padding: 0 10px; }
+}
+/* Na prancheta os orbes não descem sobre a barra da ferramenta (nem no hover). */
+html.na-prancheta .topo .dt-hub { margin-top: -4px; margin-bottom: -4px; }
+html.na-prancheta .topo .dt-link:hover .dt-hub, html.na-prancheta .topo .dt-link:focus-visible .dt-hub { transform: scale(1.06); }
+html.na-prancheta .topo .dt-link:hover .dt-hub.pr { transform: scale(1.06) rotate(-4deg); }
+html.na-prancheta .topo .pr-dica { display: none; }
+html.na-prancheta .prancheta-dc { padding-top: 6px; }
+
+/* Confronto da partida no tablet e no celular: logo em cima do nome, nomes quebram em vez de cortar. */
+@media (max-width: 900px) {
+  .confronto .selo-time { --t: 72px; }
+  .confronto__time b { white-space: normal; overflow-wrap: anywhere; font-size: 24px; }
+}
+@media (max-width: 720px) {
+  .confronto__linha { grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; text-align: center; }
+  .confronto__time, .confronto__time--b { flex-direction: column; justify-content: flex-start; gap: 10px; text-align: center; }
+  .confronto__time--b { flex-direction: column-reverse; justify-content: flex-end; }
+  .confronto .selo-time { --t: 60px; }
+  .confronto__time b { font-size: 17px; line-height: 1.05; }
+  .confronto__placar .num { font-size: 44px; }
+}
+
+/* Celular: títulos grandes cabem inteiros, K/D/A em linha própria, filtros sem quebrar. */
+@media (max-width: 640px) {
+  .titulo-xl { font-size: clamp(34px, 11vw, 60px); overflow-wrap: normal; }
+  .perfil--jogador .perfil__numeros { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .perfil--jogador .perfil__numeros > div:nth-child(3) { grid-column: 1 / -1; }
+  .segmentado button { white-space: nowrap; padding: 0 10px; }
+}
+/* Logos nas listas (Panorama, Estatísticas, perfil do jogador) também maiores. */
+.link-time .selo-time { --t: 36px; }
+.lista-rank .selo-time { --t: 40px; }
+
+/* Cartão do jogador: nome do agente gigante ao fundo, selo de titular e arte maior. */
+.elenco__grade { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+.jogador-cartao { min-height: 310px; }
+.jogador-cartao__marca { position: absolute; z-index: -2; left: -6px; top: 6px; font: 900 64px/0.8 var(--f-display); text-transform: uppercase; letter-spacing: -.01em;
+  color: transparent; -webkit-text-stroke: 1px color-mix(in srgb, var(--cor-agente) 55%, transparent); opacity: .7; white-space: nowrap; writing-mode: vertical-rl; transform: rotate(180deg); }
+.jogador-cartao__arte .corpo-agente { width: 165%; margin-top: -6%; opacity: 0; transform: translateY(12px) scale(.98); transition: opacity .5s, transform .6s var(--suave); }
+.jogador-cartao__arte .corpo-agente--pronto { opacity: 1; transform: none; }
+.jogador-cartao:hover .corpo-agente--pronto { transform: scale(1.06) translateY(-2%); }
+.jogador-cartao__selo { position: absolute; top: 12px; right: 12px; font-size: 9px; letter-spacing: .14em; padding: 4px 8px; border-radius: var(--r-pill);
+  background: rgba(15,25,35,.7); border: 1px solid color-mix(in srgb, var(--cor-agente) 60%, transparent); color: var(--giz); backdrop-filter: blur(4px); }
+.jogador-cartao__nome { font-size: 24px; }
+.jogador-cartao__numeros .num { font-size: 20px; }
+
+/* =====================================================================
+   Tablet e celular: informação centralizada onde faz sentido
+   (títulos, cabeçalhos de seção, filtros, números, cartões e chamadas).
+   Tabelas, listas ranqueadas e gráficos continuam alinhados à esquerda para leitura.
+   ===================================================================== */
+@media (max-width: 899px) {
+  .cabeca, .heroi .cabeca, .bloco-ia .cabeca { align-items: center; text-align: center; }
+  .heroi__texto { margin-inline: auto; }
+  .heroi__acoes, .heroi__destaque { justify-content: center; }
+  .secao-topo { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px; }
+  .dia__topo { justify-content: center; text-align: center; }
+  .dia__topo .dia__regua { display: none; }
+  .pills { justify-content: safe center; }
+  .barra-ferramentas { justify-content: center; }
+  .barra-ferramentas .pills { flex: 1 1 100%; }
+  .classes { justify-content: center; }
+  .voltar { align-self: center; }
+
+  .kpi, .fato, .metrica, .cartao-mini { align-items: center; text-align: center; }
+  .metrica__barra { width: 100%; }
+  .perfil { justify-content: center; text-align: center; }
+  .perfil .cabeca { align-items: center; }
+  .perfil__numeros { justify-content: center; }
+  .perfil__numeros > div { align-items: center; text-align: center; }
+  .time-heroi__numeros > div { align-items: center; text-align: center; }
+
+  .cartao-time { align-items: center; text-align: center; }
+  .cartao-time__topo { flex-direction: column; text-align: center; }
+  .cartao-time__nome { align-items: center; }
+  .cartao-time__numeros { justify-content: center; }
+  .cartao-time .barra { width: 100%; }
+
+  .banner-prancheta { flex-direction: column; text-align: center; justify-content: center; }
+  .banner-prancheta > div { align-items: center; }
+  .banner-agente { justify-content: center; text-align: center; }
+  .banner-agente__texto { align-items: center; }
+  .podio__texto { align-items: center; text-align: center; }
+  .podio__numeros { justify-content: center; }
+  .agente-meta { align-items: center; text-align: center; }
+  .agente-meta__linha { width: 100%; }
+  .agente-meta .barra { width: 100%; }
+  .mapa-meta .secao-topo { align-items: center; }
+
+  .jogador-cartao__info { align-items: center; text-align: center; }
+  .jogador-cartao__numeros { width: 100%; text-align: center; }
+  .jogador-cartao__numeros > span { align-items: center; }
+  .jogador-cartao__agentes { justify-content: center; }
+
+  .figura__topo { flex-direction: column; justify-content: center; text-align: center; }
+  .figura__rodape { justify-content: center; text-align: center; }
+  .legenda { justify-content: center; }
+  .aneis { justify-content: center; }
+  .composicao { align-items: center; text-align: center; }
+  .abas-mapa { justify-content: center; }
+  .destaque-jogador { text-align: left; }
+  .rodape__dentro { justify-content: center; text-align: center; }
+}
+
+/* Agente sem círculo, como as logos: o busto recortado aparece solto, com sombra e brilho na cor da função. */
+.agente--busto { border: 0; background: none; border-radius: 0; overflow: visible; }
+.agente--busto img { width: 100%; height: 100%; object-fit: contain; object-position: bottom;
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.6)) drop-shadow(0 0 6px color-mix(in srgb, var(--cor-classe, #9AA6B2) 30%, transparent)); transition: transform .35s var(--mola); }
+.agente--busto.agente--p { width: 32px; height: 32px; }
+.agente--busto { width: 42px; height: 42px; }
+.agente--busto.agente--g { width: 64px; height: 64px; }
+a:hover .agente--busto img, .pill:hover .agente--busto img, tr:hover .agente--busto img { transform: scale(1.08) translateY(-1px); }
+.agente--busto.agente--p img, .agente--busto.agente--m img { transform: scale(1.22); transform-origin: 50% 35%; }
+a:hover .agente--busto.agente--p img, tr:hover .agente--busto.agente--p img, a:hover .agente--busto.agente--m img { transform: scale(1.3) translateY(-1px); }
+@media (max-width: 899px) { .banner-prancheta > span { flex: 0 0 auto !important; align-items: center; } }
+
+/* Destaques da partida: os três dividem a altura da coluna e o espaço vira arte do agente,
+   nunca um cartão vazio esticado. */
+.destaques { display: grid; grid-auto-rows: minmax(118px, 1fr); gap: 14px; }
+.destaque-jogador--arte { position: relative; overflow: hidden; isolation: isolate; min-height: 118px; padding: 18px 22px;
+  background: radial-gradient(70% 140% at 100% 50%, color-mix(in srgb, var(--cor-agente) 40%, transparent), transparent 72%), var(--superficie);
+  transition: transform .35s var(--mola), border-color .25s, box-shadow .35s; }
+.destaque-jogador--arte:hover { transform: translateY(-3px); border-color: color-mix(in srgb, var(--cor-agente) 65%, transparent);
+  box-shadow: 0 20px 40px -22px color-mix(in srgb, var(--cor-agente) 85%, transparent); }
+.destaque-jogador__corpo { position: absolute; z-index: -1; right: 8%; top: -12%; height: 175%; width: auto; max-width: none;
+  -webkit-mask: linear-gradient(90deg, transparent, #000 35%), linear-gradient(#000 60%, transparent); -webkit-mask-composite: source-in;
+  mask: linear-gradient(90deg, transparent, #000 35%) intersect, linear-gradient(#000 60%, transparent); opacity: .9; transition: transform .6s var(--suave); }
+.destaque-jogador--arte:hover .destaque-jogador__corpo { transform: scale(1.05) translateX(-2%); }
+.destaque-jogador--arte > .agente { display: none; }
+.destaque-jogador--arte { grid-template-columns: minmax(0, 1fr) auto; }
+.destaque-jogador--arte .titulo-s { font-size: clamp(22px, 2.4vw, 30px); }
+.destaque-jogador--arte .destaque-jogador__v { font-size: clamp(26px, 3vw, 40px); text-shadow: 0 2px 14px rgba(0,0,0,.6); position: relative; }
+@media (max-width: 899px) {
+  .destaque-jogador--arte { text-align: left; }
+  .destaque-jogador__corpo { right: 24%; }
+}
+/* número embaixo do nome, à esquerda; a arte fica livre à direita */
+.destaque-jogador--arte { display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 6px; padding-right: 38%; }
+.destaque-jogador--arte .destaque-jogador__v { text-align: left; color: color-mix(in srgb, var(--cor-agente) 35%, #fff); font-size: clamp(28px, 2.6vw, 38px); }
+.destaque-jogador__corpo { right: 2%; }
+@media (max-width: 899px) { .destaque-jogador__corpo { right: 2%; } .destaque-jogador--arte { padding-right: 42%; } }
+@media (max-width: 640px) { .destaque-jogador__corpo { right: -8%; } .destaque-jogador--arte .titulo-s { font-size: 20px; } }
+
+/* =====================================================================
+   Mini prancheta animada em todo botão que abre a prancheta
+   (mesma linguagem do orbe: mesa girando, jogadores andando, radar, lápis e balão no hover)
+   ===================================================================== */
+.botao-prancheta, .botao--mesa, .dica-prancheta { position: relative; overflow: visible; }
+.mini-mesa { position: relative; flex: none; width: 26px; height: 26px; border-radius: 50%; display: inline-block; perspective: 120px;
+  box-shadow: 0 0 0 1.5px rgba(50,224,196,.55), 0 0 12px -2px rgba(50,224,196,.5); background: #0F1923; overflow: visible; }
+.mini-mesa__grade { position: absolute; inset: 0; border-radius: 50%; overflow: hidden;
+  background-image: linear-gradient(rgba(50,224,196,.28) 1px, transparent 1px), linear-gradient(90deg, rgba(50,224,196,.28) 1px, transparent 1px); background-size: 5px 5px;
+  animation: mmMesa 24s linear infinite; }
+.mini-mesa__radar { position: absolute; inset: 0; border-radius: 50%; background: conic-gradient(from 0deg, rgba(50,224,196,0) 0 72%, rgba(50,224,196,.7));
+  opacity: 0; transition: opacity .3s; animation: orbSpin 2.2s linear infinite; }
+.mm-pt { position: absolute; width: 5px; height: 5px; border-radius: 50%; }
+.mm-a1 { left: 4px; top: 8px; background: var(--time-a); animation: mmA1 2.6s ease-in-out infinite alternate; }
+.mm-a2 { left: 7px; top: 15px; background: var(--time-a); animation: mmA2 3.1s ease-in-out infinite alternate; }
+.mm-b1 { left: 16px; top: 5px; background: var(--time-b); animation: mmB1 2.9s ease-in-out infinite alternate; }
+.mm-b2 { left: 15px; top: 15px; background: var(--time-b); animation: mmB2 3.4s ease-in-out infinite alternate; }
+.mini-mesa__lapis { position: absolute; left: 15px; top: -10px; width: 7px; height: 30px; transform-origin: 3.5px 30px; transform: rotate(36deg) scale(0); opacity: 0;
+  filter: drop-shadow(-2px 3px 2px rgba(0,0,0,.5)); transition: transform .4s var(--mola), opacity .2s; }
+.mini-dica { position: absolute; left: 6px; bottom: calc(100% + 8px); white-space: nowrap; pointer-events: none; z-index: 5;
+  font: 700 17px/1 var(--f-giz); color: var(--fundo); background: var(--menta); padding: 5px 10px 6px; border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 10px 22px rgba(0,0,0,.45); transform: rotate(-4deg) scale(0); transform-origin: 10% 100%; opacity: 0;
+  transition: transform .45s var(--mola), opacity .2s; }
+.mini-dica::after { content: ""; position: absolute; left: 10px; bottom: -4px; width: 9px; height: 9px; background: var(--menta); transform: rotate(45deg); border-radius: 2px; }
+/* hover / foco: tudo acelera, radar varre, lápis rabisca, balão sobe */
+:is(.botao-prancheta, .banner-prancheta, .dica-prancheta):is(:hover, :focus-visible) .mini-mesa__radar { opacity: 1; }
+:is(.botao-prancheta, .banner-prancheta, .dica-prancheta):is(:hover, :focus-visible) .mm-pt { animation-duration: 1s; box-shadow: 0 0 5px currentColor; }
+:is(.botao-prancheta, .banner-prancheta, .dica-prancheta):is(:hover, :focus-visible) .mini-mesa__lapis { opacity: 1; transform: rotate(30deg) scale(1); animation: mmRabisco .3s ease-in-out .35s infinite; }
+:is(.botao-prancheta, .banner-prancheta, .dica-prancheta):is(:hover, :focus-visible) .mini-dica { opacity: 1; transform: rotate(-4deg) scale(1); animation: prBoia 2.2s ease-in-out .5s infinite; }
+:is(.botao-prancheta, .banner-prancheta, .dica-prancheta):is(:hover, :focus-visible) .mini-mesa { box-shadow: 0 0 0 1.5px var(--menta), 0 0 16px 1px rgba(50,224,196,.7); }
+.botao-prancheta:hover svg, .banner-prancheta:hover .botao svg { transform: none; }
+.botao--mesa .mini-mesa { box-shadow: 0 0 0 1.5px rgba(15,25,35,.5); }
+@keyframes mmMesa { to { transform: rotate(360deg); } }
+@keyframes mmA1 { to { transform: translate(5px, -3px); } }
+@keyframes mmA2 { to { transform: translate(4px, -3px); } }
+@keyframes mmB1 { to { transform: translate(-4px, 4px); } }
+@keyframes mmB2 { to { transform: translate(-3px, -3px); } }
+@keyframes mmRabisco { 0%, 100% { transform: rotate(24deg) translate(-2px, -2px); } 50% { transform: rotate(38deg) translate(1px, -1px); } }
+/* em telas de toque não há hover: o balão não aparece, só a mesa animada */
+@media (hover: none) { .mini-dica { display: none; } }

@@ -4,17 +4,21 @@ import { useDados } from '../api/useDados';
 import type { JogadorPartida, PartidaDetalhe } from '../api/tipos';
 import { useCatalogo } from '../componentes/Catalogo';
 import { BannerPrancheta, BotaoPrancheta, linkPrancheta } from '../componentes/Prancheta';
-import { Agente, Carregando, ErroDados, FonteDados, SeloTime } from '../componentes/Visuais';
+import { Confronto } from '../componentes/Confronto';
+import { Agente, Carregando, CorpoAgente, ErroDados, FonteDados, SeloTime } from '../componentes/Visuais';
+import { COR_AGENTE } from '../util/arteAgentes';
+import { coresTime } from '../util/logosTimes';
+import type { CSSProperties } from 'react';
 import { BarrasEspelhadas, EconomiaRounds, LivroRounds, Momentum, type CelulaRound } from '../graficos/Graficos';
 import { Figura } from '../graficos/Figura';
 import { useCoach, useContextoCoach } from '../coach/Coach';
 import { Link } from '../rotas';
-import { COMPRAS, dec, diaBrasilia, diaCurto, hora, minutos, nomeTime, num, pct, taxa } from '../util/formato';
+import { COMPRAS, dec, diaBrasilia, diaCurto, hora, minutos, nomeTime, num, pct, slugAgente, taxa } from '../util/formato';
 
 export function Partida({ id }: { id: string }) {
   const det = useDados(`partida:${id}`, () => dados.partida(id));
   const ser = useDados(`serie:${id}`, () => dados.serieDaPartida(id));
-  const { mapa, torneio } = useCatalogo();
+  const { mapa, torneio, agente } = useCatalogo();
   const { abrir } = useCoach();
   const p = det.dados?.data;
   const [ta, tb] = p?.times ?? [];
@@ -65,7 +69,7 @@ export function Partida({ id }: { id: string }) {
     <main className="pagina">
       <Link para="/partidas" className="voltar mono">← PARTIDAS</Link>
 
-      <section className="confronto">
+      <section className="confronto" style={{ '--c-a': coresTime(A.nome)[0], '--c-b': coresTime(B.nome)[0] } as CSSProperties}>
         <span className="rotulo rotulo--ambar">{torneio(p.torneio_id).toUpperCase()} · {diaCurto(diaBrasilia(p.inicio)).toUpperCase()}{p.inicio ? ` · ${hora(p.inicio)}` : ''}</span>
         <div className="confronto__linha">
           <Link para={`/times/${encodeURIComponent(A.id)}`} className="confronto__time">
@@ -87,7 +91,7 @@ export function Partida({ id }: { id: string }) {
             {serie.mapas.map((m, i) => (
               <Link key={m.partida_id} para={`/partidas/${encodeURIComponent(m.partida_id)}`} aria-current={m.partida_id === p.id ? 'page' : undefined} className="aba-mapa">
                 <span className="mono apagado">M{i + 1}</span><b>{mapa(m.mapa_id)}</b>
-                <span className="num"><span style={{ color: m.placar_a > m.placar_b ? 'var(--ambar)' : 'var(--apagado)' }}>{m.placar_a}</span>:<span style={{ color: m.placar_b > m.placar_a ? 'var(--menta)' : 'var(--apagado)' }}>{m.placar_b}</span></span>
+                <span className="num"><span style={{ color: m.placar_a > m.placar_b ? 'var(--time-a)' : 'var(--apagado)' }}>{m.placar_a}</span>:<span style={{ color: m.placar_b > m.placar_a ? 'var(--time-b)' : 'var(--apagado)' }}>{m.placar_b}</span></span>
                 {m.prorrogacao && <span className="chip chip--alerta">PRORR.</span>}
               </Link>
             ))}
@@ -97,7 +101,7 @@ export function Partida({ id }: { id: string }) {
 
       <section className="mapa-topo">
         <div className="cabeca">
-          <span className="rotulo">{mapa(p.mapa_id).toUpperCase()} · {rounds.length} ROUNDS · {minutos(p.duracao_ms)}{rounds.length > 24 ? ' · PRORROGAÇÃO' : ''}</span>
+          <span className="rotulo"><Link para={`/mapas/${encodeURIComponent(p.mapa_id)}`} className="link-mapa">{mapa(p.mapa_id).toUpperCase()} ↗</Link> · {rounds.length} ROUNDS · {minutos(p.duracao_ms)}{rounds.length > 24 ? ' · PRORROGAÇÃO' : ''}</span>
           <h1 className="titulo-l">{venceuA ? nomeTime(A.nome) : nomeTime(B.nome)} vence o {mapa(p.mapa_id)} por {Math.max(A.rounds_ganhos, B.rounds_ganhos)}–{Math.min(A.rounds_ganhos, B.rounds_ganhos)}</h1>
         </div>
         <div className="grade grade-4">
@@ -112,13 +116,15 @@ export function Partida({ id }: { id: string }) {
         texto={decisivo ? decisivo.motivo : 'Abra qualquer round na prancheta e acompanhe as jogadas.'} />
 
       <div className="grade grade-2">
-        <Figura titulo="Diferença no placar, round a round" legenda={[{ cor: 'var(--ambar)', rotulo: `${nomeTime(A.nome)} à frente` }, { cor: 'var(--menta)', rotulo: `${nomeTime(B.nome)} à frente` }]}
+        <Figura titulo="Diferença no placar, round a round" legenda={[{ cor: 'var(--time-a)', rotulo: `${nomeTime(A.nome)} à frente` }, { cor: 'var(--time-b)', rotulo: `${nomeTime(B.nome)} à frente` }]}
           tabela={{ colunas: ['Round', nomeTime(A.nome), nomeTime(B.nome)], linhas: pontos.map((x) => [x.round, x.a, x.b]) }} fonte={`${rounds.length} ROUNDS`}>
           <Momentum pontos={pontos} nomeA={nomeTime(A.nome)} nomeB={nomeTime(B.nome)} destaque={decisivo?.round} />
         </Figura>
-        <div className="grade" style={{ gap: 14 }}>
+        <div className="destaques">
           {destaques.map(([rot, j, f]) => j && (
-            <Link key={rot} para={`/jogadores/${encodeURIComponent(j.jogador_id)}`} className="destaque-jogador">
+            <Link key={rot} para={`/jogadores/${encodeURIComponent(j.jogador_id)}`} className="destaque-jogador destaque-jogador--arte"
+              style={{ '--cor-agente': COR_AGENTE[slugAgente(agente(j.agente_id))] ?? 'var(--trilho)' } as CSSProperties}>
+              <CorpoAgente id={j.agente_id} className="destaque-jogador__corpo" />
               <Agente id={j.agente_id} tamanho="g" />
               <span><span className="rotulo">{rot}</span><b className="titulo-s" style={{ display: 'block' }}>{j.nome}</b><span className="apagado" style={{ fontSize: 13 }}>{nomeTime(j.time_id === A.id ? A.nome : B.nome)}</span></span>
               <b className="num destaque-jogador__v">{f(j)}</b>
@@ -139,14 +145,14 @@ export function Partida({ id }: { id: string }) {
 
       {temEco && (
         <section className="grade grade-2">
-          <Figura titulo="Economia round a round" legenda={[{ cor: 'var(--ambar)', rotulo: nomeTime(A.nome) }, { cor: 'var(--menta)', rotulo: nomeTime(B.nome) }]}
+          <Figura titulo="Economia round a round" legenda={[{ cor: 'var(--time-a)', rotulo: nomeTime(A.nome) }, { cor: 'var(--time-b)', rotulo: nomeTime(B.nome) }]}
             fonte="EQUIPAMENTO SOMADO DOS CINCO · BARRA CHEIA = VENCEU O ROUND"
             tabela={{ colunas: ['Round', `${nomeTime(A.nome)}`, `${nomeTime(B.nome)}`, 'Venceu'], linhas: rounds.map((r) => [r.round, `${COMPRAS[r.compras?.[A.id] ?? ''] ?? '—'} ${num(r.equipamento?.[A.id])}`, `${COMPRAS[r.compras?.[B.id] ?? ''] ?? '—'} ${num(r.equipamento?.[B.id])}`, r.vencedor_id === A.id ? nomeTime(A.nome) : nomeTime(B.nome)]) }}>
             <EconomiaRounds nomeA={nomeTime(A.nome)} nomeB={nomeTime(B.nome)} rounds={rounds.map((r) => ({
               round: r.round, eqA: r.equipamento?.[A.id] ?? 0, eqB: r.equipamento?.[B.id] ?? 0, compraA: r.compras?.[A.id] ?? '', compraB: r.compras?.[B.id] ?? '', vencedor: lado(r.vencedor_id),
             }))} />
           </Figura>
-          <Figura titulo="Vitória por tipo de compra neste mapa" legenda={[{ cor: 'var(--ambar)', rotulo: nomeTime(A.nome) }, { cor: 'var(--menta)', rotulo: nomeTime(B.nome) }]}
+          <Figura titulo="Vitória por tipo de compra neste mapa" legenda={[{ cor: 'var(--time-a)', rotulo: nomeTime(A.nome) }, { cor: 'var(--time-b)', rotulo: nomeTime(B.nome) }]}
             fonte="REGRA DA GOLD: PISTOL = ROUNDS 1 E 13 · ECO < 10 MIL · FORCE < 20 MIL · FULL ≥ 20 MIL">
             <BarrasEspelhadas nomeA={nomeTime(A.nome)} nomeB={nomeTime(B.nome)} linhas={ecoTime(A.id).map((e, i) => {
               const b = ecoTime(B.id)[i];
@@ -155,6 +161,8 @@ export function Partida({ id }: { id: string }) {
           </Figura>
         </section>
       )}
+
+      <Confronto A={A} B={B} partidaId={p.id} />
 
       <section className="bloco-ia bloco-ia--compacto">
         <div className="cabeca"><span className="rotulo rotulo--vermelho">TROPA AI</span><h2 className="titulo-m">Pergunte sobre este mapa</h2></div>

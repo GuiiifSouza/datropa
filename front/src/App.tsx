@@ -2,7 +2,7 @@ import { lazy, Suspense } from 'react';
 import { AuthProvider } from './auth/Auth';
 import { CoachProvider, PainelCoach } from './coach/Coach';
 import { CatalogoProvider } from './componentes/Catalogo';
-import { Header, Rodape } from './componentes/Moldura';
+import { Header, NavInferior, Rodape } from './componentes/Moldura';
 import { MotorDeVida } from './componentes/Vida';
 import { Roteador, type Rota } from './rotas';
 import { Panorama } from './paginas/Panorama';
@@ -14,6 +14,8 @@ import { Jogador } from './paginas/Jogador';
 import { Estatisticas } from './paginas/Estatisticas';
 import { Meta } from './paginas/Meta';
 import { TropaAI } from './paginas/TropaAI';
+import { Comparar } from './paginas/Comparar';
+import { Mapa } from './paginas/Mapa';
 import { NaoEncontrada } from './paginas/NaoEncontrada';
 import { Carregando } from './componentes/Visuais';
 import { LimiteDeErro } from './componentes/LimiteDeErro';
@@ -30,6 +32,8 @@ const ROTAS: Rota[] = [
   { padrao: '/jogadores/:id', render: (p) => <Jogador key={p.id} id={p.id} /> },
   { padrao: '/estatisticas', render: () => <Estatisticas /> },
   { padrao: '/meta', render: () => <Meta /> },
+  { padrao: '/mapas/:id', render: (p) => <Mapa key={p.id} id={p.id} /> },
+  { padrao: '/comparar', render: () => <Comparar /> },
   { padrao: '/tropa-ai', render: () => <TropaAI /> },
   // Prancheta tática: dono Rhuan. Contrato do link: /prancheta?partida_id=<id>&round=<n>.
   // o limite de erro segura link ?j= estragado ou falha ao baixar a tela, para o site não ficar em branco
@@ -54,6 +58,7 @@ export function App() {
               <Roteador rotas={ROTAS} naoEncontrada={<NaoEncontrada />} />
             </div>
             <Rodape />
+            <NavInferior />
           </div>
         </CoachProvider>
       </CatalogoProvider>

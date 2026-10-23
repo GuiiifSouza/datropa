@@ -44,9 +44,9 @@ export function CartaoSerie({ s, destaque, mostrarTorneio }: { s: Serie; destaqu
                 {m.prorrogacao && <span className="mono" style={{ fontSize: 9, color: 'var(--alerta)' }}>PRORR.</span>}
               </span>
               <b className="num" style={{ fontSize: 20 }}>
-                <span style={{ color: m.placar_a > m.placar_b ? 'var(--ambar)' : 'var(--apagado)' }}>{m.placar_a}</span>
+                <span style={{ color: m.placar_a > m.placar_b ? 'var(--time-a)' : 'var(--apagado)' }}>{m.placar_a}</span>
                 <span style={{ color: 'var(--apagado-2)' }}>:</span>
-                <span style={{ color: m.placar_b > m.placar_a ? 'var(--menta)' : 'var(--apagado)' }}>{m.placar_b}</span>
+                <span style={{ color: m.placar_b > m.placar_a ? 'var(--time-b)' : 'var(--apagado)' }}>{m.placar_b}</span>
               </b>
             </Link>
           );

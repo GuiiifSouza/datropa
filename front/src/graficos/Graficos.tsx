@@ -8,12 +8,12 @@ import type { CSSProperties, PointerEvent, ReactNode } from 'react';
 import { useDica } from './Figura';
 import { COMPRAS, RESULTADOS, pct } from '../util/formato';
 
-const AMBAR = 'var(--ambar)';
-const MENTA = 'var(--menta)';
+const AMBAR = 'var(--time-a)';
+const MENTA = 'var(--time-b)';
 
 // ---------------------------------------------------------------- barras contra a média
 export type LinhaMedia = { rotulo: string; valor: number | null; media?: number | null; detalhe?: string };
-export function BarrasMedia({ linhas, cor = AMBAR, max = 100, formato = (v: number | null) => pct(v), rotuloMedia = 'média da cena' }: {
+export function BarrasMedia({ linhas, cor = AMBAR, max = 100, formato = (v: number | null) => pct(v), rotuloMedia = 'média geral' }: {
   linhas: LinhaMedia[]; cor?: string; max?: number; formato?: (v: number | null) => string; rotuloMedia?: string;
 }) {
   const { mostrar, esconder, elemento } = useDica();
@@ -90,8 +90,8 @@ export function Momentum({ pontos, nomeA, nomeB, altura = 220, destaque }: { pon
         {[12, 24].filter((r) => r < n).map((r) => (
           <line key={r} x1={5 + r * 10} y1="4" x2={5 + r * 10} y2={H - 4} stroke="#263442" strokeDasharray="2 3" vectorEffect="non-scaling-stroke" />
         ))}
-        <path className="momentum__area" d={area(1)} fill="rgba(249,162,59,.26)" />
-        <path className="momentum__area" d={area(-1)} fill="rgba(50,224,196,.26)" />
+        <path className="momentum__area" d={area(1)} fill="rgba(255,70,85,.24)" />
+        <path className="momentum__area" d={area(-1)} fill="rgba(63,169,245,.24)" />
         <path className="momentum__linha" pathLength={1} d={linha} fill="none" stroke="#ECE8E1" strokeWidth="2" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
         {destaque && destaque <= n && <circle cx={5 + destaque * 10} cy={xy[destaque][1]} r="3" fill="#FF4655" stroke="#16212C" strokeWidth="1" vectorEffect="non-scaling-stroke" />}
         {pontos.map((p, i) => (

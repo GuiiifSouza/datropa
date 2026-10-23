@@ -1,0 +1,178 @@
+/* Features novas: comparador, página de mapa, confronto na partida e cartão de story. */
+
+/* ---------- barras espelhadas (comparador e confronto) ---------- */
+.espelho-linha { display: grid; grid-template-columns: 84px minmax(0, 1fr) minmax(110px, 150px) minmax(0, 1fr) 84px; gap: 14px; align-items: center;
+  padding: 10px 0; border-top: 1px solid var(--linha); }
+.espelho-linha:first-of-type { border-top: 0; }
+.espelho-linha__v { font-size: 32px; text-align: right; }
+.espelho-linha__v--b { text-align: left; }
+.espelho-linha__trilho { position: relative; display: flex; height: 12px; background: var(--trilho); border-radius: var(--r-pill); }
+.espelho-linha__trilho > span { display: block; height: 100%; border-radius: var(--r-pill); transition: width .7s var(--suave); }
+.espelho-linha__trilho--a { justify-content: flex-end; }
+.espelho-linha__trilho--a > span { background: var(--time-a); }
+.espelho-linha__trilho--b > span { background: var(--time-b); }
+.espelho-linha__trilho i { position: absolute; top: -4px; width: 2px; height: 20px; background: var(--giz); border-radius: 2px; opacity: .8; }
+.espelho-linha__nome { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; font-size: 14px; color: var(--giz); }
+.espelho-linha__nome .mono { font-size: 10px; letter-spacing: .06em; }
+.espelho-linha--compacta { grid-template-columns: 56px minmax(0, 1fr) minmax(90px, 120px) minmax(0, 1fr) 56px; padding: 8px 0; }
+.espelho-linha--compacta .espelho-linha__v { font-size: 22px; }
+.espelho-linha--compacta .espelho-linha__trilho { height: 10px; }
+@media (max-width: 640px) {
+  .espelho-linha { grid-template-columns: 60px minmax(0, 1fr) 60px; grid-template-areas: "nome nome nome" "va ta vb" ". tb ."; row-gap: 6px; }
+  .espelho-linha__nome { grid-area: nome; }
+  .espelho-linha > .espelho-linha__v:first-child { grid-area: va; }
+  .espelho-linha__v--b { grid-area: vb; }
+  .espelho-linha__trilho--a { grid-area: ta; }
+  .espelho-linha__trilho--b { grid-area: tb; }
+  .espelho-linha__v { font-size: 24px; }
+  .espelho-linha__trilho--a { justify-content: flex-start; }
+  .espelho-linha__trilho--a i { display: none; }
+}
+
+/* ---------- comparador ---------- */
+.comparar__escolha { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center; position: relative; z-index: 10; }
+.escolher { position: relative; flex: 0 1 340px; min-width: min(100%, 260px); }
+.escolher .campo-busca { width: 100%; min-width: 0; }
+.escolher--a .campo-busca { border-color: rgba(255,70,85,.55); }
+.escolher--b .campo-busca { border-color: rgba(63,169,245,.55); }
+.escolher .campo-busca .mono { font-size: 11px; font-weight: 700; }
+.escolher__limpar { background: none; border: 0; color: var(--apagado); padding: 6px; border-radius: 8px; }
+.escolher__limpar:hover { color: var(--giz); }
+.escolher__lista { position: absolute; left: 0; right: 0; top: calc(100% + 8px); list-style: none; margin: 0; padding: 6px; z-index: 30; max-height: 340px; overflow: auto;
+  background: var(--superficie); border: 1px solid var(--linha-forte); border-radius: 18px; box-shadow: var(--sombra); }
+.escolher__lista button { width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 12px; background: none; color: var(--giz); text-align: left; }
+.escolher__lista button:hover { background: var(--superficie-2); }
+.escolher__lista .mono { margin-left: auto; font-size: 10px; }
+
+.duelo { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); border-radius: var(--r-4); overflow: hidden; border: 1px solid var(--linha-forte); min-height: 400px; }
+.duelo__lado { position: relative; isolation: isolate; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; padding: 32px; }
+.duelo__lado--a { background: radial-gradient(90% 90% at 30% 20%, color-mix(in srgb, var(--cor-agente) 55%, transparent), transparent 70%), linear-gradient(120deg, rgba(255,70,85,.22), var(--superficie) 70%); }
+.duelo__lado--b { align-items: flex-end; text-align: right; background: radial-gradient(90% 90% at 70% 20%, color-mix(in srgb, var(--cor-agente) 55%, transparent), transparent 70%), linear-gradient(240deg, rgba(63,169,245,.24), var(--superficie) 70%); }
+.duelo__corpo { position: absolute; z-index: -1; top: -10%; width: 92%; height: auto; animation: entra-corpo .8s var(--suave) both;
+  -webkit-mask: linear-gradient(#000 55%, transparent 88%); mask: linear-gradient(#000 55%, transparent 88%); }
+.duelo__lado--a .duelo__corpo { left: -6%; }
+.duelo__lado--b .duelo__corpo { right: -6%; transform: scaleX(-1); }
+.duelo__time { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.duelo__lado--b .duelo__time { flex-direction: row-reverse; }
+.duelo__nome { font: 900 clamp(48px, 6vw, 88px)/.85 var(--f-display); text-transform: uppercase; overflow-wrap: anywhere; }
+.duelo__nome:hover { color: var(--giz); text-decoration: underline; text-decoration-thickness: 3px; }
+.duelo__sub { font-size: 11px; letter-spacing: .14em; color: color-mix(in srgb, var(--cor-agente) 45%, var(--giz)); }
+.duelo__vazio { display: flex; flex-direction: column; gap: 6px; margin: auto; text-align: center; align-items: center; }
+.duelo__vs { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 0 22px; background: var(--fundo); text-align: center; }
+.duelo__vs .num { font-size: 56px; }
+.duelo__vs .mono { font-size: 10px; letter-spacing: .12em; color: var(--apagado); }
+.duelo__vs .mono b { font-size: 20px; }
+.comparar__metricas { gap: 4px; }
+.comparar__agentes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.comparar__coluna { display: flex; flex-direction: column; gap: 10px; }
+.comparar__agente { display: flex; flex-direction: column; gap: 2px; }
+.comparar__agente .mono { font-size: 10px; padding-left: 74px; margin-top: -18px; }
+.comparar__mapas { display: flex; flex-direction: column; }
+.comparar__mapa { display: grid; grid-template-columns: 70px minmax(0, 1fr) 70px; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--linha); text-align: center; font-weight: 600; }
+.comparar__mapa:first-child { border-top: 0; }
+.comparar__mapa .num { font-size: 26px; }
+.comparar__mapa .num:first-child { text-align: right; }
+.comparar__mapa .num:last-child { text-align: left; }
+.comparar__ia { text-align: center; align-items: center; color: var(--giz); align-self: center; max-width: 680px; }
+.comparar__sugestoes { align-items: center; text-align: center; }
+.comparar__chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+@media (max-width: 899px) {
+  .duelo { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto; }
+  .duelo__vs { grid-column: 1 / -1; grid-row: 2; flex-direction: row; padding: 12px; }
+  .duelo__vs .num { font-size: 36px; }
+  .duelo__lado { min-height: 320px; padding: 20px; }
+  .duelo__nome { overflow-wrap: normal; }
+}
+@media (max-width: 640px) {
+  .duelo__lado { min-height: 260px; padding: 16px; }
+  .duelo__sub { font-size: 9px; }
+  .comparar__agentes { grid-template-columns: 1fr; }
+}
+
+/* seleção para comparar na tabela de Estatísticas */
+.marcar { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.marcar input { width: 16px; height: 16px; accent-color: var(--vermelho); margin: 0; cursor: pointer; }
+.barra-comparar { position: sticky; bottom: 16px; z-index: 12; align-self: center; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px;
+  padding: 8px 8px 8px 18px; border-radius: var(--r-pill); background: rgba(22,33,44,.96); border: 1px solid var(--vermelho); box-shadow: var(--sombra);
+  animation: entra .35s var(--mola) both; font-size: 14px; }
+@media (max-width: 640px) { .barra-comparar { bottom: calc(96px + env(safe-area-inset-bottom)); border-radius: 22px; padding: 10px; } }
+
+/* ---------- página de mapa ---------- */
+.link-mapa { text-decoration: none; }
+.link-mapa:hover { color: var(--menta); }
+.mapa-heroi { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; gap: 14px; min-height: 380px; padding: 40px;
+  border-radius: var(--r-4); border: 1px solid var(--linha-forte);
+  background-color: var(--superficie); background-size: cover; background-position: center; background-repeat: no-repeat; }
+.mapa-heroi--sem-arte { background: radial-gradient(80% 120% at 85% 20%, rgba(50,224,196,.18), transparent 70%), var(--superficie); }
+.mapa-heroi::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(0deg, rgba(15,25,35,.75), transparent 45%); }
+.mapa-heroi > * { position: relative; z-index: 1; }
+.mapa-heroi__nome { font: 900 clamp(72px, 12vw, 160px)/.8 var(--f-display); text-transform: uppercase; margin: 0; text-shadow: 0 6px 30px rgba(0,0,0,.5); }
+.mapa-heroi__kpis { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.mapa-heroi__kpis > span { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px; min-width: 116px; border-radius: 18px; background: rgba(15,25,35,.72); border: 1px solid var(--linha); backdrop-filter: blur(6px); }
+.mapa-heroi__kpis .num { font-size: 34px; }
+.mapa-heroi__kpis .botao-prancheta { margin-left: auto; min-height: 48px; padding: 0 20px; background: rgba(15,25,35,.72); }
+.mapa-agentes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.mapa-agente { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 10px; border-radius: var(--r-2); text-align: center; color: var(--giz);
+  background: radial-gradient(90% 70% at 50% 0%, color-mix(in srgb, var(--cor-agente) 45%, transparent), transparent 72%), var(--superficie-2);
+  border: 1px solid transparent; transition: transform .35s var(--mola), border-color .25s; }
+.mapa-agente:hover { color: var(--giz); transform: translateY(-3px); border-color: color-mix(in srgb, var(--cor-agente) 60%, transparent); }
+.mapa-agente .agente--busto { width: 76px; height: 76px; }
+.mapa-agente__nome { font: 900 22px/1 var(--f-display); text-transform: uppercase; }
+.mapa-agente__nums { display: flex; gap: 10px; font: 500 11px var(--f-mono); }
+.mapa-comp { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: var(--r-2); background: var(--superficie-2); flex-wrap: wrap; }
+.mapa-comp--top { padding: 18px; background: linear-gradient(110deg, rgba(50,224,196,.12), var(--superficie-2) 60%); }
+.mapa-comp__agentes { display: flex; gap: 6px; flex-wrap: wrap; }
+.mapa-comp__v { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; }
+.mapa-comp__v .num { font-size: 32px; }
+.mapa-comp__v .mono { font-size: 10px; }
+@media (max-width: 899px) {
+  .mapa-heroi { min-height: 320px; padding: 28px 22px; align-items: center; text-align: center; }
+  .mapa-heroi__kpis { justify-content: center; }
+  .mapa-heroi__kpis .botao-prancheta { margin-left: 0; }
+}
+@media (max-width: 640px) {
+  .mapa-agentes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mapa-heroi__kpis > span { min-width: 0; flex: 1 1 40%; }
+}
+
+/* ---------- confronto dentro da partida ---------- */
+.confronto-h2h { display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: var(--r-4); border: 1px solid var(--linha-forte);
+  background: linear-gradient(110deg, color-mix(in srgb, var(--c-a) 16%, var(--superficie)), var(--superficie) 40%, var(--superficie) 60%, color-mix(in srgb, var(--c-b) 14%, var(--superficie))); }
+.confronto-h2h__topo { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; }
+.confronto-h2h__placar { font-size: 72px; }
+.confronto-h2h__series { display: flex; flex-direction: column; gap: 10px; }
+.lado-forte { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(0, 1fr)); gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid var(--linha); }
+.lado-forte:first-of-type { border-top: 0; }
+.lado-forte__time { display: inline-flex; align-items: center; gap: 8px; min-width: 0; }
+.lado-forte__time b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lado-forte__caixa { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-radius: 16px; background: var(--superficie-2); }
+.lado-forte__caixa .num { font-size: 28px; }
+.lado-forte__caixa--atk .rotulo { color: #FF8A94; }
+.lado-forte__caixa--def .rotulo { color: #8FCBF7; }
+.lado-forte__selo { grid-column: 1 / -1; font-size: 10px; letter-spacing: .12em; }
+@media (max-width: 640px) {
+  .confronto-h2h { padding: 16px; }
+  .confronto-h2h__topo .selo-time { --t: 56px; }
+  .confronto-h2h__placar { font-size: 54px; }
+  .lado-forte { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lado-forte__time { grid-column: 1 / -1; justify-content: center; }
+  .lado-forte__selo { text-align: center; }
+}
+
+/* ---------- perfil do jogador: ações ---------- */
+.perfil__acoes { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+@media (max-width: 899px) { .perfil__acoes { justify-content: center; } }
+
+/* ---------- story ---------- */
+.story-veu { position: fixed; inset: 0; z-index: 70; background: rgba(15,25,35,.8); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px;
+  overscroll-behavior: contain; animation: entra .25s ease both; }
+.story { display: flex; flex-direction: column; gap: 14px; align-items: center; max-height: 100%; padding: 18px; border-radius: var(--r-3); background: var(--superficie); border: 1px solid var(--linha-forte); box-shadow: 0 40px 100px rgba(0,0,0,.6); }
+.story__topo { align-self: stretch; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.story__tela { height: min(64vh, 620px); aspect-ratio: 9 / 16; border-radius: 22px; overflow: hidden; background: var(--fundo); box-shadow: 0 20px 50px rgba(0,0,0,.5);
+  opacity: .4; transition: opacity .4s; }
+.story__tela--pronta { opacity: 1; animation: entra .5s var(--mola) both; }
+.story__tela canvas { width: 100%; height: 100%; display: block; }
+.story__acoes { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.story__aviso { font-size: 12px; min-height: 16px; }
+@media (max-width: 640px) { .story__tela { height: min(58vh, 560px); } .story { padding: 14px; } }
+@media (max-width: 640px) { .mapa-comp--top .agente--busto { width: 48px; height: 48px; } .duelo__nome { white-space: nowrap; } }

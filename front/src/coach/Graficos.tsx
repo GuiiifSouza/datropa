@@ -37,8 +37,8 @@ function economia(t: ToolChamada, cena?: Panorama | null): ReactNode {
   const mapa = s((r.filtros as Obj | undefined)?.mapa);
   return (
     <Figura key={t.nome} titulo={`Vitória por tipo de compra${mapa ? ` · ${mapa}` : ''}`}
-      legenda={[{ cor: 'var(--ambar)', rotulo: 'Time' }, ...(cena ? [{ cor: 'var(--giz)', rotulo: 'média da cena', forma: 'traco' as const }] : [])]}
-      tabela={{ colunas: ['Compra', 'Vitória', 'Média da cena', 'Rounds'], linhas: linhas.map((l) => [l.rotulo, pct(l.valor), pct(l.media), l.detalhe]) }}
+      legenda={[{ cor: 'var(--time-a)', rotulo: 'Time' }, ...(cena ? [{ cor: 'var(--giz)', rotulo: 'média geral', forma: 'traco' as const }] : [])]}
+      tabela={{ colunas: ['Compra', 'Vitória', 'Média geral', 'Rounds'], linhas: linhas.map((l) => [l.rotulo, pct(l.valor), pct(l.media), l.detalhe]) }}
       fonte={`${n(r.rounds) ?? ''} ROUNDS · ${fonte(t)}`}>
       <BarrasMedia linhas={linhas} />
     </Figura>
@@ -57,7 +57,7 @@ function posPlant(t: ToolChamada): ReactNode {
         ...mapas.map((m) => [s(m.mapa), pct(n((m.pos_plant as Obj).taxa_sucesso_pct)), pct(n((m.retake as Obj | undefined)?.taxa_sucesso_pct))])] }}>
       <div className="aneis">
         <Anel valor={n(pp?.taxa_sucesso_pct)} rotulo={`Pós-plant · ${n(pp?.vitorias) ?? 0} de ${n(pp?.oportunidades) ?? 0}`} />
-        <Anel valor={n(rt?.taxa_sucesso_pct)} rotulo={`Defesa após plant · ${n(rt?.vitorias) ?? 0} de ${n(rt?.oportunidades) ?? 0}`} cor="var(--menta)" />
+        <Anel valor={n(rt?.taxa_sucesso_pct)} rotulo={`Defesa após plant · ${n(rt?.vitorias) ?? 0} de ${n(rt?.oportunidades) ?? 0}`} cor="var(--time-b)" />
       </div>
       {mapas.length > 1 && <BarrasMedia linhas={mapas.map((m) => ({ rotulo: s(m.mapa), valor: n((m.pos_plant as Obj).taxa_sucesso_pct) }))} />}
     </Figura>
@@ -86,7 +86,7 @@ function comparar(t: ToolChamada): ReactNode {
   if (!linhas.length) return null;
   const diretos = r.confrontos_diretos as Obj | undefined;
   return (
-    <Figura key={t.nome} titulo={`${nomeA} × ${nomeB}`} legenda={[{ cor: 'var(--ambar)', rotulo: nomeA }, { cor: 'var(--menta)', rotulo: nomeB }]}
+    <Figura key={t.nome} titulo={`${nomeA} × ${nomeB}`} legenda={[{ cor: 'var(--time-a)', rotulo: nomeA }, { cor: 'var(--time-b)', rotulo: nomeB }]}
       tabela={{ colunas: ['Métrica', nomeA, nomeB], linhas: linhas.map((l) => [l.rotulo, (l.formato ?? pct)(l.a), (l.formato ?? pct)(l.b)]) }}
       fonte={`${diretos ? `${n(diretos.partidas) ?? 0} CONFRONTOS DIRETOS · ` : ''}${fonte(t)}`}>
       <BarrasEspelhadas linhas={linhas} nomeA={nomeA} nomeB={nomeB} />
@@ -113,7 +113,7 @@ function resumoPartida(t: ToolChamada): ReactNode {
   const pid = s(r.partida_id);
   return (
     <Figura key={t.nome} titulo={`${nomeTime(nomeA)} ${n(placar[nomeA])}–${n(placar[nomeB])} ${nomeTime(nomeB)}${r.mapa ? ` · ${s(r.mapa)}` : ''}`}
-      legenda={[{ cor: 'var(--ambar)', rotulo: `${nomeTime(nomeA)} à frente` }, { cor: 'var(--menta)', rotulo: `${nomeTime(nomeB)} à frente` }]}
+      legenda={[{ cor: 'var(--time-a)', rotulo: `${nomeTime(nomeA)} à frente` }, { cor: 'var(--time-b)', rotulo: `${nomeTime(nomeB)} à frente` }]}
       fonte={`${rounds.length} ROUNDS · ${fonte(t)}`} acao={pid ? <BotaoPrancheta partidaId={pid} texto="Abrir na prancheta" /> : undefined}>
       <Momentum pontos={pontos} nomeA={nomeTime(nomeA)} nomeB={nomeTime(nomeB)} altura={180} />
       <LivroRounds rounds={celulas} nomeA={nomeTime(nomeA)} nomeB={nomeTime(nomeB)} linkRound={pid ? (k) => linkPrancheta(pid, k) : undefined}

@@ -21,6 +21,10 @@
   --menta: #32E0C4;      /* time B / defesa / prancheta */
   --alerta: #F5E36B;     /* prorrogação, aviso */
 
+  /* lados do jogo, como no VALORANT: vermelho = time A / ataque, azul = time B / defesa */
+  --time-a: #FF4655;
+  --time-b: #3FA9F5;
+
   /* tipos */
   --f-display: 'Big Shoulders Display', 'Arial Narrow', sans-serif;
   --f-texto: 'Inter Tight', system-ui, sans-serif;

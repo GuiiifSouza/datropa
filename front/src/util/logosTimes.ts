@@ -1,3 +1,5 @@
+import { CORES_LOGO } from './coresTimes';
+
 /** Logos fornecidas e autorizadas pela equipe. Aliases explícitos evitam confundir organizações. */
 const LOGOS: Record<string, string> = {
   "a2e_uff": "a2e_uff",
@@ -68,8 +70,30 @@ const LOGOS: Record<string, string> = {
   "usp_stars_gc": "usp_stars"
 };
 
+const chave = (nome: string | null | undefined) =>
+  (nome ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+
 export function logoTime(nome: string | null | undefined): string | null {
-  const chave = (nome ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
-  const logo = LOGOS[chave];
+  const logo = LOGOS[chave(nome)];
   return logo ? `/logos-times/${logo}.png` : null;
+}
+
+/** Tom estável derivado do nome, para times sem logo (sempre a mesma cor para o mesmo time). */
+function corDoNome(nome: string): string {
+  let h = 0;
+  for (const c of nome) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return `hsl(${h % 360} 62% 64%)`;
+}
+
+/**
+ * Cores do time: as da logo (scripts/cores_logos.py) ou, sem logo, um tom derivado do nome.
+ * [principal, secundária]; a secundária repete a principal quando a logo só tem uma cor.
+ */
+export function coresTime(nome: string | null | undefined): [string, string] {
+  const logo = LOGOS[chave(nome)];
+  const cs = logo ? CORES_LOGO[logo] : undefined;
+  if (cs?.length) return [cs[0], cs[1] ?? cs[0]];
+  if (logo) return ['#C5CBD3', '#9AA6B2']; // logo monocromática
+  const c = corDoNome(chave(nome) || 'time');
+  return [c, c];
 }
