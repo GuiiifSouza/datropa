@@ -18,7 +18,9 @@ type Partida = { id: string; ta: string; tb: string; a: string; b: string; pa: n
 export type DadosMapa = { mapa: string; partidas: Partida[] };
 
 // chave da prancheta -> id do mapa na base (codinome interno)
-export const MAPA_ID: Record<string, string> = { lotus: 'jam', haven: 'triad', ascent: 'ascent', breeze: 'foxtrot', fracture: 'canyon' };
+export const MAPA_ID: Record<string, string> = {
+  lotus: 'jam', haven: 'triad', ascent: 'ascent', breeze: 'foxtrot', fracture: 'canyon', abyss: 'infinity', pearl: 'pitt', sunset: 'juliett',
+};
 export const CHAVE_DO_MAPA: Record<string, string> = Object.fromEntries(Object.entries(MAPA_ID).map(([k, v]) => [v, k]));
 
 // coef = [multiplicador de u, de v, deslocamento de u, de v] (transformação do minimapa)
@@ -29,6 +31,11 @@ const CALIBRACAO: Record<string, { coef: number[]; mat: number[] }> = {
   ascent: { coef: [7e-05, -7e-05, 0.813895, 0.573242], mat: [0.0, -1014.1818, 1018.1706, 1014.1818, 0.0, 4.8999] },
   breeze: { coef: [7e-05, -7e-05, 0.465123, 0.833078], mat: [1019.4485, 0.0, -33.2472, 0.0, 1019.4485, -28.1038] },
   fracture: { coef: [7.8e-05, -7.8e-05, 0.556952, 1.155886], mat: [1027.4275, 0.0, -2.7208, 0.0, 1027.4275, -4.495] },
+  // desenhados depois: mat ajustada com as posições reais da base (abates e mortes dentro do piso, plants dentro
+  // dos sites): Pearl 100% / 100%, Sunset 100% / 100%, Abyss 99,5% / 94% (o resto são quedas do mapa e bordas)
+  abyss: { coef: [8.1e-05, -8.1e-05, 0.5, 0.5], mat: [0.0, -1012.0, 1003.389, 1012.0, 0.0, -27.311] },
+  pearl: { coef: [7.8e-05, -7.8e-05, 0.480469, 0.916016], mat: [1020.0, 0.0, -2.7779, 0.0, 1020.0, -38.0321] },
+  sunset: { coef: [7.8e-05, -7.8e-05, 0.5, 0.515625], mat: [1016.0, 0.0, -42.173, 0.0, 1016.0, -8.087] },
 };
 
 export function paraMapa(chave: string, x: number, y: number): [number, number] | null {

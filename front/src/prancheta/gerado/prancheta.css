@@ -482,3 +482,9 @@
 .prancheta-dc .et-passo:hover{border-color:#FF4655;background:#2A1520}
 .prancheta-dc .et-passo:active{transform:scale(.96)}
 .prancheta-dc .et-passo:focus-visible{outline:none;border-color:#FF4655;box-shadow:0 0 0 3px rgba(255,70,85,.3)}
+.prancheta-dc .mascara-abyss-ataque{-webkit-mask-image:url(/arte/prancheta/mapas/abyss-ataque.svg);mask-image:url(/arte/prancheta/mapas/abyss-ataque.svg)}
+.prancheta-dc .mascara-abyss-defesa{-webkit-mask-image:url(/arte/prancheta/mapas/abyss-defesa.svg);mask-image:url(/arte/prancheta/mapas/abyss-defesa.svg)}
+.prancheta-dc .mascara-pearl-ataque{-webkit-mask-image:url(/arte/prancheta/mapas/pearl-ataque.svg);mask-image:url(/arte/prancheta/mapas/pearl-ataque.svg)}
+.prancheta-dc .mascara-pearl-defesa{-webkit-mask-image:url(/arte/prancheta/mapas/pearl-defesa.svg);mask-image:url(/arte/prancheta/mapas/pearl-defesa.svg)}
+.prancheta-dc .mascara-sunset-ataque{-webkit-mask-image:url(/arte/prancheta/mapas/sunset-ataque.svg);mask-image:url(/arte/prancheta/mapas/sunset-ataque.svg)}
+.prancheta-dc .mascara-sunset-defesa{-webkit-mask-image:url(/arte/prancheta/mapas/sunset-defesa.svg);mask-image:url(/arte/prancheta/mapas/sunset-defesa.svg)}

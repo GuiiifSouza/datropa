@@ -388,6 +388,24 @@ js = trocar(js, '(AMB.calorVazio ? [] : partidasR).forEach((p, pi) =>', """if (A
 js = trocar(js, "pontosNota: AMB.calorVazio ?", "pontosNota: AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor) ? AMB.calor.nota(s.mapa, s.tipoCalor) : AMB.calorVazio ?")
 js = trocar(js, "      pontosNota: AMB.calor &&", "      calorAvisoTxt: AMB.calor ? AMB.calor.nota(s.mapa, s.tipoCalor) : '', calorAviso: !!(AMB.calor && AMB.calor.nota(s.mapa, s.tipoCalor)),\n      pontosNota: AMB.calor &&")
 js = trocar(js, "    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(", "    if (AMB.calor && this.state.modo === 'calor') AMB.calor.garantir(this.state.mapa, this.state.tipoCalor, () => this.forceUpdate());\n    if (AMB.reais && this.state.modo === 'round') AMB.reais.detalhar(")
+# mapas desenhados depois do protótipo (Abyss, Pearl e Sunset, no estilo dos outros): a defesa é o ataque girado
+# 180°; as letras dos sites estão onde o desenho original as colocou. coef é o multiplicador do minimapa da Riot
+# (catálogo da API); a calibração para o Round real e o calor fica em src/prancheta/reais.ts.
+def _mapa_novo(k, nome, cor, w, h, coef, sitios):
+    lados = (f"ataque: {{ img: '/arte/prancheta/mapas/{k}-ataque.svg', T: [1, 0, 0, 1, 0, 0], w: {w}, h: {h} }}, "
+             f"defesa: {{ img: '/arte/prancheta/mapas/{k}-defesa.svg', T: [-1, 0, 0, -1, {w}, {h}], w: {w}, h: {h} }}")
+    sit = ', '.join(f"{{ t: '{t}', x: {x}, y: {y} }}" for t, x, y in sitios)
+    return f",\n  {k}: {{ nome: '{nome}', cor: '{cor}', w: {w}, h: {h}, coef: {coef}, lados: {{ {lados} }},\n    sitios: [{sit}] }}"
+MAPAS_NOVOS = (_mapa_novo('abyss', 'Abyss', '#252A3D', 996.18, 961.88, 0.000081, [('A', 962.4, 387.5), ('B', 93.4, 353.4)])
+               + _mapa_novo('pearl', 'Pearl', '#2E5A78', 1015.72, 948.9, 0.000078, [('A', 919.8, 328.7), ('B', 201.5, 324.2)])
+               + _mapa_novo('sunset', 'Sunset', '#9A5A28', 948.49, 1002.26, 0.000078, [('A', 787.5, 368.5), ('B', 36.4, 405.9)]))
+js = trocar(js, '\n};\nvar W = MAPA_INFO.lotus.w', MAPAS_NOVOS + '\n};\nvar W = MAPA_INFO.lotus.w')
+# o mapa de calor só aparece no piso: a máscara é o próprio SVG do mapa (os vãos entre corredores ficam de fora),
+# como as .mascara-<mapa>-<lado> que o protótipo já tem para os outros mapas
+for _k in ('abyss', 'pearl', 'sunset'):
+    for _lado in ('ataque', 'defesa'):
+        _u = f'/arte/prancheta/mapas/{_k}-{_lado}.svg'
+        css += f'{ESCOPO} .mascara-{_k}-{_lado}{{-webkit-mask-image:url({_u});mask-image:url({_u})}}\n'
 # round real: abate sem posição válida (fora do minimapa ou sem posicao na API) fica na timeline,
 # mas sem a linha do tiro, que iria até NaN. A vítima no ponto da morte vem do src/prancheta/reais.ts.
 js = trocar(js, '        if (k) { tracer = ', '        if (k && isFinite(ev.raw[4]) && isFinite(ev.raw[5])) { tracer = ')
