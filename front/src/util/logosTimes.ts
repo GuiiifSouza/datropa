@@ -60,14 +60,36 @@ const LOGOS: Record<string, string> = {
   "inatel_gray": "inatel",
   "octacore_javascript": "octacore",
   "octacore_python": "octacore",
-  "pucgo_sistematica_academy": "pucgo_sistematica",
+  "pucgo_sistematica_academy": "sistematica_academy",
   "ufg_eagles_blue": "ufg_eagles",
   "ufg_gc_eagles": "ufg_eagles",
   "ufu_saints_auryn": "ufu_saints",
   "ufu_saints_trigons": "ufu_saints",
   "unicamp_tritons_black": "unicamp_tritons",
   "unicamp_tritons_red": "unicamp_tritons",
-  "usp_stars_gc": "usp_stars"
+  "usp_stars_gc": "usp_stars",
+  // mesma organização, outro time: usa a logo da organização
+  "axis_aura": "axis_anteaters",
+  "caap_auroras": "caap_hellhounds",
+  "caap_momentum": "caap_hellhounds",
+  "minerva_thunders": "ufrj_minerva",
+  "pucc_canaries": "pucc_cardinals",
+  // logos recebidas depois (Logos Restantes)
+  "brutal_esports": "brutal_esports",
+  "fatec_pg": "fatec_pg",
+  "gambiarra_ufg": "gambiarra_ufg",
+  "gdu_ufpb": "gdu_ufpb",
+  "homem_passaro": "homem_passaro",
+  "ibmec_sharks": "ibmec_sharks",
+  "ime_wolves_red": "ime_wolves_red",
+  "liga_vulkanica": "liga_vulkanica",
+  "nox_unievangelica": "nox_unievangelica",
+  "panterao_gaming": "panterao_gaming",
+  "sheriff_iff": "sheriff_iff",
+  "sistematica_unievangelica": "sistematica_unievangelica",
+  "tigre_branco": "tigre_branco",
+  "ufmg_fenix_b": "ufmg_fenix_b",
+  "unifesp_erex": "unifesp_erex"
 };
 
 const chave = (nome: string | null | undefined) =>
