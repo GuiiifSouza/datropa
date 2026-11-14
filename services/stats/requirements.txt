@@ -27,7 +27,7 @@ httpx==0.28.1
 hyperframe==6.1.0
 idna==3.20
 msgpack==1.2.3
-opentelemetry-api==1.45.1
+opentelemetry-api==1.45.2
 packaging==26.3
 proto-plus==1.29.0
 protobuf==7.36.2
